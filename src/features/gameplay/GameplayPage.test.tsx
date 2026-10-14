@@ -15,7 +15,11 @@ vi.mock('@/blocks/editor/BlocklyEditor', async () => {
         const mission = getMission('m1-first-harvest')
         if (mission) onChange(programToWorkspaceJson(mission.referenceSolution))
       }, [onChange])
-      return <div data-testid="editor" />
+      return (
+        <button type="button" onClick={() => onChange(programToWorkspaceJson({ main: [], procedures: {} }))}>
+          Trocar programa
+        </button>
+      )
     },
   }
 })
@@ -62,6 +66,32 @@ describe('GameplayPage', () => {
       vi.advanceTimersByTime(3000)
     })
     expect(screen.getByText('Tela de resultado')).toBeInTheDocument()
+  })
+
+  it('records the program that actually ran even if the workspace changes during the run', () => {
+    renderAt('/jogar/m1-first-harvest')
+    fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Trocar programa' }))
+    act(() => {
+      vi.advanceTimersByTime(10000)
+    })
+    const attempt = useProgressStore.getState().save.attempts[0]
+    expect(attempt.outcome).toBe('success')
+    expect(attempt.blocks).toBe(8)
+    expect(attempt.pseudocode).toContain('virar à direita')
+  })
+
+  it('starts the student program instead of resuming a paused demonstration', () => {
+    renderAt('/jogar/m1-first-harvest')
+    fireEvent.click(screen.getByRole('button', { name: /Ver demonstração/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
+    act(() => {
+      vi.advanceTimersByTime(10000)
+    })
+    expect(screen.getByRole('log')).toHaveTextContent('Missão cumprida!')
+    expect(useProgressStore.getState().save.attempts).toHaveLength(1)
   })
 
   it('pauses and continues', () => {

@@ -38,6 +38,7 @@ export function useGameplaySession(mission: MissionDefinition) {
   const repetitionTipShown = useRef(false)
   const recordedRunId = useRef<number | null>(null)
   const demoRunId = useRef<number | null>(null)
+  const runMeta = useRef<{ runId: number; blockCount: number; pseudocode: string } | null>(null)
 
   const onWorkspaceChange = useCallback(
     (json: WorkspaceJson) => {
@@ -81,17 +82,34 @@ export function useGameplaySession(mission: MissionDefinition) {
     for (const warning of serialized.warnings) controller.addLog('warning', warning.message)
   }, [serialized, controller])
 
+  const leaveDemo = useCallback(() => {
+    const current = controller.getSnapshot()
+    const demoActive = demoRunId.current === current.runId && (current.status === 'running' || current.status === 'paused')
+    if (demoActive) controller.reset()
+  }, [controller])
+
+  const rememberRun = useCallback(() => {
+    const runId = controller.getSnapshot().runId
+    if (runMeta.current?.runId === runId) return
+    runMeta.current = { runId, blockCount: serialized?.ok ? serialized.blockCount : 0, pseudocode }
+  }, [controller, serialized, pseudocode])
+
   const run = useCallback(() => {
     const ready = readyProgram()
     if (!ready) return
+    leaveDemo()
     controller.run(ready)
+    rememberRun()
     logWarnings()
-  }, [readyProgram, controller, logWarnings])
+  }, [readyProgram, controller, logWarnings, leaveDemo, rememberRun])
 
   const step = useCallback(() => {
     const ready = readyProgram()
-    if (ready) controller.step(ready)
-  }, [readyProgram, controller])
+    if (!ready) return
+    leaveDemo()
+    controller.step(ready)
+    rememberRun()
+  }, [readyProgram, controller, leaveDemo, rememberRun])
 
   const runDemo = useCallback(() => {
     const demo = mission.briefing.demo
@@ -106,8 +124,10 @@ export function useGameplaySession(mission: MissionDefinition) {
     const ended = snapshot.status === 'finished' || snapshot.status === 'failed'
     if (!ended || recordedRunId.current === snapshot.runId || demoRunId.current === snapshot.runId) return
     recordedRunId.current = snapshot.runId
-    const blockCount = serialized?.ok ? serialized.blockCount : 0
-    const input = buildAttemptInput(snapshot, mission, blockCount, pseudocode, new Date().toISOString())
+    const meta = runMeta.current?.runId === snapshot.runId ? runMeta.current : null
+    const blockCount = meta ? meta.blockCount : serialized?.ok ? serialized.blockCount : 0
+    const ranPseudocode = meta ? meta.pseudocode : pseudocode
+    const input = buildAttemptInput(snapshot, mission, blockCount, ranPseudocode, new Date().toISOString())
     setLastAttempt(recordAttempt(input))
   }, [snapshot, mission, serialized, pseudocode, recordAttempt])
 

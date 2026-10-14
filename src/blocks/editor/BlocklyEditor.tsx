@@ -82,6 +82,13 @@ export function BlocklyEditor({
   }, [toolbox, initialJson])
 
   useEffect(() => {
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    workspace.setIsReadOnly(readOnly)
+    if (readOnly) Blockly.hideChaff()
+  }, [readOnly, toolbox, initialJson])
+
+  useEffect(() => {
     workspaceRef.current?.highlightBlock(highlightBlockId)
   }, [highlightBlockId])
 
