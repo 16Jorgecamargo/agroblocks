@@ -114,7 +114,7 @@ class Reader {
 
   private input(owner: BlockJson, inputName: string, label: string): Expr {
     const found = child(owner, inputName)
-    if (!found) {
+    if (!found || isDisabled(found.block)) {
       this.errors.push({ blockId: owner.id, message: `O bloco "${labelOf(owner)}" está sem ${label}.` })
       return { kind: 'boolean', value: false }
     }
@@ -209,6 +209,12 @@ export function serializeWorkspace(json: WorkspaceJson): SerializeResult {
 
   if (hats.length === 0) reader.errors.push({ blockId: null, message: 'Coloque o bloco "quando executar" no programa.' })
   if (hats.length > 1) reader.errors.push({ blockId: hats[1].id, message: 'Use apenas um bloco "quando executar".' })
+  if (hats[0] && isDisabled(hats[0])) {
+    reader.errors.push({
+      blockId: hats[0].id,
+      message: 'O bloco "quando executar" está desativado. Ative-o para executar o programa.',
+    })
+  }
 
   const procedures: Record<string, Stmt[]> = {}
   for (const definition of definitions) {

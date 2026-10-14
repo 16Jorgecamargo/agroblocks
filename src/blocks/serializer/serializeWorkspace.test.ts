@@ -222,6 +222,27 @@ describe('serializeWorkspace', () => {
     expect(result.blockCount).toBe(1)
   })
 
+  it('does not run a program whose hat block was disabled', () => {
+    const result = serializeWorkspace(workspace([{ ...hat(move('a')), disabledReasons: ['MANUALLY_DISABLED'] }]))
+    expect(result).toEqual({
+      ok: false,
+      errors: [{ blockId: 'hat', message: 'O bloco "quando executar" está desativado. Ative-o para executar o programa.' }],
+      looseBlockIds: [],
+    })
+  })
+
+  it('treats a disabled condition block as a missing condition', () => {
+    const ifBlock: BlockJson = {
+      type: 'controls_if',
+      id: 'if',
+      inputs: { IF0: { block: { type: 'sensor_soil_dry', id: 's', enabled: false } }, DO0: { block: move('m') } },
+    }
+    const result = serializeWorkspace(workspace([hat(ifBlock)]))
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.errors).toEqual([{ blockId: 'if', message: 'O bloco "se" está sem condição.' }])
+  })
+
   it('rejects a duplicated hat block pasted by the student', () => {
     const result = serializeWorkspace(workspace([hat(move('a')), { type: 'when_run', id: 'hat-2' }]))
     expect(result.ok).toBe(false)
