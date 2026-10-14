@@ -138,8 +138,17 @@
 
 .execution-panel__row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-2);
+}
+
+.execution-panel__row .button {
+  min-width: 0;
+  padding: 0 var(--space-2);
+}
+
+.execution-panel {
+  min-width: 0;
 }
 
 .execution-panel__status {

@@ -1,0 +1,156 @@
+.gameplay {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 640px;
+  background: var(--chrome-bg);
+}
+
+.gameplay__small-screen,
+.gameplay__pane-tabs {
+  display: none;
+}
+
+.gameplay__body {
+  display: grid;
+  grid-template-columns: minmax(420px, 1.15fr) minmax(360px, 1.25fr) 320px;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  flex: 1;
+  min-height: 0;
+}
+
+.gameplay__editor,
+.gameplay__farm {
+  position: relative;
+  min-height: 0;
+}
+
+.gameplay__side {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.gameplay__side-tabs {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  min-height: 0;
+}
+
+.gameplay__side-panel {
+  min-height: 0;
+  overflow: auto;
+}
+
+.gameplay__celebration {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-md);
+  font-size: var(--text-lg);
+  animation: celebrate var(--duration-base) ease;
+}
+
+@keyframes celebrate {
+  from {
+    transform: translateX(-50%) scale(0.7);
+    opacity: 0;
+  }
+}
+
+.briefing__concept {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: #fdf3d8;
+  color: #3a2e0c;
+}
+
+.briefing__heading {
+  margin-top: var(--space-4);
+  font-size: var(--text-md);
+}
+
+.briefing__list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.briefing__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.briefing__resources,
+.briefing__reminder {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.briefing__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+  .gameplay {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .gameplay__pane-tabs {
+    display: block;
+    padding: var(--space-2);
+    color: var(--chrome-text);
+  }
+
+  .gameplay__body {
+    grid-template-columns: 1fr;
+  }
+
+  .gameplay__editor,
+  .gameplay__farm,
+  .gameplay__side {
+    display: none;
+    min-height: 70vh;
+  }
+
+  .gameplay[data-pane='program'] .gameplay__editor,
+  .gameplay[data-pane='farm'] .gameplay__farm,
+  .gameplay[data-pane='run'] .gameplay__side {
+    display: grid;
+  }
+}
+
+@media (max-width: 767px) {
+  .gameplay__small-screen {
+    display: block;
+    margin: 0;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-accent);
+    color: #1d1a0e;
+    font-size: var(--text-sm);
+  }
+}
