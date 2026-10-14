@@ -1,0 +1,259 @@
+.mission-select__body {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  grid-template-rows: 1fr auto;
+  gap: var(--space-3);
+  padding: 0 var(--space-5) var(--space-5);
+  min-height: calc(100vh - 96px);
+}
+
+.mission-select__map {
+  grid-row: 1;
+  grid-column: 1;
+  min-height: 460px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.mission-select__loading {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  background: #a8d8ea;
+  color: var(--green-900);
+}
+
+.mission-list {
+  grid-row: 2;
+  grid-column: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mission-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-size);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--chrome-border);
+  background: var(--chrome-surface);
+  color: var(--chrome-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mission-list__item[aria-pressed='true'] {
+  border-color: var(--water-500);
+  box-shadow: 0 0 0 3px rgb(65 133 214 / 0.35);
+}
+
+.mission-list__badge {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--water-500);
+  color: #fff;
+  font-weight: 800;
+}
+
+.mission-list__item--completed .mission-list__badge {
+  background: var(--green-600);
+}
+
+.mission-list__item--locked {
+  color: var(--chrome-text-muted);
+}
+
+.mission-list__item--locked .mission-list__badge {
+  background: #6b7177;
+}
+
+.mission-detail {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+}
+
+.mission-detail__preview {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  max-height: 170px;
+}
+
+.mission-detail__preview .grid2d {
+  padding: var(--space-2);
+  gap: 2px;
+}
+
+.mission-detail__preview .grid2d__cell {
+  font-size: 12px;
+}
+
+.mission-detail__number {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.mission-detail__title {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.mission-detail__concept {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.mission-detail__concept strong {
+  display: block;
+}
+
+.mission-detail__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+}
+
+.stars__on {
+  color: var(--sun-400);
+}
+
+.stars__off {
+  color: #c9d0cc;
+}
+
+.mission-detail__status,
+.mission-detail__best,
+.mission-detail__lock {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.mission-detail__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 700;
+}
+
+.mission-detail__status--completed {
+  color: var(--color-success);
+}
+
+.mission-detail__lock {
+  color: var(--color-danger);
+}
+
+.mission-detail__start {
+  min-height: 52px;
+  font-size: var(--text-md);
+}
+
+.map-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 132px;
+  padding: 6px 8px;
+  text-align: left;
+  border-radius: 10px;
+  border: 2px solid rgb(255 255 255 / 0.6);
+  background: rgb(21 34 28 / 0.88);
+  color: #fff;
+  font: 600 13px/1.1 var(--font-sans);
+  cursor: pointer;
+}
+
+.map-label__number {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.18);
+  font-weight: 800;
+}
+
+.map-label--completed .map-label__mark {
+  color: #7ccf6a;
+}
+
+.map-label--available {
+  background: rgb(65 133 214 / 0.95);
+}
+
+.map-label--locked {
+  opacity: 0.8;
+}
+
+.map-label.is-selected {
+  outline: 3px solid var(--sun-400);
+}
+
+.mission-select__body--flat {
+  grid-template-columns: 1fr 340px;
+  grid-template-rows: auto;
+}
+
+.mission-select__body--flat .mission-list {
+  grid-row: 1;
+  flex-direction: column;
+  align-content: start;
+}
+
+@media (max-width: 900px) {
+  .mission-select__body,
+  .mission-select__body--flat {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .mission-select__map {
+    display: none;
+  }
+
+  .mission-list {
+    grid-row: auto;
+    flex-direction: column;
+  }
+
+  .mission-detail {
+    grid-row: auto;
+    grid-column: auto;
+  }
+}
+
+.map-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map-scene .map-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
