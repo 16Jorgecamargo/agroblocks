@@ -1,0 +1,68 @@
+.tutorial-bubble {
+  position: absolute;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: var(--space-4);
+  max-width: 420px;
+  z-index: 3;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-md);
+}
+
+.tutorial-bubble::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 40px;
+  border: 10px solid transparent;
+  border-top: 0;
+  border-bottom-color: var(--color-surface);
+}
+
+.tutorial-bubble__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+.tutorial-bubble__dots {
+  display: flex;
+  gap: 6px;
+}
+
+.tutorial-bubble__dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border);
+}
+
+.tutorial-bubble__dots span.is-done {
+  background: var(--color-primary);
+}
+
+.tutorial-bubble__text {
+  margin: 0;
+}
+
+.tutorial-bubble__waiting {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.tutorial-bubble__actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tutorial-bubble--done {
+  text-align: center;
+  justify-items: center;
+}
