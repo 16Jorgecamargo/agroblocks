@@ -19,6 +19,7 @@ import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { FarmView } from '@/render/FarmView'
 import { useProgressStore } from '@/stores/progressStore'
+import { useGameAudio } from '@/services/audio/useGameAudio'
 import './GameplayPage.css'
 
 const SIDE_TABS: TabItem[] = [
@@ -38,6 +39,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
   const reducedMotion = useReducedMotion()
   const session = useGameplaySession(mission)
   const { snapshot, controller } = session
+  useGameAudio(snapshot)
   const [showBriefing, setShowBriefing] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [stepMode, setStepMode] = useState(false)
