@@ -164,6 +164,14 @@ describe('ExecutionController', () => {
     expect(controller.getSnapshot().state.robot.x).toBe(1)
   })
 
+  it('clears the console without touching the state', () => {
+    const { controller } = setup()
+    controller.step(solution)
+    controller.clearLog()
+    expect(controller.getSnapshot().log).toEqual([])
+    expect(controller.getSnapshot().state.robot.x).toBe(1)
+  })
+
   it('notifies subscribers on every change', () => {
     const { controller } = setup()
     const listener = vi.fn()

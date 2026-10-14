@@ -102,6 +102,10 @@ export class ExecutionController {
     this.patch({ log: this.appendLog([this.entry(kind, text)]) })
   }
 
+  clearLog(): void {
+    this.patch({ log: [] })
+  }
+
   dispose(): void {
     this.cancel()
     this.runId += 1
