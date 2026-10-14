@@ -1,0 +1,109 @@
+import { expect, test } from '@playwright/test'
+import { act, program } from '@/blocks/interpreter/programBuilder'
+import { getMission } from '@/data/missions'
+import { openMission, saveWithProgram, seedStorage } from './helpers'
+
+const firstHarvest = getMission('m1-first-harvest')
+if (!firstHarvest) throw new Error('mission missing')
+
+test('starts a new farm from the home screen at the guided training', async ({ page }) => {
+  await seedStorage(page, {})
+  await page.goto('/')
+  await expect(page.getByRole('heading', { level: 1, name: 'AgroBlocks' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Continuar missão/ })).toBeDisabled()
+  await page.getByRole('button', { name: 'Iniciar nova fazenda' }).click()
+  await expect(page).toHaveURL(/#\/jogar\/m0-training$/)
+  await page.getByRole('button', { name: 'Começar' }).click()
+  await expect(page.getByText('1/6')).toBeVisible()
+})
+
+test('builds a program by dragging a real block into the editor', async ({ page }) => {
+  await seedStorage(page, {})
+  await openMission(page, 'm0-training')
+  await page.getByRole('button', { name: 'Próximo' }).click()
+  await expect(page.getByText('2/6')).toBeVisible()
+
+  await page.getByRole('treeitem', { name: /Movimento/ }).click()
+  const source = page.locator('.blocklyFlyout .blocklyDraggable').filter({ hasText: 'mover para frente' }).first()
+  const hat = page.locator('.blocklyBlockCanvas .blocklyDraggable').filter({ hasText: 'quando executar' }).first()
+  const from = await source.boundingBox()
+  const to = await hat.boundingBox()
+  if (!from || !to) throw new Error('blocks not visible')
+  await page.mouse.move(from.x + 12, from.y + from.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(to.x + 36, to.y + 62, { steps: 20 })
+  await page.mouse.up()
+
+  await expect(page.getByText('3/6')).toBeVisible()
+  await page.getByRole('tab', { name: 'Pseudocódigo' }).click()
+  await expect(page.locator('.pseudocode-panel__code')).toContainText('quando executar:\n    mover para frente')
+})
+
+test('explains an error and highlights the failing state', async ({ page }) => {
+  const wrong = program([act('moveForward'), act('moveForward'), act('moveForward'), act('harvest')])
+  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', wrong) })
+  await openMission(page, 'm1-first-harvest')
+  await page.getByRole('button', { name: 'Executar' }).click()
+  await expect(page.getByRole('log')).toContainText('Não há planta para colher neste canteiro.')
+  await expect(page.getByRole('log')).toContainText('O robô colheu no lugar errado')
+  await expect(page.getByText('Execução interrompida por erro')).toBeVisible()
+})
+
+test('step mode executes one instruction per click', async ({ page }) => {
+  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
+  await openMission(page, 'm1-first-harvest')
+  await page.getByRole('switch', { name: 'Passo a passo' }).click()
+  await page.getByRole('button', { name: 'Próximo passo' }).click()
+  await page.getByRole('button', { name: 'Próximo passo' }).click()
+  await expect(page.locator('.execution-panel__status dd').nth(1)).toHaveText('2')
+  await expect(page.getByRole('gridcell', { name: /coluna 1, linha 3: .*robô/ })).toBeVisible()
+})
+
+test('completes a phase, shows the result and advances to the next phase', async ({ page }) => {
+  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
+  await openMission(page, 'm1-first-harvest')
+  await page.getByRole('button', { name: 'Executar' }).click()
+  await expect(page.getByRole('log')).toContainText('Missão cumprida!')
+  await expect(page).toHaveURL(/#\/resultado\/m1-first-harvest$/)
+  await expect(page.getByRole('heading', { name: 'Missão concluída!' })).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Comandos executados' })).toContainText('8')
+  await page.getByRole('link', { name: 'Próxima fase' }).click()
+  await expect(page).toHaveURL(/#\/jogar\/m2-row-planting$/)
+})
+
+test('reloading the page keeps progress and the saved program', async ({ page }) => {
+  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution, ['m0-training']) })
+  await openMission(page, 'm1-first-harvest')
+  await page.getByRole('button', { name: 'Executar' }).click()
+  await expect(page).toHaveURL(/#\/resultado\/m1-first-harvest$/)
+  await page.goto('/')
+  await page.reload()
+  const continueButton = page.getByRole('button', { name: /Continuar missão/ })
+  await expect(continueButton).toBeEnabled()
+  await expect(continueButton).toContainText('Fase 2 - Plantação em série')
+  await page.goto('/#/jogar/m1-first-harvest')
+  await page.getByRole('button', { name: 'Começar' }).click()
+  await page.getByRole('tab', { name: 'Pseudocódigo' }).click()
+  await expect(page.locator('.pseudocode-panel__code')).toContainText('virar à direita')
+})
+
+test('the dashboard shows real recorded data and the empty state before it', async ({ page }) => {
+  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
+  await page.goto('/#/painel')
+  await expect(page.getByText('Ainda não existem registros neste navegador.')).toBeVisible()
+  await openMission(page, 'm1-first-harvest')
+  await page.getByRole('button', { name: 'Executar' }).click()
+  await expect(page).toHaveURL(/#\/resultado\/m1-first-harvest$/)
+  await page.goto('/#/painel')
+  await expect(page.getByRole('group', { name: 'Fases concluídas' })).toContainText('1 de 6')
+})
+
+test('renders the 3D farm without runtime errors', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await openMission(page, 'm1-first-harvest')
+  await expect(page.locator('.farm-view canvas')).toBeVisible()
+  await page.waitForTimeout(1500)
+  expect(errors).toEqual([])
+})
