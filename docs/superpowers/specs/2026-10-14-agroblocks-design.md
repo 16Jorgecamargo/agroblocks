@@ -253,38 +253,52 @@ quando executar:
 
 ## 6. UI, renderização e telas
 
+### Referência visual obrigatória
+Arquivo: `reference/AgroBlocks_ Fazenda Inteligente em Ação.png`. O jogo deve assumir esta identidade: fazenda low-poly isométrica rica em detalhes, cromo de interface verde-escuro com cartões claros arredondados, blocos estilo Scratch com ícones.
+
 ### Cena 3D
 - Câmera ortográfica isométrica fixa; botões girar 90° e zoom.
-- Modelos procedurais low-poly por estado: canteiro (tom de marrom seco/molhado + brilho azul), sulcos em `tilled`, broto / planta média / planta madura com fruto, colhido (palha), robô com indicador de direção e seta no chão, obstáculo (rocha/cerca), reservatório, depósito de sementes, área bloqueada (hachura escura), marcadores de objetivo.
+- Grade da missão cercada por cenário decorativo procedural determinístico (semente = id da missão): árvores low-poly (copas facetadas em verdes variados), cercas de madeira, pedras cinza, gramado em blocos com variação de tom, galpão/celeiro, moinho/silo. Decoração fica fora da grade e não participa das regras.
+- Canteiros: blocos de terra elevados com bordas de madeira; tom marrom claro (seco) / escuro (molhado) + brilho azul; sulcos em `tilled`; broto / planta média / planta madura com frutos vermelhos/alaranjados; colhido (palha); obstáculo = rocha facetada; bloqueado = arbusto denso/cerca; reservatório = tanque azul com estrutura; depósito de sementes = caixa/silo com sacos; marcadores de objetivo.
+- Robô: corpo branco arredondado em caixa, visor escuro com dois olhos ciano, antena curta, duas rodas grandes escuras; seta azul no chão indica direção.
 - Estado não depende só de cor: forma, altura, ícones flutuantes (gota, check de maduro), legenda.
 - Animações disparadas por eventos do engine já aplicados: tween de posição/rotação, scale-in de planta, partículas de água, item voando para o HUD na colheita, shake + ícone de erro.
-- Configuração "gráficos leves": sem sombras, sem partículas, DPR 1.
-- Sem WebGL: mensagem + fallback `Grid2DFallback` em CSS Grid usando o mesmo estado.
+- Configuração "gráficos leves": sem sombras, sem partículas, sem decoração densa, DPR 1.
+- Sem WebGL ou modo 2D escolhido: mensagem + `Grid2DFallback` em CSS Grid usando o mesmo estado.
 - Painel textual acessível descrevendo robô e célula atual.
 
 ### Layout de gameplay (desktop)
 ```
-┌─ HUD: logo · fase · objetivo · sementes · água · energia · colheita · pausa · config ─┐
-│ Blockly (toolbox + workspace) │ Cena 3D                                               │
-│                               ├───────────────────────────────────────────────────────┤
-│                               │ Executar · Pausar · Continuar · Parar · Reiniciar ·    │
-│                               │ Passo · Velocidade · contador · bloco atual            │
-│                               │ Abas: Console · Dicas · Pseudocódigo                    │
-└───────────────────────────────┴───────────────────────────────────────────────────────┘
+┌ HUD escuro: logo │ Fase N - Título / objetivo │ Sementes │ Água │ Energia │ Colheita │ ? │ ⚙ │ Sair ┐
+│ Categorias │ Flyout + workspace Blockly │ Cena 3D                     │ Execução                │
+│ (quadrado  │                            │                             │ [▶ Executar]            │
+│  colorido  │                            │                             │ [⏸ Pausar/Continuar]    │
+│  + nome)   │                            │                             │ Passo a passo (toggle)  │
+│            │                            │                             │  + [Próximo passo]      │
+│            │                            │                             │ Velocidade (slider 4)   │
+│            │                            │                             │ [■ Parar] [↺ Reiniciar] │
+│            │                            │                             │ Abas: Console·Dicas·    │
+│            │                            │                             │       Pseudocódigo      │
+└────────────┴────────────────────────────┴─────────────────────────────┴─────────────────────────┘
 ```
-Tablet: abas Programa / Fazenda / Console. Celular (< 768 px): aviso de experiência ideal em telas maiores; visualização e execução permitidas.
+- HUD: chips de recurso com ícone + rótulo + valor; botão vermelho "Sair" volta ao mapa de missões.
+- Contador de comandos e bloco atual ficam no topo do console.
+- Tablet: abas Programa / Fazenda / Execução. Celular (< 768 px): aviso de experiência ideal em telas maiores; visualização e execução permitidas.
 
 ### Telas
-- **Início:** cena 3D animada, "AgroBlocks", "Automatize. Programe. Cultive.", texto de apresentação, Iniciar nova fazenda, Continuar missão (desabilitado sem progresso), Como jogar, Configurações, indicador de progresso.
-- **Missões:** cartões com número, nome, objetivo, conceito, dificuldade, estado (ícone + texto), melhor resultado, botão iniciar.
-- **Gameplay:** briefing com explicação do conceito e demonstração opcional antes de começar.
-- **Resultado:** ver seção 7.
-- **Tutorial (Fase 0):** sobreposição guiada; passos avançam por eventos reais (bloco arrastado, bloco removido, execução, pausa, continuar, erro proposital e correção).
-- **Painel educativo**, **Avaliação**, **Configurações** (som, música, reduzir animações, gráficos leves, velocidade padrão, código de participante, resetar progresso com confirmação), **Como jogar**.
+- **Início:** cena 3D de fazenda em tela cheia (celeiro vermelho, moinho, silo, árvores, robô em primeiro plano); logo "AgroBlocks" com folha, "Automatize. Programe. Cultive.", texto de apresentação; botões à esquerda: Iniciar nova fazenda (verde), Continuar missão (escuro, mostra "Fase N - título"; desabilitado sem progresso), Como jogar, Configurações.
+- **Missões ("Seus desafios"):** mapa 3D isométrico com trilha/rio ligando nós hexagonais numerados (concluída = check verde, disponível = destaque azul, bloqueada = cadeado cinza); cartão lateral com miniatura, número, título, objetivo, conceito, dificuldade em estrelas, melhor resultado e "Iniciar fase". Lista acessível equivalente por teclado/leitor de tela; em telas pequenas a lista substitui o mapa.
+- **Gameplay:** briefing em modal antes de começar (conceito + objetivo + demonstração opcional).
+- **Resultado:** modal sobre cena de celebração (robô com caixa de colheita, confetes) — ver seção 7; painel "Como funciona?" com os blocos da solução em miniatura, passos numerados "O que o robô fez?" e caixa "Dica".
+- **Tutorial (Fase 0):** balão de fala sobre a cena + indicador "n/6" com pontos + botões ← / Próximo / →. Passos que pedem ação real (arrastar, remover, executar, pausar, continuar, corrigir) desabilitam "Próximo" até o evento acontecer.
+- **Configurações:** modal com abas laterais Geral (idioma — apenas Português (Brasil), tema), Som (música, efeitos), Visual (reduzir animações, gráficos leves, modo 2D/3D), Controles (velocidade padrão, atalhos), Dados (código de participante, reiniciar progresso com confirmação).
+- **Painel educativo**, **Avaliação**, **Como jogar**: mesmo cromo (cartões claros sobre fundo verde-escuro).
 
 ### Design system
-- Tokens CSS: `#183D2D`, `#358653`, `#B9DCA8`, `#F5F7F0`, `#806044`, `#4185D6`, `#F2C14E`, `#15221C`; modo escuro.
-- Fonte Inter. Foco visível 3 px amarelo. Alvos ≥ 44 px. Contraste AA.
+- Tokens CSS: `#183D2D`, `#358653`, `#B9DCA8`, `#F5F7F0`, `#806044`, `#4185D6`, `#F2C14E`, `#15221C`; cromo de jogo escuro por padrão com cartões claros; modo escuro completo.
+- Cores das categorias de blocos (como na referência): Movimento azul `#4C8DF6`, Agricultura verde `#3FA34D`, Sensores amarelo `#E0A526`, Controle roxo `#8E5BE8`, Variáveis laranja `#F07C2A`, Procedimentos rosa `#E0508F`, Números teal `#3D9AA3`, chapéu "quando executar" amarelo com ícone ▶.
+- Blocos com ícones SVG próprios (seta para movimento, broto/gota/cesto para agricultura).
+- Fonte Inter. Foco visível 3 px amarelo. Alvos ≥ 44 px. Contraste AA nos textos de interface (blocos amarelos usam tom escurecido para legibilidade).
 - Atalhos: Ctrl+Enter executar, Espaço pausar/continuar, `.` passo, Esc parar.
 - `prefers-reduced-motion` respeitado + opção manual.
 
@@ -308,7 +322,7 @@ interface MissionDefinition {
   growTicks: number
   rules: { forbidWaterWet?: boolean; stepLimit?: number }
   allowedBlocks: BlockType[]
-  initialProgram?: string
+  initialProgram?: Program
   objectives: Objective[]
   constraints?: Constraint[]
   efficiency: { referenceActions: number; referenceBlocks: number }
