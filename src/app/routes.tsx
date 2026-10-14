@@ -3,10 +3,12 @@ import { Navigate } from 'react-router'
 import { HomePage } from '@/features/home/HomePage'
 import { GameplayPage } from '@/features/gameplay/GameplayPage'
 import { MissionSelectPage } from '@/features/mission-select/MissionSelectPage'
+import { ResultsPage } from '@/features/results/ResultsPage'
 
 export const appRoutes: RouteObject[] = [
   { path: '/', element: <HomePage /> },
   { path: '/missoes', element: <MissionSelectPage /> },
   { path: '/jogar/:missionId', element: <GameplayPage /> },
+  { path: '/resultado/:missionId', element: <ResultsPage /> },
   { path: '*', element: <Navigate to="/" replace /> },
 ]
