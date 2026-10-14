@@ -1,0 +1,55 @@
+.blockly-editor {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.blockly-editor__host {
+  position: absolute;
+  inset: 0;
+}
+
+.blockly-editor__lock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgb(21 34 28 / 0.08);
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: not-allowed;
+  z-index: 70;
+}
+
+.blockly-editor .agro-loose-block {
+  opacity: 0.45;
+}
+
+.blockly-editor .blocklyTreeLabel,
+.blockly-editor .blocklyToolboxCategoryLabel {
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+
+.blockly-editor .blocklyToolboxCategory,
+.blockly-editor .blocklyTreeRow {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  margin: 2px 6px;
+}
+
+.blockly-editor .blocklyToolboxCategory .blocklyTreeIcon,
+.blockly-editor .blocklyTreeRow .blocklyTreeIcon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: currentColor;
+}
