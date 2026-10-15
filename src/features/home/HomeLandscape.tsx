@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { animate } from 'motion'
-import type { Group, PerspectiveCamera } from 'three'
+import type { PerspectiveCamera } from 'three'
 import { EASINGS } from '@/motion/easings'
 import { Flat } from '@/render/farm3d/materials'
 import { PlotTile } from '@/render/farm3d/PlotTile'
@@ -44,19 +44,8 @@ function CameraDrift({ ambient }: { ambient: boolean }) {
 }
 
 function IdleRobot({ ambient }: { ambient: boolean }) {
-  const ref = useRef<Group>(null)
-  useEffect(() => {
-    const group = ref.current
-    if (!group || !ambient) return
-    const bob = animate(group.position, { y: [0.2, 0.32, 0.2] }, { duration: DURATIONS.robotBob, repeat: Infinity, ease: EASINGS.easeInOutSine })
-    const look = animate(group.rotation, { y: [-0.55, -0.25, -0.55] }, { duration: DURATIONS.robotLook, repeat: Infinity, ease: EASINGS.easeInOutSine })
-    return () => {
-      bob.stop()
-      look.stop()
-    }
-  }, [ambient])
   return (
-    <group ref={ref} position={[3.1, 0.2, 4.4]} rotation={[0, -0.55, 0]} scale={1.05}>
+    <group position={[2.9, 0, 4.3]} rotation={[0, -0.45, 0]} scale={1.3}>
       <RobotShowcase clip="idle" reducedMotion={!ambient} />
     </group>
   )
