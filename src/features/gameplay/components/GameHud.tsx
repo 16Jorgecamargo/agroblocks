@@ -62,7 +62,7 @@ function ResourceChip({ icon, label, value, max, tone, flightTarget = false, pop
           ? { boxShadow: ['0 0 0 0 rgba(242,193,78,0.7)', '0 0 0 6px rgba(242,193,78,0)'] }
           : { boxShadow: '0 0 0 0 rgba(242,193,78,0)' }
       }
-      transition={level === 'low' && ambient ? { duration: 1.2, repeat: Infinity, ease: EASINGS.easeInOutSine } : { duration: 0.2 }}
+      transition={level === 'low' && ambient ? { duration: DURATIONS.lowResourcePulse, repeat: Infinity, ease: EASINGS.easeInOutSine } : { duration: DURATIONS.quickExit }}
     >
       <Icon name={icon} size={22} />
       <span className="resource-chip__text" aria-hidden="true">

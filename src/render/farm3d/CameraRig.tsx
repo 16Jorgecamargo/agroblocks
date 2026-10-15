@@ -5,6 +5,7 @@ import { useMotionValue } from 'motion/react'
 import type { OrthographicCamera } from 'three'
 import { EASINGS } from '@/motion/easings'
 import { SPRINGS } from '@/motion/springs'
+import { DURATIONS } from '@/motion/presets'
 
 interface CameraRigProps {
   gridWidth: number
@@ -31,12 +32,12 @@ export function CameraRig({ gridWidth, gridHeight, quarterTurns, zoomLevel, show
   const kick = useMotionValue(0)
 
   useEffect(() => {
-    const controls = animate(angle, baseAngle(quarterTurns), reducedMotion ? { duration: 0 } : SPRINGS.smooth)
+    const controls = animate(angle, baseAngle(quarterTurns), reducedMotion ? { duration: DURATIONS.instant } : SPRINGS.smooth)
     return () => controls.stop()
   }, [quarterTurns, reducedMotion, angle])
 
   useEffect(() => {
-    const controls = animate(zoom, zoomLevel, reducedMotion ? { duration: 0 } : SPRINGS.smooth)
+    const controls = animate(zoom, zoomLevel, reducedMotion ? { duration: DURATIONS.instant } : SPRINGS.smooth)
     return () => controls.stop()
   }, [zoomLevel, reducedMotion, zoom])
 
@@ -45,13 +46,13 @@ export function CameraRig({ gridWidth, gridHeight, quarterTurns, zoomLevel, show
       dolly.set(1)
       return
     }
-    const controls = animate(dolly, 1, { duration: 1.4, ease: EASINGS.easeOutCubic })
+    const controls = animate(dolly, 1, { duration: DURATIONS.dolly, ease: EASINGS.easeOutCubic })
     return () => controls.stop()
   }, [reducedMotion, dolly])
 
   useEffect(() => {
     if (!kickKey || reducedMotion) return
-    const controls = animate(kick, [0, 0.35, -0.25, 0.1, 0], { duration: 0.5, ease: EASINGS.easeOutExpo })
+    const controls = animate(kick, [0, 0.35, -0.25, 0.1, 0], { duration: DURATIONS.cameraKick, ease: EASINGS.easeOutExpo })
     return () => controls.stop()
   }, [kickKey, reducedMotion, kick])
 

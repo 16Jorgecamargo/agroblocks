@@ -8,7 +8,7 @@ import { newlyUnlocked } from '@/features/mission-select/unlocks'
 import { continueMissionId } from '@/game/progress/progression'
 import type { MissionStatus } from '@/game/progress/types'
 import { EASINGS } from '@/motion/easings'
-import { gridWaveItem, PRESSABLE } from '@/motion/presets'
+import { DURATIONS, gridWaveItem, PRESSABLE } from '@/motion/presets'
 import { SPRINGS } from '@/motion/springs'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { hasWebGL } from '@/render/hasWebGL'
@@ -37,7 +37,7 @@ function ListBadge({ status, order, celebrate }: { status: MissionStatus; order:
           key={content}
           initial={{ scale: 0, rotate: -90 }}
           animate={celebrate && content === 'lock' ? { scale: [1, 1.2, 1], rotate: [0, -15, 15, 0] } : { scale: 1, rotate: 0 }}
-          exit={{ scale: 0, rotate: 90, transition: { duration: 0.2 } }}
+          exit={{ scale: 0, rotate: 90, transition: { duration: DURATIONS.quickExit } }}
           transition={SPRINGS.jelly}
         >
           {content === 'lock' ? <Icon name="lock" size={16} /> : content === 'check' ? <Icon name="check" size={16} /> : order}
@@ -101,7 +101,7 @@ export function MissionSelectPage() {
                   onClick={() => setSelectedId(mission.id)}
                   {...PRESSABLE}
                   animate={available && ambient ? { boxShadow: ['0 0 0 0 rgba(65,133,214,0.6)', '0 0 0 8px rgba(65,133,214,0)'] } : undefined}
-                  transition={available && ambient ? { duration: 1.6, repeat: Infinity, ease: EASINGS.easeOutCubic } : PRESSABLE.transition}
+                  transition={available && ambient ? { duration: DURATIONS.glowPulse, repeat: Infinity, ease: EASINGS.easeOutCubic } : PRESSABLE.transition}
                 >
                   <ListBadge status={status} order={mission.order} celebrate={celebrateIds.includes(mission.id)} />
                   <span className="mission-list__name">{mission.tutorial ? 'Treinamento' : mission.title}</span>

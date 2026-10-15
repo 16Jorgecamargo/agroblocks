@@ -5,7 +5,7 @@ import { GameToggle } from '@/components/game/GameToggle'
 import { Icon, type IconName } from '@/components/icons/Icon'
 import { STATUS_LABELS } from '@/features/gameplay/gameplayLogic'
 import { SPEEDS, type ExecutionStatus, type Speed } from '@/game/execution/types'
-import { BADGE_POP, ERROR_SHAKE, snapIn } from '@/motion/presets'
+import { BADGE_POP, DURATIONS, ERROR_SHAKE, snapIn } from '@/motion/presets'
 import { SPRINGS } from '@/motion/springs'
 
 interface ExecutionPanelProps {
@@ -40,7 +40,7 @@ function SwapIcon({ name }: { name: IconName }) {
         className="icon-swap"
         initial={{ scale: 0, rotate: -90 }}
         animate={{ scale: 1, rotate: 0 }}
-        exit={{ scale: 0, rotate: 90, transition: { duration: 0.15 } }}
+        exit={{ scale: 0, rotate: 90, transition: { duration: DURATIONS.iconSwapExit } }}
         transition={SPRINGS.snap}
       >
         <Icon name={name} />

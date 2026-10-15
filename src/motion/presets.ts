@@ -23,12 +23,39 @@ export const DURATIONS = {
   rowExpand: 0.72,
   harvestFlight: 0.9,
   confetti: 2.8,
+  instant: 0,
+  iconSwapExit: 0.15,
+  quickExit: 0.2,
+  pageExit: 0.25,
+  fadeExit: 0.3,
+  tagExit: 0.35,
+  cardFlipIn: 0.45,
+  cameraKick: 0.5,
+  dotBounce: 0.6,
+  nudgeRepeatDelay: 0.6,
+  soilCrossfade: 0.7,
+  tutorialDot: 0.8,
+  heartbeatRepeatDelay: 0.8,
+  burst: 0.9,
+  heartbeat: 1.2,
+  lowResourcePulse: 1.2,
+  damagePulse: 1.2,
+  dolly: 1.4,
+  shimmer: 1.4,
+  glowPulse: 1.6,
+  robotBob: 2.4,
+  logoSway: 3.2,
+  sway: 4,
+  swayVariance: 0.6,
+  robotLook: 6,
+  windmill: 8,
+  skySway: 14,
 } as const
 
 export const fadeSlide: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: DURATIONS.fadeSlide, ease: EASINGS.easeOutCubic } },
-  exit: { opacity: 0, y: -12, transition: { duration: 0.3, ease: EASINGS.easeInCubic } },
+  exit: { opacity: 0, y: -12, transition: { duration: DURATIONS.fadeExit, ease: EASINGS.easeInCubic } },
 }
 
 export const softRise: Variants = {
@@ -39,7 +66,7 @@ export const softRise: Variants = {
 export const snapIn: Variants = {
   hidden: { opacity: 0, scale: 0.85 },
   visible: { opacity: 1, scale: 1, transition: { duration: DURATIONS.snapIn, ease: EASINGS.easeOutExpo } },
-  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2, ease: EASINGS.easeInCubic } },
+  exit: { opacity: 0, scale: 0.9, transition: { duration: DURATIONS.quickExit, ease: EASINGS.easeInCubic } },
 }
 
 export const overshoot: Variants = {
@@ -87,8 +114,8 @@ export const toastItem: Variants = {
 
 export const dialogBackdrop: Variants = {
   hidden: { opacity: 0, backdropFilter: 'blur(0px)' },
-  visible: { opacity: 1, backdropFilter: 'blur(4px)', transition: { duration: 0.3, ease: EASINGS.easeOutCubic } },
-  exit: { opacity: 0, backdropFilter: 'blur(0px)', pointerEvents: 'none', transition: { duration: 0.3, ease: EASINGS.easeInCubic } },
+  visible: { opacity: 1, backdropFilter: 'blur(4px)', pointerEvents: 'auto', transition: { duration: DURATIONS.fadeExit, ease: EASINGS.easeOutCubic } },
+  exit: { opacity: 0, backdropFilter: 'blur(0px)', pointerEvents: 'none', transition: { duration: DURATIONS.fadeExit, ease: EASINGS.easeInCubic } },
 }
 
 export const dialogSheet: Variants = {
@@ -102,18 +129,23 @@ export type PageTransitionKind = 'blurCrossfade' | 'iris' | 'push'
 export const pageVariants: Record<PageTransitionKind, Variants> = {
   blurCrossfade: {
     initial: { opacity: 0, filter: 'blur(10px)' },
-    animate: { opacity: 1, filter: 'blur(0px)', transition: { duration: DURATIONS.blurCrossfade, ease: EASINGS.easeInOutSine } },
-    exit: { opacity: 0, filter: 'blur(10px)', transition: { duration: 0.3, ease: EASINGS.easeInOutSine } },
+    animate: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      transitionEnd: { filter: 'none' },
+      transition: { duration: DURATIONS.blurCrossfade, ease: EASINGS.easeInOutSine },
+    },
+    exit: { opacity: 0, filter: 'blur(10px)', transition: { duration: DURATIONS.fadeExit, ease: EASINGS.easeInOutSine } },
   },
   iris: {
     initial: { clipPath: 'circle(0% at 50% 50%)' },
     animate: { clipPath: 'circle(150% at 50% 50%)', transition: { duration: DURATIONS.iris, ease: EASINGS.easeInCubic } },
-    exit: { opacity: 0, transition: { duration: 0.25 } },
+    exit: { opacity: 0, transition: { duration: DURATIONS.pageExit } },
   },
   push: {
     initial: { opacity: 0, x: -60 },
     animate: { opacity: 1, x: 0, transition: { duration: DURATIONS.push, ease: EASINGS.easeInOutCubic } },
-    exit: { opacity: 0, x: 60, transition: { duration: 0.25, ease: EASINGS.easeInOutCubic } },
+    exit: { opacity: 0, x: 60, transition: { duration: DURATIONS.pageExit, ease: EASINGS.easeInOutCubic } },
   },
 }
 
@@ -145,7 +177,7 @@ export const FOCUS_HALO = {
 
 export const HEARTBEAT = {
   keyframes: { scale: [1, 1.06, 1, 1.04, 1] },
-  options: { duration: 1.2, ease: EASINGS.easeInOutSine, repeat: Infinity, repeatDelay: 0.8 },
+  options: { duration: DURATIONS.heartbeat, ease: EASINGS.easeInOutSine, repeat: Infinity, repeatDelay: DURATIONS.heartbeatRepeatDelay },
 }
 
 export const PRESSABLE = {
@@ -156,6 +188,6 @@ export const PRESSABLE = {
 
 export const cardFlip: Variants = {
   hidden: { opacity: 0, rotateY: -80 },
-  visible: { opacity: 1, rotateY: 0, transition: { duration: 0.45, ease: EASINGS.easeOutCubic } },
-  exit: { opacity: 0, rotateY: 80, transition: { duration: 0.25, ease: EASINGS.easeInCubic } },
+  visible: { opacity: 1, rotateY: 0, transition: { duration: DURATIONS.cardFlipIn, ease: EASINGS.easeOutCubic } },
+  exit: { opacity: 0, rotateY: 80, transition: { duration: DURATIONS.pageExit, ease: EASINGS.easeInCubic } },
 }

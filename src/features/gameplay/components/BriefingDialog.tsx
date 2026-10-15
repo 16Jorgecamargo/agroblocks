@@ -5,7 +5,7 @@ import { Icon } from '@/components/icons/Icon'
 import { describeConstraint, describeObjective } from '@/game/missions/goals'
 import { CONCEPT_LABELS, type MissionDefinition } from '@/game/missions/missionTypes'
 import { formatResource } from '@/features/gameplay/gameplayLogic'
-import { questBanner, staggerContainer, staggerItem } from '@/motion/presets'
+import { DURATIONS, questBanner, staggerContainer, staggerItem } from '@/motion/presets'
 import { EASINGS } from '@/motion/easings'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 
@@ -61,7 +61,7 @@ export function BriefingDialog({ open, mission, onStart, onDemo }: BriefingDialo
         <motion.span
           className="briefing__start"
           animate={ambient ? { boxShadow: ['0 0 0 0 rgba(63,163,77,0.55)', '0 0 0 12px rgba(63,163,77,0)'] } : undefined}
-          transition={ambient ? { duration: 1.6, repeat: Infinity, ease: EASINGS.easeOutCubic } : undefined}
+          transition={ambient ? { duration: DURATIONS.glowPulse, repeat: Infinity, ease: EASINGS.easeOutCubic } : undefined}
         >
           <GameButton tone="primary" size="lg" icon="play" onClick={onStart}>
             Começar

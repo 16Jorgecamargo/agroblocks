@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { GameButton } from '@/components/game/GameButton'
 import { Icon } from '@/components/icons/Icon'
 import { HINT_LEVEL_LABELS } from '@/features/gameplay/gameplayLogic'
-import { HEARTBEAT, rowExpand } from '@/motion/presets'
+import { DURATIONS, HEARTBEAT, rowExpand } from '@/motion/presets'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 
 interface HintsPanelProps {
@@ -34,7 +34,7 @@ export function HintsPanel({ hints, revealed, canReveal, failedAttempts, onRevea
           </motion.li>
         ))}
       </ol>
-      <motion.div animate={attention ? HEARTBEAT.keyframes : { scale: 1 }} transition={attention ? HEARTBEAT.options : { duration: 0.2 }}>
+      <motion.div animate={attention ? HEARTBEAT.keyframes : { scale: 1 }} transition={attention ? HEARTBEAT.options : { duration: DURATIONS.quickExit }}>
         <GameButton tone="accent" icon="bulb" onClick={onReveal} disabled={!canReveal}>
           Pedir dica ({revealed}/4)
         </GameButton>
@@ -45,7 +45,7 @@ export function HintsPanel({ hints, revealed, canReveal, failedAttempts, onRevea
             className="hints-panel__lock"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 1.2, rotate: -8, transition: { duration: 0.35 } }}
+            exit={{ opacity: 0, scale: 1.2, rotate: -8, transition: { duration: DURATIONS.tagExit } }}
           >
             <Icon name="lock" size={16} /> O exemplo parcial libera depois de 2 tentativas sem sucesso.
           </motion.p>

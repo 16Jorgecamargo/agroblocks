@@ -3,6 +3,7 @@ import { animate } from 'motion'
 import type { Group } from 'three'
 import { EASINGS } from '@/motion/easings'
 import { SPRINGS } from '@/motion/springs'
+import { DURATIONS } from '@/motion/presets'
 
 export function SpringIn({ enabled, children }: { enabled: boolean; children: ReactNode }) {
   const ref = useRef<Group>(null)
@@ -29,7 +30,7 @@ export function Sway({ enabled, seed, children }: { enabled: boolean; seed: numb
     const controls = animate(
       group.rotation,
       { z: [0, amplitude, -amplitude, 0] },
-      { duration: 4 + (seed % 5) * 0.6, repeat: Infinity, ease: EASINGS.easeInOutSine, delay: (seed % 7) * 0.3 },
+      { duration: DURATIONS.sway + (seed % 5) * DURATIONS.swayVariance, repeat: Infinity, ease: EASINGS.easeInOutSine, delay: (seed % 7) * 0.3 },
     )
     return () => controls.stop()
   }, [enabled, seed])

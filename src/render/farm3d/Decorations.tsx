@@ -7,6 +7,7 @@ import { decorationModelId } from '@/render/models/modelChoice'
 import { PALETTE } from '@/render/palette'
 import { Flat } from '@/render/farm3d/materials'
 import type { Decoration } from '@/render/sceneLayout'
+import { DURATIONS } from '@/motion/presets'
 
 const CANOPY = [PALETTE.leaf, PALETTE.grassDark, PALETTE.leafDark]
 
@@ -111,7 +112,7 @@ export function Windmill({ animate: spin }: { animate: boolean }) {
   useEffect(() => {
     const group = blades.current
     if (!group || !spin) return
-    const controls = animateValue(group.rotation, { z: [0, Math.PI * 2] }, { duration: 8, repeat: Infinity, ease: 'linear' })
+    const controls = animateValue(group.rotation, { z: [0, Math.PI * 2] }, { duration: DURATIONS.windmill, repeat: Infinity, ease: 'linear' })
     return () => controls.stop()
   }, [spin])
   return (

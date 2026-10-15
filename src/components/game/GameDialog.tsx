@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useIsPresent } from 'motion/react'
 import { Icon, type IconName } from '@/components/icons/Icon'
 import { dialogBackdrop, dialogSheet, overshoot, staggerContainer, staggerItem } from '@/motion/presets'
 import './GameDialog.css'
@@ -22,14 +22,26 @@ interface DialogFrameProps {
 function DialogFrame({ title, icon, tone, size, onClose, children }: DialogFrameProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const titleId = useId()
+  const isPresent = useIsPresent()
+  const previousRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    if (!isPresent) return
     const node = dialogRef.current
+    const active = document.activeElement
+    if (active instanceof HTMLElement && !node?.contains(active)) previousRef.current = active
     const first = node?.querySelector<HTMLElement>(FOCUSABLE)
     const target = first ?? node
     target?.focus()
-    return () => previous?.focus()
+  }, [isPresent])
+
+  useEffect(() => {
+    return () => {
+      const active = document.activeElement
+      const node = dialogRef.current
+      const focusLost = !active || active === document.body || (node?.contains(active) ?? false)
+      if (focusLost) previousRef.current?.focus()
+    }
   }, [])
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {

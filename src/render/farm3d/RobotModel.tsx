@@ -10,6 +10,7 @@ import { modelEntry, modelUrl, type ModelEntry } from '@/render/models/manifest'
 import { ModelBoundary, useClonedScene } from '@/render/models/Model'
 import { robotClipFor, type RobotClip } from '@/render/models/modelChoice'
 import { PALETTE } from '@/render/palette'
+import { shakeTrack } from '@/render/farm3d/robotMotion'
 import { cellToWorld, FACING_YAW } from '@/render/sceneLayout'
 import type { Robot } from '@/game/world/types'
 
@@ -129,6 +130,7 @@ export function RobotModel({ robot, gridWidth, gridHeight, durationMs, failed, c
     if (reducedMotion || durationMs <= 0) {
       group.position.set(target.x, 0.18, target.z)
       group.rotation.y = yaw
+      setMoving(false)
       return
     }
     setMoving(true)
@@ -138,20 +140,21 @@ export function RobotModel({ robot, gridWidth, gridHeight, durationMs, failed, c
     return () => {
       move.stop()
       turn.stop()
+      setMoving(false)
     }
   }, [target.x, target.z, robot.facing, reducedMotion, durationMs, speed])
 
   useEffect(() => {
     const group = ref.current
     if (!group || !failed || reducedMotion) return
-    const x = group.position.x
-    const shake = animate(group.position, { x: ERROR_SHAKE.keyframes.x.map((offset) => x + offset / 120) }, ERROR_SHAKE.options)
+    group.position.z = target.z
+    const shake = animate(group.position, { x: shakeTrack(target.x) }, ERROR_SHAKE.options)
     return () => shake.stop()
-  }, [failed, reducedMotion])
+  }, [failed, reducedMotion, target.x, target.z])
 
   return (
     <group ref={ref} position={[initial.x, 0.18, initial.z]} rotation={[0, initial.yaw, 0]}>
-      <RobotVisual clip={robotClipFor({ moving, failed, celebrating })} failed={failed} />
+      <RobotVisual clip={reducedMotion ? 'idle' : robotClipFor({ moving, failed, celebrating })} failed={failed} />
       <mesh position={[0, 0.03, 0.62]} rotation={[-Math.PI / 2, 0, Math.PI]}>
         <circleGeometry args={[0.16, 3]} />
         <meshBasicMaterial color={PALETTE.arrow} transparent opacity={0.85} />

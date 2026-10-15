@@ -12,6 +12,7 @@ import { PALETTE } from '@/render/palette'
 import { BARN_POSITION, mapScenery, NODE_POSITIONS, pathStones, RIVER_POINTS } from '@/features/mission-select/missionMapLayout'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import type { MissionStatus } from '@/game/progress/types'
+import { DURATIONS } from '@/motion/presets'
 
 interface MissionMapSceneProps {
   missions: MissionDefinition[]
@@ -133,7 +134,7 @@ export default function MissionMapScene({ missions, statuses, selectedId, onSele
               <motion.span
                 className="map-label__hex"
                 animate={pulse ? { boxShadow: ['0 0 0 0 rgba(76,141,246,0.9)', '0 0 0 10px rgba(76,141,246,0)'] } : undefined}
-                transition={pulse ? { duration: 1.6, repeat: Infinity, ease: EASINGS.easeOutCubic } : undefined}
+                transition={pulse ? { duration: DURATIONS.glowPulse, repeat: Infinity, ease: EASINGS.easeOutCubic } : undefined}
               >
                 <span className="map-label__number">{mission.tutorial ? 'T' : mission.order}</span>
                 <Icon name={status === 'completed' ? 'check' : status === 'locked' ? 'lock' : 'play'} size={14} />

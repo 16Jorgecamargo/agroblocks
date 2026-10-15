@@ -10,6 +10,7 @@ import { RobotShowcase } from '@/render/farm3d/RobotModel'
 import { PALETTE } from '@/render/palette'
 import { createRandom, hashString } from '@/render/seededRandom'
 import type { Cell } from '@/game/world/types'
+import { DURATIONS } from '@/motion/presets'
 
 const HILLS: [number, number, number, number, string][] = [
   [-14, -26, 16, 5, '#7fb35a'],
@@ -26,7 +27,7 @@ function CameraDrift({ ambient }: { ambient: boolean }) {
 
   useEffect(() => {
     if (!ambient) return
-    const controls = animate(sway.current, { value: [0, 1, 0] }, { duration: 14, repeat: Infinity, ease: EASINGS.easeInOutSine })
+    const controls = animate(sway.current, { value: [0, 1, 0] }, { duration: DURATIONS.skySway, repeat: Infinity, ease: EASINGS.easeInOutSine })
     return () => controls.stop()
   }, [ambient])
 
@@ -44,8 +45,8 @@ function IdleRobot({ ambient }: { ambient: boolean }) {
   useEffect(() => {
     const group = ref.current
     if (!group || !ambient) return
-    const bob = animate(group.position, { y: [0.2, 0.32, 0.2] }, { duration: 2.4, repeat: Infinity, ease: EASINGS.easeInOutSine })
-    const look = animate(group.rotation, { y: [-0.55, -0.25, -0.55] }, { duration: 6, repeat: Infinity, ease: EASINGS.easeInOutSine })
+    const bob = animate(group.position, { y: [0.2, 0.32, 0.2] }, { duration: DURATIONS.robotBob, repeat: Infinity, ease: EASINGS.easeInOutSine })
+    const look = animate(group.rotation, { y: [-0.55, -0.25, -0.55] }, { duration: DURATIONS.robotLook, repeat: Infinity, ease: EASINGS.easeInOutSine })
     return () => {
       bob.stop()
       look.stop()

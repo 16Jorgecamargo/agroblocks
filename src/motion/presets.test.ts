@@ -66,3 +66,10 @@ describe('motion presets', () => {
     expect(scaleSpring(SPRINGS.smooth, 1)).toEqual(SPRINGS.smooth)
   })
 })
+
+describe('page transitions', () => {
+  it('leave no filter behind so fixed children stay attached to the viewport', () => {
+    const animateTarget = pageVariants.blurCrossfade.animate as { transitionEnd?: { filter?: string } }
+    expect(animateTarget.transitionEnd?.filter).toBe('none')
+  })
+})

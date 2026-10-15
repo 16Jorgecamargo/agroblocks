@@ -9,6 +9,7 @@ import { Model } from "@/render/models/Model";
 import { cropModelId, cropStageFor } from "@/render/models/modelChoice";
 import type { Cell } from "@/game/world/types";
 import { EASINGS } from "@/motion/easings";
+import { DURATIONS } from '@/motion/presets'
 
 interface PlotTileProps {
   cell: Cell;
@@ -98,7 +99,7 @@ function SoilBed({ color }: { color: string }) {
     const controls = animate(
       current.color,
       { r: target.r, g: target.g, b: target.b },
-      { duration: 0.7, ease: EASINGS.easeInOutSine },
+      { duration: DURATIONS.soilCrossfade, ease: EASINGS.easeInOutSine },
     );
     return () => controls.stop();
   }, [color]);

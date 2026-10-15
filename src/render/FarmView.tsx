@@ -11,6 +11,7 @@ import { EASINGS } from '@/motion/easings'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './FarmView.css'
+import { DURATIONS } from '@/motion/presets'
 
 const FarmScene = lazy(() => import('@/render/farm3d/FarmScene'))
 
@@ -111,7 +112,7 @@ export function FarmView(props: FarmViewProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.9, 0.2, 0.7, 0] }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: EASINGS.easeOutExpo }}
+            transition={{ duration: DURATIONS.damagePulse, ease: EASINGS.easeOutExpo }}
           />
         )}
       </AnimatePresence>

@@ -5,7 +5,7 @@ import { GameButton } from '@/components/game/GameButton'
 import { advanceTutorial, statusSignal, TUTORIAL_STEPS, type TutorialSignal } from '@/features/tutorial/tutorialMachine'
 import type { ExecutionSnapshot } from '@/game/execution/types'
 import { EASINGS } from '@/motion/easings'
-import { NUDGE, overshoot, PRESSABLE } from '@/motion/presets'
+import { DURATIONS, NUDGE, overshoot, PRESSABLE } from '@/motion/presets'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import './TutorialOverlay.css'
 
@@ -67,7 +67,7 @@ export function TutorialOverlay({ snapshot, blockEvent }: TutorialOverlayProps) 
                 key={item.id}
                 className={position < index ? 'is-done' : position === index ? 'is-current' : ''}
                 animate={position === index && ambient ? { y: [0, -4, 0] } : { y: 0 }}
-                transition={position === index && ambient ? { duration: 0.8, repeat: Infinity, ease: EASINGS.easeOutCubic } : { duration: 0.2 }}
+                transition={position === index && ambient ? { duration: DURATIONS.tutorialDot, repeat: Infinity, ease: EASINGS.easeOutCubic } : { duration: DURATIONS.quickExit }}
               />
             ))}
           </span>
@@ -83,7 +83,7 @@ export function TutorialOverlay({ snapshot, blockEvent }: TutorialOverlayProps) 
             variants={overshoot}
             initial="hidden"
             animate="visible"
-            exit={{ opacity: 0, y: 12, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, y: 12, transition: { duration: DURATIONS.quickExit } }}
           >
             <p className="tutorial-bubble__text">
               {waiting && (
@@ -91,7 +91,7 @@ export function TutorialOverlay({ snapshot, blockEvent }: TutorialOverlayProps) 
                   className="tutorial-bubble__arrow"
                   aria-hidden="true"
                   animate={ambient ? NUDGE.keyframes : undefined}
-                  transition={ambient ? { ...NUDGE.options, repeat: Infinity, repeatDelay: 0.6 } : undefined}
+                  transition={ambient ? { ...NUDGE.options, repeat: Infinity, repeatDelay: DURATIONS.nudgeRepeatDelay } : undefined}
                 >
                   ➜
                 </motion.span>

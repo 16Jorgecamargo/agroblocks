@@ -21,7 +21,7 @@ import { stepDelayMs } from '@/game/execution/types'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { EASINGS } from '@/motion/easings'
-import { fadeSlide } from '@/motion/presets'
+import { DURATIONS, fadeSlide } from '@/motion/presets'
 import { SPRINGS } from '@/motion/springs'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { locateCell } from '@/render/cellLocator'
@@ -153,7 +153,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
                   aria-hidden="true"
                   initial={{ scale: 0.5, opacity: 0.9 }}
                   animate={{ scale: 2.6, opacity: 0 }}
-                  transition={{ duration: 0.9, ease: EASINGS.easeOutCubic }}
+                  transition={{ duration: DURATIONS.burst, ease: EASINGS.easeOutCubic }}
                 />
                 <strong>Missão concluída!</strong>
                 {mission.tutorial && <span> Você completou o treinamento.</span>}

@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { EASINGS } from '@/motion/easings'
 import './Logo.css'
+import { DURATIONS } from '@/motion/presets'
 
 interface LogoProps {
   size?: 'sm' | 'lg'
@@ -28,7 +29,7 @@ export function Logo({ size = 'sm', variant, animated = false }: LogoProps) {
             focusable="false"
             style={{ originX: 0.5, originY: 1 }}
             animate={animated ? { rotate: [-5, 5, -5] } : { rotate: 0 }}
-            transition={animated ? { duration: 3.2, ease: EASINGS.easeInOutSine, repeat: Infinity } : { duration: 0 }}
+            transition={animated ? { duration: DURATIONS.logoSway, ease: EASINGS.easeInOutSine, repeat: Infinity } : { duration: DURATIONS.instant }}
           >
             <path d="M24 40V22" stroke="#2f7a32" strokeWidth="3" strokeLinecap="round" />
             <path d="M24 24C22 12 12 6 2 8c2 10 10 16 22 16z" fill="#4caf43" />
