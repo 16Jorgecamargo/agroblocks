@@ -82,7 +82,7 @@ interface LegendDialogProps {
 
 export function LegendDialog({ open, onClose, use3d, reducedMotion }: LegendDialogProps) {
   return (
-    <GameDialog open={open} title="Legenda" icon="book" tone="info" size="lg" onClose={onClose}>
+    <GameDialog open={open} title="Legenda" icon="book" tone="info" size="fixed" onClose={onClose}>
       <LegendBody use3d={use3d} reducedMotion={reducedMotion} />
     </GameDialog>
   )

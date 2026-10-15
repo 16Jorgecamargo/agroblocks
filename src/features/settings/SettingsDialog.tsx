@@ -70,7 +70,7 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
   )
 
   return (
-    <GameDialog open={open} title="Configurações" icon="gear" tone="info" size="lg" onClose={onClose}>
+    <GameDialog open={open} title="Configurações" icon="gear" tone="info" size="fixed" onClose={onClose}>
       <DialogSection className="settings__layout">
         <PillTabs items={TABS} active={tab} onChange={setTab} label="Seções das configurações" idPrefix={PREFIX} orientation="vertical" />
         <AnimatePresence mode="wait" initial={false}>

@@ -24,7 +24,8 @@ function openLegend() {
 
 describe('LegendDialog', () => {
   it('opens on the empty soil page with one preview', () => {
-    openLegend()
+    const dialog = openLegend()
+    expect(dialog).toHaveClass('game-dialog--fixed')
     expect(screen.getByRole('heading', { name: 'Vazio' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Vazio' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('1/10')).toBeInTheDocument()

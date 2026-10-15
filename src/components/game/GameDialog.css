@@ -29,6 +29,17 @@
   width: min(760px, 100%);
 }
 
+.game-dialog--fixed {
+  width: min(780px, 100%);
+  height: min(640px, calc(100vh - 32px));
+}
+
+.game-dialog--fixed .game-dialog__body {
+  flex: 1;
+  min-height: 0;
+  align-content: start;
+}
+
 .game-dialog--info {
   --dialog-tone: #4c8df6;
 }

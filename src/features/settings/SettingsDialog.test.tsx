@@ -19,6 +19,11 @@ describe('SettingsDialog', () => {
     useProgressStore.getState().resetProgress()
   })
 
+  it('keeps the same fixed size on every tab', () => {
+    renderDialog()
+    expect(screen.getByRole('dialog', { name: 'Configurações' })).toHaveClass('game-dialog--fixed')
+  })
+
   it('toggles dark mode from the general tab', () => {
     renderDialog()
     fireEvent.click(screen.getByRole('switch', { name: 'Modo escuro' }))
