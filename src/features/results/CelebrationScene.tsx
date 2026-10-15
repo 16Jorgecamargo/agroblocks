@@ -3,6 +3,7 @@ import { CameraRig } from '@/render/farm3d/CameraRig'
 import { Flat } from '@/render/farm3d/materials'
 import { RobotShowcase } from '@/render/farm3d/RobotModel'
 import { Model } from '@/render/models/Model'
+import { SpinningProp } from '@/render/world/SpinningProp'
 import { PALETTE } from '@/render/palette'
 
 export default function CelebrationScene({ reducedMotion }: { reducedMotion: boolean }) {
@@ -34,9 +35,7 @@ export default function CelebrationScene({ reducedMotion }: { reducedMotion: boo
       <group position={[-3.5, 0, -3]} rotation={[0, 0.6, 0]} scale={0.55}>
         <Model id="barn" fallback={null} />
       </group>
-      <group position={[3.2, 0, -3.2]} scale={0.5}>
-        <Model id="tower-windmill" fallback={null} />
-      </group>
+      <SpinningProp prop={{ model: 'tower-windmill', x: 3.2, z: -3.2, rotation: 0, scale: 0.5 }} active={!reducedMotion} />
       <group position={[-3, 0, 2.5]}>
         <Model id="tree-a" fallback={null} />
       </group>

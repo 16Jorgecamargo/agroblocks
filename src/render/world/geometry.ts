@@ -59,6 +59,11 @@ export function segmentIntersection(a: Vec2, b: Vec2, c: Vec2, d: Vec2): Vec2 | 
   return { x: a.x + t * (b.x - a.x) + 0, z: a.z + t * (b.z - a.z) + 0 }
 }
 
+export function segmentDistance(a: Vec2, b: Vec2, c: Vec2, d: Vec2): number {
+  if (segmentIntersection(a, b, c, d)) return 0
+  return Math.min(distanceToSegment(a, c, d), distanceToSegment(b, c, d), distanceToSegment(c, a, b), distanceToSegment(d, a, b))
+}
+
 export function polylineLength(line: Vec2[]): number {
   let total = 0
   for (let index = 0; index < line.length - 1; index += 1) total += Math.hypot(line[index + 1].x - line[index].x, line[index + 1].z - line[index].z)

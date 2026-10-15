@@ -43,4 +43,16 @@ describe('SceneWithSplash', () => {
     act(() => screen.getByRole('button', { name: 'canvas' }).click())
     await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), { timeout: 3000 })
   })
+
+  it('gives up waiting after a ceiling even if a load stalls or the canvas never starts', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    loader.active = true
+    render(<SceneWithSplash>{() => <span>scene</span>}</SceneWithSplash>)
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    act(() => {
+      vi.advanceTimersByTime(9000)
+    })
+    vi.useRealTimers()
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), { timeout: 3000 })
+  })
 })

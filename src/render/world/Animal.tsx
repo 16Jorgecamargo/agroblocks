@@ -7,10 +7,10 @@ import { SPRINGS } from '@/motion/springs'
 import { modelEntry, modelUrl, type ModelEntry } from '@/render/models/manifest'
 import { ModelBoundary, useClonedScene } from '@/render/models/Model'
 import { createRandom, hashString } from '@/render/seededRandom'
-import { closestAngle, headingTo, idleSeconds, nextTarget, SPECIES_GAIT, SPECIES_SPEED, walkSeconds, type AnimalPhase } from '@/render/world/animalBrain'
-import type { AnimalSpawn, Vec2 } from '@/render/world/worldTypes'
+import { closestAngle, headingTo, idleSeconds, nextTarget, SPECIES_GAIT, SPECIES_SPEED, walkSeconds, type AnimalPhase, type Course } from '@/render/world/animalBrain'
+import type { AnimalSpawn } from '@/render/world/worldTypes'
 
-export type Occupancy = Map<string, Vec2>
+export type Occupancy = Map<string, Course>
 
 const FULL_TURN = Math.PI * 2
 const HEADING_STEPS = 628
@@ -60,25 +60,28 @@ function AnimalBody({ entry, spawn, active, occupancy }: { entry: ModelEntry; sp
         }
         const from = { x: body.position.x, z: body.position.z }
         const others = [...occupancy.entries()].filter(([id]) => id !== spawn.id).map(([, point]) => point)
-        const target = nextTarget(random, spawn.area, from, 1.2 * spawn.scale, others)
-        occupancy.set(spawn.id, target)
+        const target = nextTarget(random, spawn.area, from, 1.2 * spawn.scale, others, spawn.scale)
+        occupancy.set(spawn.id, { from, to: target })
         if (target === from) continue
         setPhase('walk')
         const turn = animate(body.rotation, { y: closestAngle(body.rotation.y, headingTo(from, target)) }, SPRINGS.snap)
         const walk = animate(body.position, { x: target.x, z: target.z }, { duration: walkSeconds(from, target, speed), ease: 'linear' })
         running = [turn, walk]
         await walk
+        occupancy.set(spawn.id, { from: target, to: target })
       }
     }
     void loop()
     return () => {
       cancelled = true
       running.forEach((controls) => controls.stop())
+      const body = group.current
+      if (body) occupancy.set(spawn.id, { from: { x: body.position.x, z: body.position.z }, to: { x: body.position.x, z: body.position.z } })
     }
   }, [active, spawn, occupancy])
 
   useEffect(() => {
-    occupancy.set(spawn.id, { x: spawn.x, z: spawn.z })
+    occupancy.set(spawn.id, { from: { x: spawn.x, z: spawn.z }, to: { x: spawn.x, z: spawn.z } })
     return () => {
       occupancy.delete(spawn.id)
     }

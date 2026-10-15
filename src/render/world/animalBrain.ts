@@ -1,10 +1,15 @@
 import { DURATIONS } from '@/motion/presets'
-import { distanceToSegment, pointInPolygon, polygonBounds } from '@/render/world/geometry'
+import { distanceToSegment, pointInPolygon, polygonBounds, segmentDistance } from '@/render/world/geometry'
 import type { AnimalSpecies, Vec2 } from '@/render/world/worldTypes'
 
 export type AnimalPhase = 'idle' | 'walk'
 
 export type AnimalGait = 'walk' | 'graze'
+
+export interface Course {
+  from: Vec2
+  to: Vec2
+}
 
 export const SPECIES_GAIT: Record<AnimalSpecies, AnimalGait> = {
   cow: 'walk',
@@ -36,12 +41,16 @@ export function walkSeconds(from: Vec2, to: Vec2, speed: number): number {
   return Math.max(DURATIONS.animalStepMin, Math.hypot(to.x - from.x, to.z - from.z) / speed)
 }
 
-export function nextTarget(random: () => number, area: Vec2[], from: Vec2, minStep = 1.2, others: Vec2[] = []): Vec2 {
+export function nextTarget(random: () => number, area: Vec2[], from: Vec2, minStep = 1.2, others: Course[] = [], spacing = 1): Vec2 {
   const bounds = polygonBounds(area)
   for (let tries = 0; tries < TARGET_TRIES; tries += 1) {
     const candidate = { x: bounds.minX + random() * (bounds.maxX - bounds.minX), z: bounds.minZ + random() * (bounds.maxZ - bounds.minZ) }
     if (!pointInPolygon(candidate, area) || Math.hypot(candidate.x - from.x, candidate.z - from.z) < minStep) continue
-    const crowded = others.some((other) => Math.hypot(candidate.x - other.x, candidate.z - other.z) < PERSONAL_SPACE || distanceToSegment(other, from, candidate) < PASSING_SPACE)
+    const crowded = others.some(
+      (other) =>
+        distanceToSegment(candidate, other.from, other.to) < PERSONAL_SPACE * spacing ||
+        segmentDistance(from, candidate, other.from, other.to) < PASSING_SPACE * spacing,
+    )
     if (!crowded) return candidate
   }
   return from

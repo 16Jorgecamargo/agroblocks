@@ -58,6 +58,7 @@ export const DURATIONS = {
   wingFlap: 0.25,
   lilyBob: 3.2,
   splashHold: 0.4,
+  splashMax: 8,
 } as const
 
 export const fadeSlide: Variants = {

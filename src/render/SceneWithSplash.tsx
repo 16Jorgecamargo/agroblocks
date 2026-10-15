@@ -31,6 +31,11 @@ export function SceneWithSplash({ children, label = 'Carregando fazenda…' }: {
   const [hidden, setHidden] = useState(false)
 
   useEffect(() => {
+    const ceiling = window.setTimeout(() => setHidden(true), DURATIONS.splashMax * 1000)
+    return () => window.clearTimeout(ceiling)
+  }, [])
+
+  useEffect(() => {
     if (!ready || active || hidden) return
     const hold = animate(0, 1, { duration: DURATIONS.splashHold })
     hold.then(() => setHidden(true))
