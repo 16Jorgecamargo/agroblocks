@@ -14,7 +14,7 @@ interface Grid2DProps {
   failed: boolean;
 }
 
-const PLOT_GLYPHS: Record<Cell["plot"], string> = {
+export const PLOT_GLYPHS: Record<Cell["plot"], string> = {
   untilled: "",
   tilled: "≡",
   seeded: "•",
@@ -23,7 +23,7 @@ const PLOT_GLYPHS: Record<Cell["plot"], string> = {
   harvested: "✂",
 };
 
-const TERRAIN_GLYPHS: Record<Exclude<Cell["terrain"], "soil">, string> = {
+export const TERRAIN_GLYPHS: Record<Exclude<Cell["terrain"], "soil">, string> = {
   obstacle: "⛰",
   blocked: "✕",
   reservoir: "💧",

@@ -4,6 +4,7 @@ import type { CellRef } from '@/game/missions/goals'
 import type { GameEvent, GameState } from '@/game/world/types'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { describeRobot } from '@/render/cellDescription'
+import { LegendDialog } from '@/features/legend/LegendDialog'
 import { Grid2D } from '@/render/grid2d/Grid2D'
 import { hasWebGL } from '@/render/hasWebGL'
 import { SceneWithSplash } from '@/render/SceneWithSplash'
@@ -77,7 +78,7 @@ export function FarmView(props: FarmViewProps) {
             </button>
           </>
         )}
-        <button type="button" className="farm-view__tool farm-view__tool--wide" aria-expanded={showLegend} onClick={() => setShowLegend((value) => !value)}>
+        <button type="button" className="farm-view__tool farm-view__tool--wide" aria-haspopup="dialog" onClick={() => setShowLegend(true)}>
           Legenda
         </button>
       </div>
@@ -121,20 +122,7 @@ export function FarmView(props: FarmViewProps) {
         )}
       </AnimatePresence>
 
-      {showLegend && (
-        <ul className="farm-view__legend">
-          <li><span className="legend-swatch legend-swatch--untilled" />Solo sem preparo</li>
-          <li><span className="legend-swatch legend-swatch--tilled" />Solo preparado (sulcos)</li>
-          <li><span className="legend-swatch legend-swatch--seeded" />Semente plantada</li>
-          <li><span className="legend-swatch legend-swatch--growing" />Planta em crescimento</li>
-          <li><span className="legend-swatch legend-swatch--mature" />Planta madura (com frutos)</li>
-          <li><span className="legend-swatch legend-swatch--wet" />Solo molhado (gota azul)</li>
-          <li><span className="legend-swatch legend-swatch--obstacle" />Pedra / área bloqueada</li>
-          <li><span className="legend-swatch legend-swatch--reservoir" />Reservatório de água</li>
-          <li><span className="legend-swatch legend-swatch--depot" />Depósito de sementes</li>
-          <li><span className="legend-swatch legend-swatch--goal" />Canteiro do objetivo</li>
-        </ul>
-      )}
+      <LegendDialog open={showLegend} onClose={() => setShowLegend(false)} use3d={use3d} reducedMotion={reducedMotion} />
 
       <p className="visually-hidden" aria-live="polite">
         {describeRobot(props.state)}

@@ -1,0 +1,82 @@
+.legend__layout {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: var(--space-5);
+  min-height: 380px;
+}
+
+.legend__panel {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+}
+
+.legend__preview {
+  display: grid;
+  place-items: center;
+  height: 220px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--color-surface-alt);
+}
+
+.legend__tile {
+  width: 120px;
+  height: 120px;
+  font-size: 3rem;
+}
+
+.legend__group {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.legend__title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 800;
+}
+
+.legend__description {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.legend__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.legend__facts dt {
+  font-weight: 700;
+}
+
+.legend__facts dd {
+  margin: 0;
+}
+
+.legend__pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .legend__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .legend__layout .pill-tabs--vertical {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}

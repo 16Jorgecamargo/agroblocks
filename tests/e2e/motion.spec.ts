@@ -74,3 +74,20 @@ test('the mission map and the home screen render their 3D worlds without errors'
   await expect(page.locator('.mission-select__map .scene-splash')).toHaveCount(0, { timeout: 30_000 })
   expect(errors).toEqual([])
 })
+
+test('the legend opens as a paged dialog with one 3D preview and closes', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await openMission(page, 'm1-first-harvest')
+  await page.getByRole('button', { name: 'Legenda' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Legenda' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByRole('heading', { name: 'Vazio' })).toBeVisible()
+  await dialog.getByRole('tab', { name: 'Pronto para colher' }).click()
+  await expect(dialog.getByRole('heading', { name: 'Pronto para colher' })).toBeVisible()
+  await expect(dialog.locator('canvas')).toHaveCount(1)
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+  expect(errors).toEqual([])
+})
