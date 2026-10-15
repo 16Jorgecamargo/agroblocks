@@ -28,6 +28,7 @@ export class ExecutionController {
   private runId = 0
   private logId = 0
   private rewindPending = false
+  private rewinding = false
 
   constructor(
     private readonly mission: ControllerMission,
@@ -67,11 +68,22 @@ export class ExecutionController {
 
   step(program: Program): void {
     const { status } = this.snapshot
-    if (status === 'running') return
+    if (status === 'running' || this.rewinding) return
     if (status !== 'paused') {
       if (status !== 'idle') this.restore(false)
       this.start(program)
       this.patch({ status: 'paused' })
+      if (this.rewindPending) {
+        this.rewindPending = false
+        this.rewinding = true
+        const runId = this.runId
+        this.cancelTimer = this.scheduler.schedule(() => {
+          this.cancelTimer = null
+          this.rewinding = false
+          if (runId === this.runId) this.advance()
+        }, REWIND_DELAY_MS)
+        return
+      }
     }
     this.advance()
   }
@@ -147,6 +159,7 @@ export class ExecutionController {
 
   private restore(keepLog: boolean): void {
     if (this.snapshot.stepCount > 0) this.rewindPending = true
+    this.rewinding = false
     this.cancel()
     this.runId += 1
     this.generator = null

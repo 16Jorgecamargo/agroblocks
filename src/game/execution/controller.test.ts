@@ -81,6 +81,22 @@ describe('ExecutionController', () => {
     expect(controller.getSnapshot().status).toBe('finished')
   })
 
+  it('waits for the robot to return before the first step of a new step-by-step run', () => {
+    const { controller, scheduler } = setup()
+    controller.run(solution)
+    scheduler.runAll()
+    expect(controller.getSnapshot().status).toBe('finished')
+    controller.step(solution)
+    expect(controller.getSnapshot()).toMatchObject({ status: 'paused', stepCount: 0 })
+    expect(scheduler.delays.at(-1)).toBe(REWIND_DELAY_MS)
+    controller.step(solution)
+    expect(controller.getSnapshot().stepCount).toBe(0)
+    scheduler.runNext()
+    expect(controller.getSnapshot().stepCount).toBe(1)
+    controller.step(solution)
+    expect(controller.getSnapshot().stepCount).toBe(2)
+  })
+
   it('highlights the block of the current step', () => {
     const { controller } = setup()
     controller.step(solution)
