@@ -83,7 +83,7 @@ O engine (`src/game`) e o interpretador não importam React, Three.js nem Blockl
 ## Movimento e assets
 
 - **Animações:** toda animação usa [Motion](https://motion.dev) — `motion/react` na interface e `animate()` sobre objetos Three.js na cena 3D. Molas, durações e easings ficam em `src/motion/` e seguem a [Motion Reference](https://motion-reference.takayustudio.jp). Tabela completa em `docs/motion.md`. "Reduzir animações" (ou `prefers-reduced-motion`) desliga movimento, confete, voos e efeitos.
-- **Modelos 3D:** a cena aceita pacotes CC0 (Kenney Nature Kit, Quaternius Ultimate Crops e Animated Robot) convertidos para GLB em `public/models/`, descritos em `src/render/models/manifest.generated.json` (validado com Zod, orçamento de 5 MB). Se o manifesto estiver vazio ou um modelo falhar, a cena usa os modelos procedurais.
+- **Mundo 3D:** `src/render/world/buildWorld.ts` gera, de forma determinística, o ambiente das três cenas (fazenda do jogo, mapa de missões e tela inicial): pátio com celeiros, silos e moinhos, pasto cercado com animais que passeiam, pomar, rio com ponte, caminhos de terra, floresta e chão coberto de grama e flores. Os modelos são CC0 (Kenney Nature Kit, Quaternius Nature Crops, Farm Buildings, Farm Animals, Stylized Nature MegaKit e Animated Robot), convertidos para GLB em `public/models/` (≤ 10 MB) com escala calculada pela altura real de cada objeto. Uma tela de carregamento cobre cada cena até os modelos chegarem.
 - **Offline:** nenhum recurso é buscado de fora em tempo de execução (as imagens do Blockly ficam em `public/blockly-media/`), exceto as fontes do Google Fonts.
 
 Os pacotes de origem (Kenney Nature Kit, Quaternius Nature Crops Pack, Animated Robot e Farm Buildings) ficam extraídos em `assets-src/` (fora do git, caminhos em `scripts/assets/sources.json`). Para regenerar os GLB (só em desenvolvimento):
@@ -106,6 +106,7 @@ Veja `docs/decisions/`:
 5. Controller como external store do React (sem store de sessão separada).
 6. Motion como camada única de animação.
 7. Assets CC0 em GLB com fallback procedural.
+8. Mundo compartilhado gerado por função pura, com instancing.
 
 ## Missões
 
