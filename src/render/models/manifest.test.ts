@@ -16,8 +16,8 @@ const entry = {
 }
 
 describe('model manifest', () => {
-  it('lists the models the scene needs without crop models', () => {
-    expect(REQUIRED_MODEL_IDS).toContain('robot')
+  it('lists the models the scene needs without crop or robot models', () => {
+    expect(REQUIRED_MODEL_IDS).not.toContain('robot')
     expect(REQUIRED_MODEL_IDS.filter((id) => id.startsWith('crop-'))).toHaveLength(0)
   })
 

@@ -18,7 +18,7 @@ export default function CelebrationScene({ reducedMotion }: { reducedMotion: boo
         <Flat color={PALETTE.grassLight} />
       </mesh>
       <group scale={1.23}>
-        <RobotShowcase clip="success" />
+        <RobotShowcase clip="success" tool="crate" reducedMotion={reducedMotion} />
       </group>
       <group position={[0.2, 0.55, 0.9]}>
         <mesh>

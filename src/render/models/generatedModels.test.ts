@@ -20,11 +20,6 @@ describe('generated models', () => {
     expect(total).toBeLessThanOrEqual(MODEL_BUDGET_BYTES)
   })
 
-  it('maps the four robot clips', () => {
-    const robot = MODEL_MANIFEST.find((entry) => entry.id === 'robot')
-    expect(Object.keys(robot?.clips ?? {}).sort()).toEqual(['error', 'idle', 'move', 'success'])
-  })
-
   it('gives every animal an idle and a move clip', () => {
     for (const id of ANIMALS) {
       const animal = MODEL_MANIFEST.find((entry) => entry.id === id)
@@ -33,12 +28,11 @@ describe('generated models', () => {
     }
   })
 
-  it('keeps proportions between the robot, a cow and the big barn', () => {
+  it('measures a cow and the big barn', () => {
     const height = (id: string) => {
       const entry = MODEL_MANIFEST.find((item) => item.id === id)
       return entry ? entry.scale : 0
     }
-    expect(height('robot')).toBeGreaterThan(0)
     expect(height('cow')).toBeGreaterThan(0)
     expect(height('barn')).toBeGreaterThan(0)
   })

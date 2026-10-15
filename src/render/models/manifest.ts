@@ -9,7 +9,6 @@ export const REQUIRED_MODEL_IDS = [
   'rock-a',
   'rock-b',
   'bush',
-  'robot',
 ] as const
 
 export const OPTIONAL_MODEL_IDS = ['barn', 'silo', 'windmill', 'reservoir', 'seed-depot'] as const

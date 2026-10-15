@@ -95,6 +95,8 @@ export default function FarmScene({
       )}
       <RobotModel
         robot={state.robot}
+        events={lastEvents}
+        eventKey={eventKey}
         gridWidth={width}
         gridHeight={height}
         durationMs={duration}
