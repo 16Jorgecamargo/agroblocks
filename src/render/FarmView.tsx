@@ -1,5 +1,5 @@
-import { lazy, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { lazy, useMemo, useState, type ReactNode } from 'react'
+import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react'
 import type { CellRef } from '@/game/missions/goals'
 import type { GameEvent, GameState } from '@/game/world/types'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -12,7 +12,8 @@ import { EASINGS } from '@/motion/easings'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './FarmView.css'
-import { DURATIONS } from '@/motion/presets'
+import { DURATIONS, PRESSABLE } from '@/motion/presets'
+import { SPRINGS } from '@/motion/springs'
 
 const FarmScene = lazy(() => import('@/render/farm3d/FarmScene'))
 
@@ -48,6 +49,16 @@ interface FarmViewProps {
 
 const ZOOM_LEVELS = [0.7, 0.85, 1, 1.25, 1.5]
 
+type ToolButtonProps = Omit<HTMLMotionProps<'button'>, 'children'> & { wide?: boolean; children: ReactNode }
+
+function ToolButton({ wide = false, children, ...rest }: ToolButtonProps) {
+  return (
+    <motion.button type="button" className={`farm-view__tool${wide ? ' farm-view__tool--wide' : ''}`} data-pressable="true" {...PRESSABLE} {...rest}>
+      {children}
+    </motion.button>
+  )
+}
+
 export function FarmView(props: FarmViewProps) {
   const { renderMode, lowGraphics } = useSettingsStore((store) => store.settings)
   const reducedMotion = useReducedMotion()
@@ -64,23 +75,27 @@ export function FarmView(props: FarmViewProps) {
       <div className="farm-view__toolbar">
         {use3d && (
           <>
-            <button type="button" className="farm-view__tool" onClick={() => setQuarterTurns((turns) => turns - 1)} aria-label="Girar câmera para a esquerda">
-              ↺
-            </button>
-            <button type="button" className="farm-view__tool" onClick={() => setQuarterTurns((turns) => turns + 1)} aria-label="Girar câmera para a direita">
-              ↻
-            </button>
-            <button type="button" className="farm-view__tool" onClick={() => setZoomIndex((index) => Math.max(0, index - 1))} aria-label="Afastar câmera" disabled={zoomIndex === 0}>
+            <ToolButton onClick={() => setQuarterTurns((turns) => turns - 1)} aria-label="Girar câmera para a esquerda">
+              <motion.span data-turns={quarterTurns} className="farm-view__glyph" animate={{ rotate: quarterTurns * 90 }} transition={SPRINGS.snap}>
+                ↺
+              </motion.span>
+            </ToolButton>
+            <ToolButton onClick={() => setQuarterTurns((turns) => turns + 1)} aria-label="Girar câmera para a direita">
+              <motion.span data-turns={quarterTurns} className="farm-view__glyph" animate={{ rotate: quarterTurns * 90 }} transition={SPRINGS.snap}>
+                ↻
+              </motion.span>
+            </ToolButton>
+            <ToolButton onClick={() => setZoomIndex((index) => Math.max(0, index - 1))} aria-label="Afastar câmera" disabled={zoomIndex === 0}>
               −
-            </button>
-            <button type="button" className="farm-view__tool" onClick={() => setZoomIndex((index) => Math.min(ZOOM_LEVELS.length - 1, index + 1))} aria-label="Aproximar câmera" disabled={zoomIndex === ZOOM_LEVELS.length - 1}>
+            </ToolButton>
+            <ToolButton onClick={() => setZoomIndex((index) => Math.min(ZOOM_LEVELS.length - 1, index + 1))} aria-label="Aproximar câmera" disabled={zoomIndex === ZOOM_LEVELS.length - 1}>
               +
-            </button>
+            </ToolButton>
           </>
         )}
-        <button type="button" className="farm-view__tool farm-view__tool--wide" aria-haspopup="dialog" onClick={() => setShowLegend(true)}>
+        <ToolButton wide aria-haspopup="dialog" onClick={() => setShowLegend(true)}>
           Legenda
-        </button>
+        </ToolButton>
       </div>
 
       {missingWebgl && (

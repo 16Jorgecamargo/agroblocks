@@ -125,3 +125,19 @@ test('screens fill the window without page scroll or overscroll bounce', async (
     expect(state).toEqual({ scrollY: 0, fits: true, overscroll: ['none', 'none'] })
   }
 })
+
+test('farm view tool buttons animate, and the rotate arrows spin with the camera', async ({ page }) => {
+  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await openMission(page, 'm1-first-harvest')
+  const right = page.getByRole('button', { name: 'Girar câmera para a direita' })
+  await right.click()
+  await expect(right.locator('[data-turns]')).toHaveAttribute('data-turns', '1')
+  await expect.poll(() => right.locator('[data-turns]').evaluate((element) => getComputedStyle(element).transform)).not.toBe('none')
+  const left = page.getByRole('button', { name: 'Girar câmera para a esquerda' })
+  await left.click()
+  await left.click()
+  await expect(left.locator('[data-turns]')).toHaveAttribute('data-turns', '-1')
+  for (const name of ['Aproximar câmera', 'Afastar câmera', 'Legenda']) {
+    await expect(page.getByRole('button', { name }).first()).toHaveAttribute('data-pressable', 'true')
+  }
+})
