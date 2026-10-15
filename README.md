@@ -80,15 +80,25 @@ reference/        referência visual
 
 O engine (`src/game`) e o interpretador não importam React, Three.js nem Blockly e são testados sem interface.
 
+## Movimento e assets
+
+- **Animações:** toda animação usa [Motion](https://motion.dev) — `motion/react` na interface e `animate()` sobre objetos Three.js na cena 3D. Molas, durações e easings ficam em `src/motion/` e seguem a [Motion Reference](https://motion-reference.takayustudio.jp). Tabela completa em `docs/motion.md`. "Reduzir animações" (ou `prefers-reduced-motion`) desliga movimento, confete, voos e efeitos.
+- **Modelos 3D:** a cena aceita pacotes CC0 (Kenney Nature Kit, Quaternius Ultimate Crops e Animated Robot) convertidos para GLB em `public/models/`, descritos em `src/render/models/manifest.generated.json` (validado com Zod, orçamento de 5 MB). Se o manifesto estiver vazio ou um modelo falhar, a cena usa os modelos procedurais.
+- **Offline:** nenhum recurso é buscado de fora em tempo de execução (as imagens do Blockly ficam em `public/blockly-media/`), exceto as fontes do Google Fonts.
+
+Os pacotes de modelos são baixados manualmente (alguns sites bloqueiam downloads automáticos) e salvos em `assets-src/` como `nature-kit.zip`, `crops.zip` e `robot.zip`; a conversão para GLB (scripts em `scripts/assets/`) ainda está pendente — até lá a cena usa os modelos procedurais.
+
 ## Decisões técnicas
 
 Veja `docs/decisions/`:
 
 1. Interpretador próprio sobre AST com generators (sem `eval`).
-2. Cena Three.js procedural low-poly, sem modelos externos.
+2. Cena Three.js procedural low-poly (hoje fallback dos modelos CC0, ver 7).
 3. Somente LocalStorage, com validação Zod e backup de dados corrompidos.
 4. HashRouter + `base: './'` para hospedagem estática.
 5. Controller como external store do React (sem store de sessão separada).
+6. Motion como camada única de animação.
+7. Assets CC0 em GLB com fallback procedural.
 
 ## Missões
 
