@@ -1,4 +1,4 @@
-import { MODEL_BUDGET_BYTES, parseManifest, REQUIRED_MODEL_IDS } from '@/render/models/manifest'
+import { MODEL_BUDGET_BYTES, parseManifest, REQUIRED_MODEL_IDS, WORLD_MODEL_IDS } from '@/render/models/manifest'
 
 const entry = {
   id: 'robot',
@@ -30,7 +30,13 @@ describe('model manifest', () => {
     expect(parseManifest('nope')).toEqual([])
   })
 
-  it('keeps a 5 MB budget', () => {
-    expect(MODEL_BUDGET_BYTES).toBe(5242880)
+  it('keeps a 10 MB budget', () => {
+    expect(MODEL_BUDGET_BYTES).toBe(10485760)
+  })
+
+  it('names every model the world uses', () => {
+    expect(WORLD_MODEL_IDS).toContain('cow')
+    expect(WORLD_MODEL_IDS).toContain('grass-short')
+    expect(new Set(WORLD_MODEL_IDS).size).toBe(WORLD_MODEL_IDS.length)
   })
 })

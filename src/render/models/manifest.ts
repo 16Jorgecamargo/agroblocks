@@ -20,9 +20,53 @@ export const REQUIRED_MODEL_IDS = [
 
 export const OPTIONAL_MODEL_IDS = ['barn', 'silo', 'windmill', 'reservoir', 'seed-depot', 'straw'] as const
 
-export type ModelId = (typeof REQUIRED_MODEL_IDS)[number] | (typeof OPTIONAL_MODEL_IDS)[number]
+export const WORLD_MODEL_IDS = [
+  'small-barn',
+  'open-barn',
+  'silo-house',
+  'tower-windmill',
+  'water-tower',
+  'chicken-coop',
+  'cow',
+  'horse',
+  'pig',
+  'sheep',
+  'llama',
+  'pug',
+  'tree-d',
+  'pine-round',
+  'mega-tree-a',
+  'mega-tree-b',
+  'mega-pine',
+  'bush-large',
+  'bush-flowers',
+  'fence-gate',
+  'bridge',
+  'log-stack',
+  'sign',
+  'lily',
+  'mushrooms',
+  'flower-red',
+  'flower-yellow',
+  'flower-purple',
+  'flower-patch',
+  'grass-short',
+  'grass-tall',
+  'clover',
+  'fern',
+  'pebble',
+  'rock-medium',
+  'apple-tree',
+  'corn-row',
+  'wheat-row',
+  'lettuce-row',
+  'pumpkin-row',
+  'carrot-row',
+] as const
 
-export const MODEL_BUDGET_BYTES = 5 * 1024 * 1024
+export type ModelId = (typeof REQUIRED_MODEL_IDS)[number] | (typeof OPTIONAL_MODEL_IDS)[number] | (typeof WORLD_MODEL_IDS)[number]
+
+export const MODEL_BUDGET_BYTES = 10 * 1024 * 1024
 
 const entrySchema = z.object({
   id: z.string(),
