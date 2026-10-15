@@ -22,6 +22,8 @@
 | 6 | `plan_phase6_scene3d.md` | Modelos na cena, robô animado, câmera, efeitos, 2D com Motion | 4, 5 |
 | 7 | `plan_phase7_e2e_docs.md` | E2E, documentação, verificação visual e de desempenho | 1–6 |
 
+**Emendas obrigatórias:** `plan_amendments_reference.md` (R1–R6) — fidelidade à imagem de referência; prevalece sobre o texto das fases. Ordem: R1 logo após a Task 2.2; R2/R3 dentro das Tasks 3.3/3.4; R4 após a 3.4; R5 dentro da 4.3; R6 dentro das 4.2/4.4.
+
 Ao fim de cada fase: `npm run typecheck && npx vitest run` verdes e app executável.
 
 ## Global Constraints
