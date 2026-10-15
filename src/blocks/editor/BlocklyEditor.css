@@ -20,7 +20,7 @@
   align-items: flex-end;
   justify-content: center;
   padding: var(--space-4);
-  background: rgb(21 34 28 / 0.08);
+  background: rgb(19 31 41 / 0.08);
   color: var(--color-text);
   font-weight: 600;
   cursor: not-allowed;

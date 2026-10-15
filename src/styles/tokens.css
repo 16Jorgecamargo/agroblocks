@@ -16,11 +16,14 @@
   --cat-variable: #f07c2a;
   --cat-procedure: #e0508f;
   --cat-event: #e0a526;
-  --chrome-bg: #15221c;
-  --chrome-surface: #1e3128;
-  --chrome-border: #2e4a3b;
-  --chrome-text: #eef5ea;
-  --chrome-text-muted: #a9bfae;
+  --chrome-bg: #131f29;
+  --chrome-surface: #1c2a35;
+  --chrome-border: #2a3b48;
+  --chrome-text: #eef3f6;
+  --chrome-text-muted: #9fb0bd;
+  --card-bg: #f7f6f2;
+  --brand-brown: #5b3a1e;
+  --brand-green: #3c9a3a;
   --exit-600: #e5484d;
 
   --color-bg: var(--cream-50);
@@ -39,6 +42,7 @@
   --color-focus: var(--sun-400);
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Baloo 2', 'Inter', system-ui, sans-serif;
   --font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
