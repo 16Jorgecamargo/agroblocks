@@ -10,17 +10,12 @@ import { PALETTE } from '@/render/palette'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
 import { Herd } from '@/render/world/Herd'
+import { HILL_BASE_Y, HOME_HILLS } from '@/render/world/hillScatter'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import type { Cell } from '@/game/world/types'
 import { DURATIONS } from '@/motion/presets'
 
-const HILLS: [number, number, number, number, string][] = [
-  [-14, -26, 16, 5, '#7fb35a'],
-  [2, -30, 20, 6, '#8cc065'],
-  [18, -24, 14, 5, '#76ab52'],
-  [-24, -18, 12, 4, '#88bb60'],
-]
 
 const BED_CELLS: Cell['plot'][] = ['mature', 'growing', 'mature', 'seeded', 'mature', 'growing', 'mature', 'mature', 'growing', 'seeded', 'mature', 'growing']
 
@@ -65,10 +60,10 @@ export default function HomeLandscape({ ambient, lowGraphics, onReady }: { ambie
         <planeGeometry args={[120, 80]} />
         <Flat color={PALETTE.grassLight} />
       </mesh>
-      {HILLS.map(([x, z, width, height, color], index) => (
-        <mesh key={index} position={[x, -1, z]} scale={[width, height, 6]}>
+      {HOME_HILLS.map((hill, index) => (
+        <mesh key={index} position={[hill.x, HILL_BASE_Y, hill.z]} scale={[hill.width, hill.height, hill.depth]}>
           <icosahedronGeometry args={[1, 1]} />
-          <Flat color={color} />
+          <Flat color={hill.color} />
         </mesh>
       ))}
       <WorldTerrain world={world} withGround={false} />

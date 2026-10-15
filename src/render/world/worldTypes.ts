@@ -21,6 +21,7 @@ export interface PropItem {
   model: ModelId
   x: number
   z: number
+  y?: number
   rotation: number
   scale: number
 }

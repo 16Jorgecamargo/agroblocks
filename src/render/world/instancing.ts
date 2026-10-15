@@ -8,7 +8,7 @@ export function propMatrix(prop: PropItem, entry: { scale: number; yOffset: numb
   const size = entry.scale * prop.scale
   const stretch = entry.stretchY ?? 1
   return new Matrix4().compose(
-    new Vector3(prop.x, entry.yOffset * prop.scale * stretch, prop.z),
+    new Vector3(prop.x, (prop.y ?? 0) + entry.yOffset * prop.scale * stretch, prop.z),
     new Quaternion().setFromAxisAngle(UP, prop.rotation + entry.rotationY),
     new Vector3(size, size * stretch, size),
   )

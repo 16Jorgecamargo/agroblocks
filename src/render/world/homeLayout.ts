@@ -1,12 +1,15 @@
 import { rectDistance, rectPolygon } from '@/render/world/geometry'
 import { addButterflies, addClutter, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
+import { HOME_HILLS, hillScatter, hillSurfaceY } from '@/render/world/hillScatter'
 import { WorldDraft } from '@/render/world/worldDraft'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
 export const HOME_BEDS: Rect = { minX: -1.6, maxX: 2.8, minZ: 0, maxZ: 3.2 }
 
 export const HOME_ROBOT: Vec2 = { x: 3.4, z: 4.6 }
+
+export const HOME_TITLE_LANE = { x: 1, halfWidth: 9, minZ: -18 }
 
 export function homeLayout(input: WorldInput, random: () => number): World {
   const full = input.density === 'full'
@@ -32,7 +35,9 @@ export function homeLayout(input: WorldInput, random: () => number): World {
   draft.fenceLine({ x: pastureRect.minX, z: pastureRect.minZ }, { x: pastureRect.maxX, z: pastureRect.minZ })
   draft.fenceLine({ x: pastureRect.minX, z: pastureRect.minZ }, { x: pastureRect.minX, z: pastureRect.maxZ }, 1)
 
-  draft.scatter(FOREST_MODELS, full ? 80 : 35, { minX: -28, maxX: 28, minZ: -32, maxZ: -6 }, [0.9, 1.3])
+  const behindTitle = (point: Vec2) => Math.abs(point.x - HOME_TITLE_LANE.x) < HOME_TITLE_LANE.halfWidth && point.z > HOME_TITLE_LANE.minZ
+  const offHills = (point: Vec2) => !behindTitle(point) && HOME_HILLS.every((hill) => hillSurfaceY(hill, point.x, point.z) < 0)
+  draft.scatter(FOREST_MODELS, full ? 80 : 35, { minX: -28, maxX: 28, minZ: -32, maxZ: -6 }, [0.9, 1.3], offHills)
   draft.scatter(TREE_MODELS, full ? 12 : 6, { minX: -13, maxX: -7, minZ: -4, maxZ: 5 }, [0.9, 1.2])
   draft.scatter(TREE_MODELS, full ? 10 : 5, { minX: 8, maxX: 13, minZ: -3, maxZ: 5 }, [0.9, 1.2])
   addClutter(draft, { minX: -11, maxX: 11, minZ: -4, maxZ: 8 }, input.density, 260, awayFromBeds)
@@ -43,7 +48,7 @@ export function homeLayout(input: WorldInput, random: () => number): World {
     paths: [farmPath],
     river: null,
     trail: [],
-    props: draft.props,
+    props: [...draft.props, ...hillScatter(random, HOME_HILLS, input.density)],
     pasture,
     animals: spawnHerd(random, pasture, [['cow', 2], ['sheep', 2]], 'home'),
     butterflies: addButterflies(random, { minX: -2, maxX: 4, minZ: -0.5, maxZ: 4 }, 5),

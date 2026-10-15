@@ -3,8 +3,9 @@ import { buildWorld, gridSizeOf } from '@/render/world/buildWorld'
 import { distanceToPolyline, pointInPolygon, rectDistance } from '@/render/world/geometry'
 import { CLUTTER_MODELS, EXEMPT_MODELS, GRID_CLEARANCE, TALL_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import type { World } from '@/render/world/worldTypes'
-import { HOME_BEDS, HOME_ROBOT } from '@/render/world/homeLayout'
+import { HOME_BEDS, HOME_ROBOT, HOME_TITLE_LANE } from '@/render/world/homeLayout'
 import { MAP_ISLAND } from '@/render/world/mapLayout'
+import { HOME_HILLS, hillSurfaceY } from '@/render/world/hillScatter'
 
 const BUILDINGS = ['barn', 'small-barn', 'open-barn', 'silo', 'silo-house', 'tower-windmill', 'windmill', 'water-tower', 'reservoir', 'chicken-coop']
 
@@ -98,6 +99,22 @@ describe('buildWorld map', () => {
 
 describe('buildWorld home', () => {
   const world = buildWorld({ layout: 'home', gridWidth: 0, gridHeight: 0, seed: 'home', density: 'full' })
+
+  it('keeps forest trees out of the lane behind the title', () => {
+    for (const prop of world.props) {
+      if (prop.y !== undefined || !(TREE_MODELS as readonly string[]).includes(prop.model)) continue
+      const behind = Math.abs(prop.x - HOME_TITLE_LANE.x) < HOME_TITLE_LANE.halfWidth && prop.z > HOME_TITLE_LANE.minZ && prop.z < -6
+      expect(behind).toBe(false)
+    }
+  })
+
+  it('dresses the far hills and keeps the plain forest out of them', () => {
+    expect(world.props.filter((prop) => (prop.y ?? 0) > 0).length).toBeGreaterThanOrEqual(60)
+    for (const prop of world.props) {
+      if (prop.y !== undefined) continue
+      for (const hill of HOME_HILLS) expect(hillSurfaceY(hill, prop.x, prop.z)).toBeLessThan(0)
+    }
+  })
 
   it('keeps the crop beds and the robot spot clear', () => {
     for (const prop of world.props) {
