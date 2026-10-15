@@ -36,4 +36,9 @@ describe('generated models', () => {
     expect(height('cow')).toBeGreaterThan(0)
     expect(height('barn')).toBeGreaterThan(0)
   })
+
+  it('no longer ships models that are now drawn in code', () => {
+    const ids = MODEL_MANIFEST.map((entry) => entry.id)
+    for (const id of ['robot', 'crop-1', 'crop-2', 'crop-3', 'crop-4', 'crop-5', 'straw', 'fence', 'fence-gate']) expect(ids).not.toContain(id)
+  })
 })

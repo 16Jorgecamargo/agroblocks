@@ -1,54 +1,6 @@
 {
   "models": [
     {
-      "id": "crop-5",
-      "pack": "crops",
-      "source": "FBX/Tomato_4.fbx",
-      "usage": "planta: madura",
-      "targetHeight": 0.8,
-      "rotationY": 0
-    },
-    {
-      "id": "crop-1",
-      "pack": "crops",
-      "source": "FBX/Tomato_1.fbx",
-      "usage": "planta: semente",
-      "scaleLike": "crop-5",
-      "rotationY": 0
-    },
-    {
-      "id": "crop-2",
-      "pack": "crops",
-      "source": "FBX/Tomato_2.fbx",
-      "usage": "planta: broto",
-      "scaleLike": "crop-5",
-      "rotationY": 0
-    },
-    {
-      "id": "crop-3",
-      "pack": "crops",
-      "source": "FBX/Tomato_3.fbx",
-      "usage": "planta: crescendo",
-      "scaleLike": "crop-5",
-      "rotationY": 0
-    },
-    {
-      "id": "crop-4",
-      "pack": "crops",
-      "source": "FBX/Tomato_Harvested.fbx",
-      "usage": "planta: quase madura",
-      "scaleLike": "crop-5",
-      "rotationY": 0
-    },
-    {
-      "id": "straw",
-      "pack": "crops",
-      "source": "FBX/Tomato_Harvested.fbx",
-      "usage": "canteiro colhido",
-      "scaleLike": "crop-5",
-      "rotationY": 0
-    },
-    {
       "id": "apple-tree",
       "pack": "crops",
       "source": "FBX/Apple_4.fbx",
@@ -171,24 +123,6 @@
       "tint": {
         "grass": "#4caa44"
       }
-    },
-    {
-      "id": "fence",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/fence_simple.glb",
-      "usage": "cerca",
-      "targetWidth": 1,
-      "rotationY": 0,
-      "stretchY": 1.9
-    },
-    {
-      "id": "fence-gate",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/fence_gate.glb",
-      "usage": "porteira",
-      "targetWidth": 1,
-      "rotationY": 0,
-      "stretchY": 1.9
     },
     {
       "id": "bridge",
@@ -497,24 +431,6 @@
       "clips": {
         "idle": "Armature|Idle",
         "move": "Armature|Jump"
-      }
-    },
-    {
-      "id": "robot",
-      "pack": "robot",
-      "source": "FBX/Robot.fbx",
-      "usage": "robô agrícola",
-      "targetHeight": 0.9,
-      "rotationY": 0,
-      "clips": {
-        "idle": "RobotArmature|Robot_Idle",
-        "move": "RobotArmature|Robot_Walking",
-        "success": "RobotArmature|Robot_ThumbsUp",
-        "error": "RobotArmature|Robot_No"
-      },
-      "recolor": {
-        "Main": "#f4f6f5",
-        "Grey": "#9aa7b0"
       }
     }
   ]

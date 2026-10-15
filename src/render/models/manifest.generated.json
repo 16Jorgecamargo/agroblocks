@@ -1,18 +1,6 @@
 {
   "models": [
     {
-      "id": "crop-5",
-      "file": "models/crop-5.glb",
-      "usage": "planta: madura",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.4651,
-      "yOffset": 0.0001,
-      "rotationY": 0,
-      "bytes": 64824
-    },
-    {
       "id": "apple-tree",
       "file": "models/apple-tree.glb",
       "usage": "macieira do pomar",
@@ -143,32 +131,6 @@
       "yOffset": 0.1852,
       "rotationY": 0,
       "bytes": 3712
-    },
-    {
-      "id": "fence",
-      "file": "models/fence.glb",
-      "usage": "cerca",
-      "author": "Kenney (kenney.nl)",
-      "license": "CC0-1.0",
-      "page": "https://kenney.nl/assets/nature-kit",
-      "scale": 1,
-      "yOffset": 0.05,
-      "rotationY": 0,
-      "stretchY": 1.9,
-      "bytes": 3704
-    },
-    {
-      "id": "fence-gate",
-      "file": "models/fence-gate.glb",
-      "usage": "porteira",
-      "author": "Kenney (kenney.nl)",
-      "license": "CC0-1.0",
-      "page": "https://kenney.nl/assets/nature-kit",
-      "scale": 1,
-      "yOffset": 0.05,
-      "rotationY": 0,
-      "stretchY": 1.9,
-      "bytes": 16728
     },
     {
       "id": "bridge",
@@ -565,88 +527,6 @@
         "idle": "Armature|Idle",
         "move": "Armature|Jump"
       }
-    },
-    {
-      "id": "robot",
-      "file": "models/robot.glb",
-      "usage": "robô agrícola",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.itch.io/lowpoly-robot",
-      "scale": 0.2001,
-      "yOffset": 0.0041,
-      "rotationY": 0,
-      "bytes": 276168,
-      "clips": {
-        "idle": "RobotArmature|Robot_Idle",
-        "move": "RobotArmature|Robot_Walking",
-        "success": "RobotArmature|Robot_ThumbsUp",
-        "error": "RobotArmature|Robot_No"
-      },
-      "recolor": {
-        "Main": "#f4f6f5",
-        "Grey": "#9aa7b0"
-      }
-    },
-    {
-      "id": "crop-1",
-      "file": "models/crop-1.glb",
-      "usage": "planta: semente",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.4651,
-      "yOffset": -0.0001,
-      "rotationY": 0,
-      "bytes": 3684
-    },
-    {
-      "id": "crop-2",
-      "file": "models/crop-2.glb",
-      "usage": "planta: broto",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.4651,
-      "yOffset": 0.0033,
-      "rotationY": 0,
-      "bytes": 11996
-    },
-    {
-      "id": "crop-3",
-      "file": "models/crop-3.glb",
-      "usage": "planta: crescendo",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.4651,
-      "yOffset": 0.0007,
-      "rotationY": 0,
-      "bytes": 48924
-    },
-    {
-      "id": "crop-4",
-      "file": "models/crop-4.glb",
-      "usage": "planta: quase madura",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.4651,
-      "yOffset": 0.0001,
-      "rotationY": 0,
-      "bytes": 55492
-    },
-    {
-      "id": "straw",
-      "file": "models/straw.glb",
-      "usage": "canteiro colhido",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.4651,
-      "yOffset": 0.0001,
-      "rotationY": 0,
-      "bytes": 55492
     }
   ]
 }

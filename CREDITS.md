@@ -4,7 +4,6 @@ Todos os modelos 3D são CC0 1.0 (domínio público) e foram convertidos para GL
 
 | Modelo | Uso | Autor | Origem |
 |---|---|---|---|
-| crop-5 | planta: madura | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
 | apple-tree | macieira do pomar | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
 | tree-a | árvore | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | tree-b | árvore | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
@@ -16,8 +15,6 @@ Todos os modelos 3D são CC0 1.0 (domínio público) e foram convertidos para GL
 | rock-b | pedra pequena | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | bush | arbusto | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | bush-large | arbusto grande | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
-| fence | cerca | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
-| fence-gate | porteira | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | bridge | ponte de madeira | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | log-stack | pilha de toras | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | sign | placa | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
@@ -49,11 +46,5 @@ Todos os modelos 3D são CC0 1.0 (domínio público) e foram convertidos para GL
 | sheep | ovelha | Quaternius | https://quaternius.com/packs/farmanimals.html |
 | llama | lhama | Quaternius | https://quaternius.com/packs/farmanimals.html |
 | pug | cachorro | Quaternius | https://quaternius.com/packs/farmanimals.html |
-| robot | robô agrícola | Quaternius | https://quaternius.itch.io/lowpoly-robot |
-| crop-1 | planta: semente | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| crop-2 | planta: broto | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| crop-3 | planta: crescendo | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| crop-4 | planta: quase madura | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| straw | canteiro colhido | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
 
 Ícones, interface e modelos procedurais de reserva são originais do projeto.

@@ -11,7 +11,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions'
 import { dedup, prune, quantize, resample, textureCompress, weld } from '@gltf-transform/functions'
 import { fitToTarget, fitWithScale } from '../../src/render/models/fit.ts'
 
-const REQUIRED = ['crop-1', 'crop-2', 'crop-3', 'crop-4', 'crop-5', 'tree-a', 'tree-b', 'tree-c', 'pine', 'rock-a', 'rock-b', 'bush', 'fence', 'robot']
+const REQUIRED = ['tree-a', 'tree-b', 'tree-c', 'pine', 'rock-a', 'rock-b', 'bush']
 const BUDGET = 10 * 1024 * 1024
 const OUT = 'public/models'
 const TMP = 'assets-src/tmp'

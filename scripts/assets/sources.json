@@ -15,13 +15,6 @@
       "license": "CC0-1.0"
     },
     {
-      "id": "robot",
-      "dir": "assets-src/Animated Robot by Quaternius",
-      "page": "https://quaternius.itch.io/lowpoly-robot",
-      "author": "Quaternius",
-      "license": "CC0-1.0"
-    },
-    {
       "id": "farm-buildings",
       "dir": "assets-src/Farm Buildings by Quaternius",
       "page": "https://quaternius.com/packs/farmbuildings.html",
