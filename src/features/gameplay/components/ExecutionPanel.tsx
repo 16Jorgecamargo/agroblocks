@@ -38,6 +38,8 @@ function SwapIcon({ name }: { name: IconName }) {
 export function ExecutionPanel(props: ExecutionPanelProps) {
   const { status, speed, stepMode } = props
   const running = status === 'running'
+  const active = running || status === 'paused'
+  const stepping = stepMode && active
   const [scope, animatePanel] = useAnimate<HTMLElement>()
 
   useEffect(() => {
@@ -49,13 +51,30 @@ export function ExecutionPanel(props: ExecutionPanelProps) {
       <h2 id="execution-title" className="side-title">
         Execução
       </h2>
-      <GameButton tone="primary" size="lg" className="execution-panel__main" onClick={stepMode ? props.onStep : props.onRun} disabled={running}>
-        <SwapIcon name={stepMode ? 'step' : 'play'} />
-        {stepMode ? 'Próximo passo' : 'Executar'}
-      </GameButton>
-      <GameButton tone="secondary" icon="stop" className="execution-panel__secondary" onClick={props.onStop} disabled={status === 'idle'}>
-        Parar
-      </GameButton>
+      {stepping ? (
+        <motion.div key="split" role="group" aria-label="Controles do passo a passo" className="execution-panel__split" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={SPRINGS.snap}>
+          <GameButton tone="primary" size="lg" className="execution-panel__main" onClick={props.onStep} disabled={running}>
+            <SwapIcon name="step" />
+            Próximo passo
+          </GameButton>
+          <GameButton tone="danger" size="lg" icon="stop" className="execution-panel__main" onClick={props.onStop}>
+            Parar
+          </GameButton>
+        </motion.div>
+      ) : (
+        <motion.div key={active ? 'stop' : 'run'} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={SPRINGS.snap}>
+          {active ? (
+            <GameButton tone="danger" size="lg" icon="stop" className="execution-panel__main" onClick={props.onStop}>
+              Parar
+            </GameButton>
+          ) : (
+            <GameButton tone="primary" size="lg" className="execution-panel__main" onClick={stepMode ? props.onStep : props.onRun}>
+              <SwapIcon name="play" />
+              Executar
+            </GameButton>
+          )}
+        </motion.div>
+      )}
       <GameToggle label="Passo a passo" checked={stepMode} onChange={props.onStepModeChange} />
       <label className="execution-panel__speed">
         <span>Velocidade</span>

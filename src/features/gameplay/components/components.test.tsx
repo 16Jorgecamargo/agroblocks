@@ -35,21 +35,39 @@ describe('gameplay components', () => {
     expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument()
   })
 
-  it('offers only run and stop, with stop enabled while a run is active', () => {
+  it('turns Executar into a red Parar while the program runs', () => {
     const { rerender } = render(<ExecutionPanel {...panelProps} status="idle" />)
     expect(screen.getByRole('button', { name: 'Executar' })).toBeEnabled()
-    expect(screen.getByRole('button', { name: 'Parar' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Parar' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Pausar' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Reiniciar' })).not.toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Parar' })).toHaveLength(1)
 
     rerender(<ExecutionPanel {...panelProps} status="running" />)
-    expect(screen.getByRole('button', { name: 'Executar' })).toBeDisabled()
-    fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
+    expect(screen.queryByRole('button', { name: 'Executar' })).not.toBeInTheDocument()
+    const stop = screen.getByRole('button', { name: 'Parar' })
+    expect(stop).toHaveClass('game-button--danger')
+    fireEvent.click(stop)
     expect(panelProps.onStop).toHaveBeenCalled()
 
-    rerender(<ExecutionPanel {...panelProps} status="paused" />)
-    expect(screen.getByRole('button', { name: 'Parar' })).toBeEnabled()
+    rerender(<ExecutionPanel {...panelProps} status="finished" />)
+    expect(screen.getByRole('button', { name: 'Executar' })).toBeEnabled()
+  })
+
+  it('splits into Próximo passo and Parar side by side once a step run starts', () => {
+    const onStep = vi.fn()
+    const onStop = vi.fn()
+    const { rerender } = render(<ExecutionPanel {...panelProps} onStep={onStep} onStop={onStop} status="idle" stepMode />)
+    fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
+    expect(onStep).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('button', { name: 'Parar' })).not.toBeInTheDocument()
+
+    rerender(<ExecutionPanel {...panelProps} onStep={onStep} onStop={onStop} status="paused" stepMode />)
+    const split = screen.getByRole('group', { name: 'Controles do passo a passo' })
+    expect([...split.querySelectorAll('button')].map((button) => button.textContent?.trim())).toEqual(['Próximo passo', 'Parar'])
+    fireEvent.click(screen.getByRole('button', { name: 'Próximo passo' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
+    expect(onStep).toHaveBeenCalledTimes(2)
+    expect(onStop).toHaveBeenCalledTimes(1)
   })
 
   it('drops the status, command counter and current block readouts', () => {

@@ -9,7 +9,7 @@ import { registerSwatchCategory } from '@/blocks/toolbox/swatchCategory'
 import type { ToolboxJson } from '@/blocks/toolbox/buildToolbox'
 import { loadWorkspaceSafely } from '@/blocks/editor/safeLoad'
 import type { WorkspaceJson } from '@/blocks/serializer/workspaceJson'
-import { ERROR_SHAKE, FOCUS_HALO } from '@/motion/presets'
+import { ERROR_SHAKE, FOCUS_HALO, RUNNING_BLOCK } from '@/motion/presets'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import './BlocklyEditor.css'
 
@@ -106,11 +106,28 @@ export function BlocklyEditor({
     if (!workspace) return
     workspace.highlightBlock(highlightBlockId)
     haloRef.current?.stop()
+    const root = highlightBlockId ? workspace.getBlockById(highlightBlockId)?.getSvgRoot() ?? null : null
     const path = highlightBlockId ? blockPath(workspace, highlightBlockId) : null
-    if (path && !reduced) haloRef.current = animate(path, FOCUS_HALO.keyframes, FOCUS_HALO.options)
+    root?.classList.add('agro-running-block')
+    const controls: AnimationPlaybackControls[] = []
+    let active = true
+    if (path && !reduced) {
+      controls.push(animate(path, RUNNING_BLOCK.march.keyframes, RUNNING_BLOCK.march.options))
+      const flash = animate(path, RUNNING_BLOCK.flash.keyframes, RUNNING_BLOCK.flash.options)
+      controls.push(flash)
+      flash.then(() => {
+        if (active) haloRef.current = animate(path, FOCUS_HALO.keyframes, FOCUS_HALO.options)
+      })
+    }
     return () => {
+      active = false
+      controls.forEach((control) => control.stop())
       haloRef.current?.stop()
-      if (path) path.style.filter = ''
+      root?.classList.remove('agro-running-block')
+      if (path) {
+        path.style.filter = ''
+        path.style.strokeDashoffset = ''
+      }
     }
   }, [highlightBlockId, reduced])
 
@@ -146,7 +163,7 @@ export function BlocklyEditor({
       <div ref={hostRef} className="blockly-editor__host" aria-label="Editor de blocos do programa" />
       {readOnly && (
         <div className="blockly-editor__lock" role="status">
-          Edição bloqueada durante a execução. Pare ou reinicie para editar.
+          Edição bloqueada durante a execução. Clique em Parar para editar.
         </div>
       )}
     </div>

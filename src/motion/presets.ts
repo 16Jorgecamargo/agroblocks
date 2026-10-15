@@ -4,6 +4,8 @@ import { SPRINGS } from '@/motion/springs'
 
 export const DURATIONS = {
   fadeSlide: 0.6,
+  runningMarch: 0.6,
+  runningFlash: 0.35,
   softRise: 0.9,
   snapIn: 0.38,
   shrinkFadeExit: 0.52,
@@ -169,6 +171,11 @@ export const NUDGE = {
 export const BADGE_POP = {
   keyframes: { scale: [1, 1.35, 0.95, 1] },
   options: { duration: DURATIONS.badgePop, ease: EASINGS.easeOutBack },
+}
+
+export const RUNNING_BLOCK = {
+  march: { keyframes: { strokeDashoffset: [0, -28] }, options: { duration: DURATIONS.runningMarch, ease: 'linear' as const, repeat: Infinity } },
+  flash: { keyframes: { filter: ['brightness(1.35) drop-shadow(0 0 14px rgba(242,193,78,1))', 'brightness(1) drop-shadow(0 0 6px rgba(242,193,78,0.9))'] }, options: { duration: DURATIONS.runningFlash, ease: EASINGS.easeOutCubic } },
 }
 
 export const FOCUS_HALO = {

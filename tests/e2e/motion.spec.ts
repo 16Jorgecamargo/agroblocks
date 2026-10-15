@@ -59,6 +59,13 @@ test('the running block glows and the harvest flies to the counter in full motio
   await expect
     .poll(async () => page.locator('.blocklyBlockCanvas .blocklyPath').evaluateAll((paths) => paths.some((path) => (path as SVGElement).style.filter.includes('drop-shadow'))))
     .toBe(true)
+  await expect
+    .poll(async () =>
+      page.locator('.blocklyBlockCanvas .agro-running-block > .blocklyPath').evaluateAll((paths) =>
+        paths.some((path) => getComputedStyle(path).strokeDasharray !== 'none' && (path as SVGElement).style.strokeDashoffset !== ''),
+      ),
+    )
+    .toBe(true)
   await expect(page.locator('.harvest-flight')).toHaveCount(1, { timeout: 20_000 })
   await expect(page.getByRole('group', { name: 'Colheita: 1' })).toBeVisible({ timeout: 20_000 })
 })

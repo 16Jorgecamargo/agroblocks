@@ -28,6 +28,12 @@
   z-index: 70;
 }
 
+.blockly-editor .agro-running-block > .blocklyPath {
+  stroke: #f2c14e;
+  stroke-width: 3px;
+  stroke-dasharray: 10 4;
+}
+
 .blockly-editor .agro-loose-block {
   opacity: 0.45;
 }
