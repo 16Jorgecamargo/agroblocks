@@ -1,4 +1,8 @@
 import { useMemo, useRef, type RefObject } from 'react'
+import { motion } from 'motion/react'
+import { Icon } from '@/components/icons/Icon'
+import { EASINGS } from '@/motion/easings'
+import { SPRINGS } from '@/motion/springs'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
 import { CameraRig } from '@/render/farm3d/CameraRig'
@@ -15,6 +19,8 @@ interface MissionMapSceneProps {
   selectedId: string
   onSelect: (id: string) => void
   lowGraphics: boolean
+  ambient: boolean
+  celebrateIds: string[]
 }
 
 const NODE_COLORS: Record<MissionStatus, string> = {
@@ -23,11 +29,6 @@ const NODE_COLORS: Record<MissionStatus, string> = {
   locked: '#6b7177',
 }
 
-const STATUS_MARK: Record<MissionStatus, string> = {
-  completed: '✓',
-  available: '▶',
-  locked: '🔒',
-}
 
 function LabelProjector({ labels }: { labels: RefObject<(HTMLButtonElement | null)[]> }) {
   const camera = useThree((three) => three.camera)
@@ -46,16 +47,16 @@ function LabelProjector({ labels }: { labels: RefObject<(HTMLButtonElement | nul
   return null
 }
 
-export default function MissionMapScene({ missions, statuses, selectedId, onSelect, lowGraphics }: MissionMapSceneProps) {
+export default function MissionMapScene({ missions, statuses, selectedId, onSelect, lowGraphics, ambient, celebrateIds }: MissionMapSceneProps) {
   const scenery = useMemo(() => mapScenery('mission-map', lowGraphics ? 14 : 38), [lowGraphics])
   const stones = useMemo(() => pathStones(), [])
   const labels = useRef<(HTMLButtonElement | null)[]>([])
   return (
     <div className="map-scene">
       <Canvas orthographic shadows={!lowGraphics} dpr={lowGraphics ? 1 : [1, 2]} camera={{ position: [16, 16, 16], zoom: 40, near: -200, far: 400 }} aria-hidden="true">
-        <color attach="background" args={[PALETTE.sky]} />
+        <color attach="background" args={['#131f29']} />
         <LabelProjector labels={labels} />
-        <CameraRig gridWidth={18} gridHeight={10} quarterTurns={0} zoomLevel={1.1} showcase={false} reducedMotion />
+        <CameraRig gridWidth={18} gridHeight={10} quarterTurns={0} zoomLevel={1.32} showcase={false} reducedMotion />
         <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
         <directionalLight position={[8, 14, 6]} intensity={1.4} castShadow={!lowGraphics} />
         <mesh position={[0, -0.1, 0]} receiveShadow>
@@ -109,6 +110,8 @@ export default function MissionMapScene({ missions, statuses, selectedId, onSele
       </Canvas>
       {missions.map((mission) => {
         const status = statuses[mission.id] ?? 'locked'
+        const celebrate = celebrateIds.includes(mission.id)
+        const pulse = status === 'available' && ambient && !celebrate
         return (
           <button
             key={mission.id}
@@ -121,9 +124,22 @@ export default function MissionMapScene({ missions, statuses, selectedId, onSele
             className={`map-label map-label--${status}${mission.id === selectedId ? ' is-selected' : ''}`}
             onClick={() => onSelect(mission.id)}
           >
-            <span className="map-label__mark">{STATUS_MARK[status]}</span>
-            <span className="map-label__number">{mission.tutorial ? 'T' : mission.order}</span>
-            <span className="map-label__text">{mission.title}</span>
+            <motion.span
+              className="map-label__inner"
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={celebrate ? { opacity: 1, scale: [0.6, 1.25, 1], rotate: [0, -6, 6, 0] } : { opacity: 1, scale: 1 }}
+              transition={{ ...SPRINGS.marker, delay: mission.order * 0.07 }}
+            >
+              <motion.span
+                className="map-label__hex"
+                animate={pulse ? { boxShadow: ['0 0 0 0 rgba(76,141,246,0.9)', '0 0 0 10px rgba(76,141,246,0)'] } : undefined}
+                transition={pulse ? { duration: 1.6, repeat: Infinity, ease: EASINGS.easeOutCubic } : undefined}
+              >
+                <span className="map-label__number">{mission.tutorial ? 'T' : mission.order}</span>
+                <Icon name={status === 'completed' ? 'check' : status === 'locked' ? 'lock' : 'play'} size={14} />
+              </motion.span>
+              <span className="map-label__text">{mission.title}</span>
+            </motion.span>
           </button>
         )
       })}

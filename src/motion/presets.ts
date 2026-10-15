@@ -153,3 +153,9 @@ export const PRESSABLE = {
   whileTap: { y: 3, scale: 0.97 },
   transition: SPRINGS.push3d,
 }
+
+export const cardFlip: Variants = {
+  hidden: { opacity: 0, rotateY: -80 },
+  visible: { opacity: 1, rotateY: 0, transition: { duration: 0.45, ease: EASINGS.easeOutCubic } },
+  exit: { opacity: 0, rotateY: 80, transition: { duration: 0.25, ease: EASINGS.easeInCubic } },
+}
