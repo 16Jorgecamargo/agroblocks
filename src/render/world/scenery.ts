@@ -38,7 +38,7 @@ export function addButterflies(random: () => number, area: Rect, count: number):
   return Array.from({ length: count }, () => ({ x: area.minX + random() * (area.maxX - area.minX), z: area.minZ + random() * (area.maxZ - area.minZ) }))
 }
 
-export function spawnHerd(random: () => number, pasture: Vec2[], herd: [AnimalSpecies, number][], prefix: string): AnimalSpawn[] {
+export function spawnHerd(random: () => number, pasture: Vec2[], herd: [AnimalSpecies, number][], prefix: string, scale = 1): AnimalSpawn[] {
   const bounds = polygonBounds(pasture)
   const animals: AnimalSpawn[] = []
   for (const [species, count] of herd) {
@@ -51,7 +51,7 @@ export function spawnHerd(random: () => number, pasture: Vec2[], herd: [AnimalSp
           break
         }
       }
-      animals.push({ id: `${prefix}-${species}-${index}`, species, x: point.x, z: point.z, area: pasture })
+      animals.push({ id: `${prefix}-${species}-${index}`, species, x: point.x, z: point.z, area: pasture, scale })
     }
   }
   return animals

@@ -4,12 +4,13 @@ import type { PropItem } from '@/render/world/worldTypes'
 
 const UP = new Vector3(0, 1, 0)
 
-export function propMatrix(prop: PropItem, entry: { scale: number; yOffset: number; rotationY: number }): Matrix4 {
+export function propMatrix(prop: PropItem, entry: { scale: number; yOffset: number; rotationY: number; stretchY?: number }): Matrix4 {
   const size = entry.scale * prop.scale
+  const stretch = entry.stretchY ?? 1
   return new Matrix4().compose(
-    new Vector3(prop.x, entry.yOffset * prop.scale, prop.z),
+    new Vector3(prop.x, entry.yOffset * prop.scale * stretch, prop.z),
     new Quaternion().setFromAxisAngle(UP, prop.rotation + entry.rotationY),
-    new Vector3(size, size, size),
+    new Vector3(size, size * stretch, size),
   )
 }
 

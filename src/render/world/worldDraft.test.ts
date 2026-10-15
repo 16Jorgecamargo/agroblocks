@@ -33,4 +33,11 @@ describe('WorldDraft', () => {
     expect(added).toHaveLength(4)
     expect(added.filter((prop) => prop.model === 'fence-gate')).toHaveLength(1)
   })
+
+  it('builds smaller fences when a smaller unit is given', () => {
+    const draft = new WorldDraft(createRandom(4), { grid, paths: [], river: null, keepOut: [], frontGuard: null })
+    draft.fenceLine({ x: 10, z: 0 }, { x: 14, z: 0 }, -1, 0.5)
+    expect(draft.props).toHaveLength(8)
+    expect(draft.props[0].scale).toBeCloseTo(0.5)
+  })
 })

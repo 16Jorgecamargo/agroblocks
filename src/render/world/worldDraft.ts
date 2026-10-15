@@ -70,11 +70,11 @@ export class WorldDraft {
     return placed
   }
 
-  fenceLine(from: Vec2, to: Vec2, gateIndex = -1): void {
+  fenceLine(from: Vec2, to: Vec2, gateIndex = -1, unit = 1): void {
     const dx = to.x - from.x
     const dz = to.z - from.z
     const length = Math.hypot(dx, dz)
-    const segments = Math.max(1, Math.round(length))
+    const segments = Math.max(1, Math.round(length / unit))
     const rotation = Math.atan2(-dz, dx)
     for (let index = 0; index < segments; index += 1) {
       const t = (index + 0.5) / segments

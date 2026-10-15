@@ -112,4 +112,18 @@ describe('buildWorld home', () => {
     for (const model of ['barn', 'water-tower', 'tower-windmill', 'small-barn'] as const) expect(models.has(model)).toBe(true)
     expect(world.animals.length).toBeGreaterThanOrEqual(4)
   })
+
+describe('world feedback fixes', () => {
+  it('keeps the area around the grid natural, without aligned crop rows', () => {
+    const world = buildWorld({ layout: 'farm', gridWidth: 5, gridHeight: 5, seed: 'rows', density: 'full' })
+    expect(world.props.some((prop) => prop.model.endsWith('-row'))).toBe(false)
+  })
+
+  it('shrinks map animals to the scale of the map scenery', () => {
+    const world = buildWorld({ layout: 'map', gridWidth: 0, gridHeight: 0, seed: 'mission-map', density: 'full' })
+    for (const animal of world.animals) expect(animal.scale).toBeLessThanOrEqual(0.6)
+    const farm = buildWorld({ layout: 'farm', gridWidth: 5, gridHeight: 5, seed: 'scale', density: 'full' })
+    for (const animal of farm.animals) expect(animal.scale).toBe(1)
+  })
+})
 })

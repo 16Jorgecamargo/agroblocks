@@ -39,11 +39,6 @@ const FOOTPRINTS: Partial<Record<ModelId, number>> = {
   'rock-a': 0.6,
   'bush-large': 0.6,
   bush: 0.4,
-  'corn-row': 0.4,
-  'wheat-row': 0.4,
-  'lettuce-row': 0.4,
-  'pumpkin-row': 0.4,
-  'carrot-row': 0.4,
 }
 
 const CLUTTER_SET: ReadonlySet<ModelId> = new Set<ModelId>(CLUTTER_MODELS)

@@ -7,13 +7,15 @@ import { SPRINGS } from '@/motion/springs'
 import { modelEntry, modelUrl, type ModelEntry } from '@/render/models/manifest'
 import { ModelBoundary, useClonedScene } from '@/render/models/Model'
 import { createRandom, hashString } from '@/render/seededRandom'
-import { closestAngle, headingTo, idleSeconds, nextTarget, SPECIES_SPEED, walkSeconds, type AnimalPhase } from '@/render/world/animalBrain'
-import type { AnimalSpawn } from '@/render/world/worldTypes'
+import { closestAngle, headingTo, idleSeconds, nextTarget, SPECIES_GAIT, SPECIES_SPEED, walkSeconds, type AnimalPhase } from '@/render/world/animalBrain'
+import type { AnimalSpawn, Vec2 } from '@/render/world/worldTypes'
+
+export type Occupancy = Map<string, Vec2>
 
 const FULL_TURN = Math.PI * 2
 const HEADING_STEPS = 628
 
-function AnimalBody({ entry, spawn, active }: { entry: ModelEntry; spawn: AnimalSpawn; active: boolean }) {
+function AnimalBody({ entry, spawn, active, occupancy }: { entry: ModelEntry; spawn: AnimalSpawn; active: boolean; occupancy: Occupancy }) {
   const object = useClonedScene(entry)
   const { animations } = useGLTF(modelUrl(entry))
   const { actions } = useAnimations(animations, object)
@@ -38,7 +40,8 @@ function AnimalBody({ entry, spawn, active }: { entry: ModelEntry; spawn: Animal
       return
     }
     const random = createRandom(hashString(spawn.id))
-    const speed = SPECIES_SPEED[spawn.species]
+    const speed = SPECIES_SPEED[spawn.species] * spawn.scale
+    const grazes = SPECIES_GAIT[spawn.species] === 'graze'
     let cancelled = false
     let running: AnimationPlaybackControls[] = []
     const loop = async () => {
@@ -49,8 +52,17 @@ function AnimalBody({ entry, spawn, active }: { entry: ModelEntry; spawn: Animal
         await rest
         const body = group.current
         if (cancelled || !body) return
+        if (grazes) {
+          const turn = animate(body.rotation, { y: body.rotation.y + (random() - 0.5) * Math.PI }, SPRINGS.snap)
+          running = [turn]
+          await turn
+          continue
+        }
         const from = { x: body.position.x, z: body.position.z }
-        const target = nextTarget(random, spawn.area, from)
+        const others = [...occupancy.entries()].filter(([id]) => id !== spawn.id).map(([, point]) => point)
+        const target = nextTarget(random, spawn.area, from, 1.2 * spawn.scale, others)
+        occupancy.set(spawn.id, target)
+        if (target === from) continue
         setPhase('walk')
         const turn = animate(body.rotation, { y: closestAngle(body.rotation.y, headingTo(from, target)) }, SPRINGS.snap)
         const walk = animate(body.position, { x: target.x, z: target.z }, { duration: walkSeconds(from, target, speed), ease: 'linear' })
@@ -63,22 +75,29 @@ function AnimalBody({ entry, spawn, active }: { entry: ModelEntry; spawn: Animal
       cancelled = true
       running.forEach((controls) => controls.stop())
     }
-  }, [active, spawn])
+  }, [active, spawn, occupancy])
+
+  useEffect(() => {
+    occupancy.set(spawn.id, { x: spawn.x, z: spawn.z })
+    return () => {
+      occupancy.delete(spawn.id)
+    }
+  }, [occupancy, spawn])
 
   return (
-    <group ref={group} position={[initial.x, 0, initial.z]} rotation={[0, initial.yaw, 0]}>
+    <group ref={group} position={[initial.x, 0, initial.z]} rotation={[0, initial.yaw, 0]} scale={spawn.scale}>
       <primitive object={object} scale={entry.scale} position={[0, entry.yOffset, 0]} rotation={[0, entry.rotationY, 0]} />
     </group>
   )
 }
 
-export function Animal({ spawn, active }: { spawn: AnimalSpawn; active: boolean }) {
+export function Animal({ spawn, active, occupancy }: { spawn: AnimalSpawn; active: boolean; occupancy: Occupancy }) {
   const entry = modelEntry(spawn.species)
   if (!entry) return null
   return (
     <ModelBoundary fallback={null}>
       <Suspense fallback={null}>
-        <AnimalBody entry={entry} spawn={spawn} active={active} />
+        <AnimalBody entry={entry} spawn={spawn} active={active} occupancy={occupancy} />
       </Suspense>
     </ModelBoundary>
   )

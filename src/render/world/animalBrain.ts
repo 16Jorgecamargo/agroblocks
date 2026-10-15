@@ -1,12 +1,23 @@
 import { DURATIONS } from '@/motion/presets'
-import { pointInPolygon, polygonBounds } from '@/render/world/geometry'
+import { distanceToSegment, pointInPolygon, polygonBounds } from '@/render/world/geometry'
 import type { AnimalSpecies, Vec2 } from '@/render/world/worldTypes'
 
 export type AnimalPhase = 'idle' | 'walk'
 
+export type AnimalGait = 'walk' | 'graze'
+
+export const SPECIES_GAIT: Record<AnimalSpecies, AnimalGait> = {
+  cow: 'walk',
+  horse: 'walk',
+  pig: 'graze',
+  sheep: 'graze',
+  llama: 'graze',
+  pug: 'graze',
+}
+
 export const SPECIES_SPEED: Record<AnimalSpecies, number> = {
-  cow: 0.6,
-  horse: 1.1,
+  cow: 0.45,
+  horse: 0.9,
   pig: 0.7,
   sheep: 0.8,
   llama: 0.8,
@@ -14,6 +25,8 @@ export const SPECIES_SPEED: Record<AnimalSpecies, number> = {
 }
 
 const TARGET_TRIES = 40
+const PERSONAL_SPACE = 1.2
+const PASSING_SPACE = 1
 
 export function idleSeconds(random: () => number): number {
   return DURATIONS.animalIdleMin + random() * (DURATIONS.animalIdleMax - DURATIONS.animalIdleMin)
@@ -23,11 +36,13 @@ export function walkSeconds(from: Vec2, to: Vec2, speed: number): number {
   return Math.max(DURATIONS.animalStepMin, Math.hypot(to.x - from.x, to.z - from.z) / speed)
 }
 
-export function nextTarget(random: () => number, area: Vec2[], from: Vec2, minStep = 1.2): Vec2 {
+export function nextTarget(random: () => number, area: Vec2[], from: Vec2, minStep = 1.2, others: Vec2[] = []): Vec2 {
   const bounds = polygonBounds(area)
   for (let tries = 0; tries < TARGET_TRIES; tries += 1) {
     const candidate = { x: bounds.minX + random() * (bounds.maxX - bounds.minX), z: bounds.minZ + random() * (bounds.maxZ - bounds.minZ) }
-    if (pointInPolygon(candidate, area) && Math.hypot(candidate.x - from.x, candidate.z - from.z) >= minStep) return candidate
+    if (!pointInPolygon(candidate, area) || Math.hypot(candidate.x - from.x, candidate.z - from.z) < minStep) continue
+    const crowded = others.some((other) => Math.hypot(candidate.x - other.x, candidate.z - other.z) < PERSONAL_SPACE || distanceToSegment(other, from, candidate) < PASSING_SPACE)
+    if (!crowded) return candidate
   }
   return from
 }

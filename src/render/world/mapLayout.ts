@@ -5,6 +5,8 @@ import { FOREST_MODELS } from '@/render/world/worldCatalog'
 import { WorldDraft } from '@/render/world/worldDraft'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
+const MAP_ANIMAL_SCALE = 0.55
+
 export const MAP_ISLAND: Rect = { minX: -10.5, maxX: 10.5, minZ: -10.5, maxZ: 10.5 }
 
 function screen(horizontal: number, depth: number): Vec2 {
@@ -37,10 +39,10 @@ export function mapLayout(input: WorldInput, random: () => number): World {
 
   for (const crossing of crossings(trailPath, river)) draft.force('bridge', crossing.point, crossing.angle, 0.7)
 
-  draft.fenceLine({ x: pastureRect.minX, z: pastureRect.minZ }, { x: pastureRect.maxX, z: pastureRect.minZ })
-  draft.fenceLine({ x: pastureRect.maxX, z: pastureRect.minZ }, { x: pastureRect.maxX, z: pastureRect.maxZ }, 1)
-  draft.fenceLine({ x: pastureRect.maxX, z: pastureRect.maxZ }, { x: pastureRect.minX, z: pastureRect.maxZ })
-  draft.fenceLine({ x: pastureRect.minX, z: pastureRect.maxZ }, { x: pastureRect.minX, z: pastureRect.minZ })
+  draft.fenceLine({ x: pastureRect.minX, z: pastureRect.minZ }, { x: pastureRect.maxX, z: pastureRect.minZ }, -1, MAP_ANIMAL_SCALE)
+  draft.fenceLine({ x: pastureRect.maxX, z: pastureRect.minZ }, { x: pastureRect.maxX, z: pastureRect.maxZ }, 2, MAP_ANIMAL_SCALE)
+  draft.fenceLine({ x: pastureRect.maxX, z: pastureRect.maxZ }, { x: pastureRect.minX, z: pastureRect.maxZ }, -1, MAP_ANIMAL_SCALE)
+  draft.fenceLine({ x: pastureRect.minX, z: pastureRect.maxZ }, { x: pastureRect.minX, z: pastureRect.minZ }, -1, MAP_ANIMAL_SCALE)
 
   draft.placeNear('barn', screen(-14, -7), Math.PI / 4, 0.6)
   draft.placeNear('small-barn', screen(1, 8), -0.4, 0.7)
@@ -62,7 +64,7 @@ export function mapLayout(input: WorldInput, random: () => number): World {
     trail,
     props: draft.props,
     pasture,
-    animals: spawnHerd(random, pasture, [['sheep', 3], ['cow', 2]], 'map'),
+    animals: spawnHerd(random, pasture, [['sheep', 3], ['cow', 2]], 'map', MAP_ANIMAL_SCALE),
     butterflies: addButterflies(random, MAP_ISLAND, 6),
   }
 }

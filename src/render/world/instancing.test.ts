@@ -24,4 +24,14 @@ describe('instancing helpers', () => {
     expect(groups.get('tree-a')).toHaveLength(2)
     expect(groups.get('cow')).toHaveLength(1)
   })
+
+  it('stretches a prop vertically when its manifest asks for it', () => {
+    const matrix = propMatrix({ model: 'fence', x: 0, z: 0, rotation: 0, scale: 1 }, { scale: 0.5, yOffset: 0, rotationY: 0, stretchY: 2 })
+    const position = new Vector3()
+    const rotation = new Quaternion()
+    const scale = new Vector3()
+    matrix.decompose(position, rotation, scale)
+    expect(scale.x).toBeCloseTo(0.5)
+    expect(scale.y).toBeCloseTo(1)
+  })
 })

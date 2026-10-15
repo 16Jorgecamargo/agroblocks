@@ -4,8 +4,6 @@ import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import { WorldDraft } from '@/render/world/worldDraft'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
-const CROP_ROWS = ['corn-row', 'wheat-row', 'lettuce-row', 'pumpkin-row', 'carrot-row'] as const
-
 export function farmLayout(input: WorldInput, random: () => number): World {
   const hw = input.gridWidth / 2
   const hh = input.gridHeight / 2
@@ -63,10 +61,6 @@ export function farmLayout(input: WorldInput, random: () => number): World {
       draft.placeNear('apple-tree', { x: hw + 8.5 + column * 2.4, z: -hh - 7 + row * 2.6 }, random() * Math.PI * 2, 0.9 + random() * 0.2)
     }
   }
-
-  CROP_ROWS.forEach((model, rowIndex) => {
-    for (let x = -hw + 0.5; x <= hw - 0.5; x += 1) draft.place(model, { x, z: hh + 2.8 + rowIndex * 1.1 }, 0, 1)
-  })
 
   const core: Rect = { minX: -hw - 13, maxX: hw + 16, minZ: -hh - 13, maxZ: hh + 8.5 }
   draft.scatter(FOREST_MODELS, full ? 30 : 15, core, [0.85, 1.15])

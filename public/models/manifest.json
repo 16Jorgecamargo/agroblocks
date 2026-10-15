@@ -25,66 +25,6 @@
       "bytes": 66424
     },
     {
-      "id": "corn-row",
-      "file": "models/corn-row.glb",
-      "usage": "fileira de milho",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.4829,
-      "yOffset": -0.0017,
-      "rotationY": 0,
-      "bytes": 40828
-    },
-    {
-      "id": "wheat-row",
-      "file": "models/wheat-row.glb",
-      "usage": "fileira de trigo",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.6329,
-      "yOffset": 0,
-      "rotationY": 0,
-      "bytes": 5340
-    },
-    {
-      "id": "lettuce-row",
-      "file": "models/lettuce-row.glb",
-      "usage": "fileira de alface",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.6327,
-      "yOffset": 0.0423,
-      "rotationY": 0,
-      "bytes": 56876
-    },
-    {
-      "id": "pumpkin-row",
-      "file": "models/pumpkin-row.glb",
-      "usage": "fileira de abóbora",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.7627,
-      "yOffset": 0.0319,
-      "rotationY": 0,
-      "bytes": 112704
-    },
-    {
-      "id": "carrot-row",
-      "file": "models/carrot-row.glb",
-      "usage": "fileira de cenoura",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/ultimatecrops.html",
-      "scale": 0.3127,
-      "yOffset": 0.1907,
-      "rotationY": 0,
-      "bytes": 22976
-    },
-    {
       "id": "tree-a",
       "file": "models/tree-a.glb",
       "usage": "árvore",
@@ -214,6 +154,7 @@
       "scale": 1,
       "yOffset": 0.05,
       "rotationY": 0,
+      "stretchY": 1.9,
       "bytes": 3704
     },
     {
@@ -226,6 +167,7 @@
       "scale": 1,
       "yOffset": 0.05,
       "rotationY": 0,
+      "stretchY": 1.9,
       "bytes": 16728
     },
     {

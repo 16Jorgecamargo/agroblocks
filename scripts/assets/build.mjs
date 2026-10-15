@@ -149,6 +149,7 @@ for (const model of ordered) {
     scale: fit.scale,
     yOffset: fit.yOffset,
     rotationY: model.rotationY,
+    ...(model.stretchY ? { stretchY: model.stretchY } : {}),
     bytes,
     ...(model.clips ? { clips: model.clips } : {}),
     ...(model.recolor ? { recolor: model.recolor } : {}),

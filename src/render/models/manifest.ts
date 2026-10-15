@@ -53,11 +53,6 @@ export const WORLD_MODEL_IDS = [
   'pebble',
   'rock-medium',
   'apple-tree',
-  'corn-row',
-  'wheat-row',
-  'lettuce-row',
-  'pumpkin-row',
-  'carrot-row',
 ] as const
 
 export type ModelId = (typeof REQUIRED_MODEL_IDS)[number] | (typeof OPTIONAL_MODEL_IDS)[number] | (typeof WORLD_MODEL_IDS)[number]
@@ -74,6 +69,7 @@ const entrySchema = z.object({
   scale: z.number().positive(),
   yOffset: z.number(),
   rotationY: z.number(),
+  stretchY: z.number().positive().optional(),
   bytes: z.number().int().positive(),
   clips: z.object({ idle: z.string(), move: z.string(), success: z.string(), error: z.string() }).partial().optional(),
   recolor: z.record(z.string(), z.string()).optional(),

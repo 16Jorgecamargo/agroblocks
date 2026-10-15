@@ -57,46 +57,6 @@
       "rotationY": 0
     },
     {
-      "id": "corn-row",
-      "pack": "crops",
-      "source": "FBX/Corn_4.fbx",
-      "usage": "fileira de milho",
-      "targetHeight": 0.95,
-      "rotationY": 0
-    },
-    {
-      "id": "wheat-row",
-      "pack": "crops",
-      "source": "FBX/Wheat_4.fbx",
-      "usage": "fileira de trigo",
-      "targetHeight": 0.6,
-      "rotationY": 0
-    },
-    {
-      "id": "lettuce-row",
-      "pack": "crops",
-      "source": "FBX/Lettuce_4.fbx",
-      "usage": "fileira de alface",
-      "targetHeight": 0.3,
-      "rotationY": 0
-    },
-    {
-      "id": "pumpkin-row",
-      "pack": "crops",
-      "source": "FBX/Pumpkin_4.fbx",
-      "usage": "fileira de abóbora",
-      "targetHeight": 0.45,
-      "rotationY": 0
-    },
-    {
-      "id": "carrot-row",
-      "pack": "crops",
-      "source": "FBX/Carrot_4.fbx",
-      "usage": "fileira de cenoura",
-      "targetHeight": 0.4,
-      "rotationY": 0
-    },
-    {
       "id": "tree-a",
       "pack": "nature-kit",
       "source": "Models/GLTF format/tree_default.glb",
@@ -218,7 +178,8 @@
       "source": "Models/GLTF format/fence_simple.glb",
       "usage": "cerca",
       "targetWidth": 1,
-      "rotationY": 0
+      "rotationY": 0,
+      "stretchY": 1.9
     },
     {
       "id": "fence-gate",
@@ -226,7 +187,8 @@
       "source": "Models/GLTF format/fence_gate.glb",
       "usage": "porteira",
       "targetWidth": 1,
-      "rotationY": 0
+      "rotationY": 0,
+      "stretchY": 1.9
     },
     {
       "id": "bridge",

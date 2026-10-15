@@ -6,11 +6,6 @@ Todos os modelos 3D são CC0 1.0 (domínio público) e foram convertidos para GL
 |---|---|---|---|
 | crop-5 | planta: madura | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
 | apple-tree | macieira do pomar | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| corn-row | fileira de milho | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| wheat-row | fileira de trigo | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| lettuce-row | fileira de alface | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| pumpkin-row | fileira de abóbora | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
-| carrot-row | fileira de cenoura | Quaternius | https://quaternius.com/packs/ultimatecrops.html |
 | tree-a | árvore | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | tree-b | árvore | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | tree-c | árvore | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
