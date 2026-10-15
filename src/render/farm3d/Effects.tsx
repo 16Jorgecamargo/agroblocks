@@ -4,6 +4,7 @@ import type { Group } from 'three'
 import { EASINGS } from '@/motion/easings'
 import { SPRINGS } from '@/motion/springs'
 import { PALETTE } from '@/render/palette'
+import { effectKind } from '@/render/farm3d/effectKind'
 import { cellToWorld } from '@/render/sceneLayout'
 import type { GameEvent } from '@/game/world/types'
 
@@ -92,6 +93,32 @@ function SeedDrop({ x, z }: EffectProps) {
   )
 }
 
+function SoilBurst({ x, z, seconds }: EffectProps) {
+  const ref = useRef<Group>(null)
+  const [finished, finish] = useFinished()
+  useEffect(() => {
+    const group = ref.current
+    if (!group) return
+    const controls = group.children.map((child, index) => {
+      const angle = (index / group.children.length) * Math.PI * 2
+      return animate(child.position, { x: [0, Math.cos(angle) * 0.35], y: [0.2, 0.5, 0.18], z: [0, Math.sin(angle) * 0.35] }, { duration: seconds, ease: EASINGS.easeOutCubic })
+    })
+    Promise.all(controls).then(finish)
+    return () => controls.forEach((control) => control.stop())
+  }, [seconds])
+  if (finished) return null
+  return (
+    <group ref={ref} position={[x, 0, z]}>
+      {[0, 1, 2, 3, 4, 5].map((index) => (
+        <mesh key={index} position={[0, 0.2, 0]}>
+          <dodecahedronGeometry args={[0.045, 0]} />
+          <meshBasicMaterial color={PALETTE.soilTilled} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 interface EffectsLayerProps {
   events: GameEvent[]
   eventKey: number
@@ -105,20 +132,14 @@ export function EffectsLayer({ events, eventKey, gridWidth, gridHeight, duration
   return (
     <>
       {events.map((event, index) => {
+        const kind = effectKind(event)
+        if (!kind || !('x' in event)) return null
         const key = `${eventKey}-${index}`
-        if (event.type === 'moistureChanged' && event.moisture === 'wet') {
-          const point = cellToWorld(event.x, event.y, gridWidth, gridHeight)
-          return <WaterSplash key={key} x={point.x} z={point.z} seconds={seconds} />
-        }
-        if (event.type === 'plotChanged' && event.to === 'harvested') {
-          const point = cellToWorld(event.x, event.y, gridWidth, gridHeight)
-          return <HarvestPop key={key} x={point.x} z={point.z} seconds={seconds} />
-        }
-        if (event.type === 'plotChanged' && event.to === 'seeded') {
-          const point = cellToWorld(event.x, event.y, gridWidth, gridHeight)
-          return <SeedDrop key={key} x={point.x} z={point.z} seconds={seconds} />
-        }
-        return null
+        const point = cellToWorld(event.x, event.y, gridWidth, gridHeight)
+        if (kind === 'water') return <WaterSplash key={key} x={point.x} z={point.z} seconds={seconds} />
+        if (kind === 'harvest') return <HarvestPop key={key} x={point.x} z={point.z} seconds={seconds} />
+        if (kind === 'seed') return <SeedDrop key={key} x={point.x} z={point.z} seconds={seconds} />
+        return <SoilBurst key={key} x={point.x} z={point.z} seconds={seconds} />
       })}
     </>
   )
