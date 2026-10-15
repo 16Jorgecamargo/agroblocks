@@ -5,6 +5,7 @@ import { SPRINGS } from '@/motion/springs'
 export const DURATIONS = {
   fadeSlide: 0.6,
   runningMarch: 0.6,
+  panelSplit: 0.28,
   runningFlash: 0.35,
   softRise: 0.9,
   snapIn: 0.38,

@@ -6,6 +6,7 @@ import { Icon, type IconName } from '@/components/icons/Icon'
 import { SPEEDS, type ExecutionStatus, type Speed } from '@/game/execution/types'
 import { BADGE_POP, DURATIONS, ERROR_SHAKE } from '@/motion/presets'
 import { SPRINGS } from '@/motion/springs'
+import { EASINGS } from '@/motion/easings'
 
 interface ExecutionPanelProps {
   status: ExecutionStatus
@@ -51,19 +52,14 @@ export function ExecutionPanel(props: ExecutionPanelProps) {
       <h2 id="execution-title" className="side-title">
         Execução
       </h2>
-      {stepping ? (
-        <motion.div key="split" role="group" aria-label="Controles do passo a passo" className="execution-panel__split" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={SPRINGS.snap}>
-          <GameButton tone="primary" size="lg" className="execution-panel__main" onClick={props.onStep} disabled={running}>
-            <SwapIcon name="step" />
-            Próximo passo
-          </GameButton>
-          <GameButton tone="danger" size="lg" icon="stop" className="execution-panel__main" onClick={props.onStop}>
-            Parar
-          </GameButton>
-        </motion.div>
-      ) : (
-        <motion.div key={active ? 'stop' : 'run'} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={SPRINGS.snap}>
-          {active ? (
+      <div className="execution-panel__actions" role={stepping ? 'group' : undefined} aria-label={stepping ? 'Controles do passo a passo' : undefined}>
+        <div className="execution-panel__slot">
+          {stepping ? (
+            <GameButton tone="primary" size="lg" className="execution-panel__main" onClick={props.onStep} disabled={running}>
+              <SwapIcon name="step" />
+              Próximo
+            </GameButton>
+          ) : active ? (
             <GameButton tone="danger" size="lg" icon="stop" className="execution-panel__main" onClick={props.onStop}>
               Parar
             </GameButton>
@@ -73,8 +69,24 @@ export function ExecutionPanel(props: ExecutionPanelProps) {
               Executar
             </GameButton>
           )}
-        </motion.div>
-      )}
+        </div>
+        <AnimatePresence initial={false}>
+          {stepping && (
+            <motion.div
+              key="stop"
+              className="execution-panel__slot execution-panel__slot--stop"
+              initial={{ width: 0, marginLeft: 0, opacity: 0 }}
+              animate={{ width: 'calc(50% - 4px)', marginLeft: 8, opacity: 1 }}
+              exit={{ width: 0, marginLeft: 0, opacity: 0 }}
+              transition={{ duration: DURATIONS.panelSplit, ease: EASINGS.easeOutCubic }}
+            >
+              <GameButton tone="danger" size="lg" icon="stop" className="execution-panel__main" onClick={props.onStop}>
+                Parar
+              </GameButton>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
       <GameToggle label="Passo a passo" checked={stepMode} onChange={props.onStepModeChange} />
       <label className="execution-panel__speed">
         <span>Velocidade</span>

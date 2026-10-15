@@ -88,14 +88,21 @@
   min-height: 48px;
 }
 
-.execution-panel__split {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--space-2);
+.execution-panel__actions {
+  display: flex;
 }
 
-.execution-panel__split .execution-panel__main {
+.execution-panel__slot {
+  flex: 1 1 0;
   min-width: 0;
+}
+
+.execution-panel__slot--stop {
+  flex: none;
+  overflow: hidden;
+}
+
+.execution-panel__slot .execution-panel__main {
   padding-inline: var(--space-2);
   white-space: nowrap;
 }

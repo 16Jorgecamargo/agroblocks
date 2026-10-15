@@ -55,7 +55,7 @@ test('step mode executes one instruction per click', async ({ page }) => {
   await openMission(page, 'm1-first-harvest')
   await page.getByRole('switch', { name: 'Passo a passo' }).click()
   await page.getByRole('button', { name: 'Executar' }).click()
-  await page.getByRole('button', { name: 'Próximo passo' }).click()
+  await page.getByRole('button', { name: 'Próximo' }).click()
   await expect(page.getByRole('log').getByText(/Robô: mover para frente/)).toHaveCount(2)
   await expect(page.getByRole('group', { name: 'Controles do passo a passo' }).getByRole('button', { name: 'Parar' })).toBeVisible()
   await expect(page.getByRole('gridcell', { name: /coluna 1, linha 3: .*robô/ })).toBeVisible()

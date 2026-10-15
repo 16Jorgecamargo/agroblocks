@@ -53,7 +53,7 @@ describe('gameplay components', () => {
     expect(screen.getByRole('button', { name: 'Executar' })).toBeEnabled()
   })
 
-  it('splits into Próximo passo and Parar side by side once a step run starts', () => {
+  it('splits into Próximo and Parar side by side once a step run starts', () => {
     const onStep = vi.fn()
     const onStop = vi.fn()
     const { rerender } = render(<ExecutionPanel {...panelProps} onStep={onStep} onStop={onStop} status="idle" stepMode />)
@@ -63,8 +63,9 @@ describe('gameplay components', () => {
 
     rerender(<ExecutionPanel {...panelProps} onStep={onStep} onStop={onStop} status="paused" stepMode />)
     const split = screen.getByRole('group', { name: 'Controles do passo a passo' })
-    expect([...split.querySelectorAll('button')].map((button) => button.textContent?.trim())).toEqual(['Próximo passo', 'Parar'])
-    fireEvent.click(screen.getByRole('button', { name: 'Próximo passo' }))
+    expect([...split.querySelectorAll('button')].map((button) => button.textContent?.trim())).toEqual(['Próximo', 'Parar'])
+    expect(split.querySelectorAll('.execution-panel__slot')).toHaveLength(2)
+    fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
     fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
     expect(onStep).toHaveBeenCalledTimes(2)
     expect(onStop).toHaveBeenCalledTimes(1)
@@ -79,7 +80,7 @@ describe('gameplay components', () => {
 
   it('turns the main button into a single step in step mode', () => {
     render(<ExecutionPanel {...panelProps} status="paused" stepMode />)
-    fireEvent.click(screen.getByRole('button', { name: 'Próximo passo' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
     expect(panelProps.onStep).toHaveBeenCalled()
   })
 
