@@ -59,6 +59,10 @@ export function MissionSelectPage() {
   const show3d = renderMode !== '2d' && webgl
 
   useEffect(() => {
+    if (show3d) void import('@/render/models/Model').then((module) => module.preloadModels())
+  }, [show3d])
+
+  useEffect(() => {
     if (celebrateIds.length === 0) return
     saveSeenUnlocks(safeStorage(), [...loadSeenUnlocks(safeStorage()), ...celebrateIds])
   }, [celebrateIds])
