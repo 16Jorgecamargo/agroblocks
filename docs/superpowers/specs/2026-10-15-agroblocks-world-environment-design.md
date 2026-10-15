@@ -53,11 +53,11 @@ Alturas-alvo: robô 0,9 · tomateiro maduro 0,8 · vaca 1,1 · cavalo 1,5 · por
 buildWorld(input: { gridWidth: number; gridHeight: number; seed: string; density: 'full' | 'light'; layout: 'farm' | 'map' | 'home' }): World
 ```
 
-`World = { tiles: TileItem[]; props: PropItem[]; pasture: Polygon; animals: AnimalSpawn[]; bounds: Rect }`. Coordenadas em unidades do jogo, origem no centro do grid da missão (para `farm`).
+`World = { ground; paths; river; island; trail; props: PropItem[]; pasture: Vec2[] | null; animals: AnimalSpawn[]; butterflies: Vec2[] }`. Coordenadas em unidades do jogo, origem no centro do grid da missão (para `farm`).
 
-### 4.2 Terreno em tiles
+### 4.2 Terreno
 
-Mundo = grid de tiles 1×1 maior que o grid da missão (margem de 10 tiles na `farm`). Cada tile: `grass`, `path` (com variante reta/curva/cruz/fim), `river` (reta/curva), `bridge`, ou `void` (fora da ilha). A borda da ilha recebe `cliff_*` (só em `map`; `farm`/`home` usam chão contínuo até o horizonte). O grid da missão continua desenhado pelo `PlotTile` atual por cima.
+`World` traz `ground` (retângulo de grama), `paths` e `river` como polilinhas com largura, `island` (só no `map`) e `trail` (pontos das fases no `map`). O renderizador desenha caminhos e rio como faixas curvas suaves (Catmull-Rom): terra clara `#c9a46b`; rio com margem `#d9c08a` e água `#4c9be8`. Pontes de madeira (Kenney `bridge_wood`) entram onde um caminho cruza o rio, calculadas por interseção de segmentos. A ilha do mapa é uma placa com laterais de rocha. Faixas curvas no lugar de tiles quadrados evitam o visual "em blocos" e seguem os caminhos arredondados da referência. O grid da missão continua desenhado pelo `PlotTile` atual.
 
 ### 4.3 Zonas na `farm`
 
@@ -86,6 +86,28 @@ A tela inicial usa `buildWorld({ layout: 'home' })` com a câmera em perspectiva
 - `src/render/world/Animal.tsx` — carrega o GLB do animal, toca o clipe pelo estado (`walk` → `Walk`/`WalkSlow`; ovelha usa `Jump` como passo; `idle` → `Idle`), move com `animate()` do Motion na posição e vira com mola `SPRINGS.snap`; velocidade 0,6–1,2 unidade/s por espécie.
 - Rebanho na `farm`: 2 vacas, 2 cavalos, 3 porcos, 4 ovelhas, 1 lhama no pasto; 1 cachorro no pátio. No `map`: grupos pequenos perto dos celeiros. Na `home`: 2 vacas e 2 ovelhas atrás da cerca.
 - "Reduzir animações" ou "Gráficos leves": animais parados em pose `Idle` congelada (sem mixer, sem deslocamento).
+
+## 5b. Vida e densidade
+
+O usuário pediu "um ambiente bem preenchido e vivo igual nas imagens de referência". Densidade alvo da `farm` em `full`: cerca de 90 árvores/arbustos/pedras na floresta, 400 itens de chão (grama, trevos, flores, samambaias, cogumelos, pedrinhas), pomar com 10 a 12 macieiras, 5 fileiras de plantio e 9 a 10 construções no pátio. Elementos vivos:
+
+- animais andando (seção 5);
+- borboletas (8 na `farm`, 6 no `map`, 5 na `home`): pequenos pares de asas que voam em laços (Motion);
+- pás do moinho girando (quando o modelo tiver um nó de pás identificável);
+- vitórias-régias balançando no rio.
+
+Todos param com "Reduzir animações" ou "Gráficos leves".
+
+## 5c. Tela de carregamento (splash)
+
+Pedido do usuário: "deixe uma tela de carregamento (splash) caso precise carregar as coisas". Cada cena 3D (fazenda, mapa e início) fica coberta por uma splash enquanto o chunk JS e os GLB carregam:
+
+- fundo azul-marinho do cromo com o logo;
+- texto "Carregando fazenda…";
+- barra de progresso real (`useProgress` do drei);
+- pontos saltitantes (Motion).
+
+A splash some com fade quando o canvas foi criado e não há carregamento ativo, ficando no mínimo 0,4 s na tela. Com movimento reduzido, some sem animação. Também some se um modelo falhar, pois o fallback entra no lugar.
 
 ## 6. Desempenho
 
