@@ -1,6 +1,9 @@
-import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useEffect, useRef, type ReactNode } from 'react'
+import { animate as animateValue } from 'motion'
 import type { Group } from 'three'
+import { Sway } from '@/render/farm3d/motion3d'
+import { Model } from '@/render/models/Model'
+import { decorationModelId } from '@/render/models/modelChoice'
 import { PALETTE } from '@/render/palette'
 import { Flat } from '@/render/farm3d/materials'
 import type { Decoration } from '@/render/sceneLayout'
@@ -103,11 +106,14 @@ export function Barn() {
   )
 }
 
-export function Windmill({ animate }: { animate: boolean }) {
+export function Windmill({ animate: spin }: { animate: boolean }) {
   const blades = useRef<Group>(null)
-  useFrame((_, delta) => {
-    if (animate && blades.current) blades.current.rotation.z += delta * 0.8
-  })
+  useEffect(() => {
+    const group = blades.current
+    if (!group || !spin) return
+    const controls = animateValue(group.rotation, { z: [0, Math.PI * 2] }, { duration: 8, repeat: Infinity, ease: 'linear' })
+    return () => controls.stop()
+  }, [spin])
   return (
     <group>
       <mesh position={[0, 1.4, 0]} castShadow>
@@ -116,7 +122,7 @@ export function Windmill({ animate }: { animate: boolean }) {
       </mesh>
       <group ref={blades} position={[0, 2.8, 0.35]}>
         {[0, 1, 2, 3].map((index) => (
-          <mesh key={index} rotation={[0, 0, (index * Math.PI) / 2]} position={[0, 0, 0]}>
+          <mesh key={index} rotation={[0, 0, (index * Math.PI) / 2]}>
             <boxGeometry args={[0.16, 1.5, 0.03]} />
             <Flat color={PALETTE.barnTrim} />
           </mesh>
@@ -141,19 +147,41 @@ function Silo() {
   )
 }
 
-export function Decorations({ items, animate }: { items: Decoration[]; animate: boolean }) {
+function procedural(item: Decoration, ambient: boolean): ReactNode {
+  switch (item.kind) {
+    case 'tree':
+      return <Tree variant={item.variant} />
+    case 'pine':
+      return <Pine />
+    case 'rock':
+      return <Rock />
+    case 'bush':
+      return <Bush />
+    case 'fence':
+      return <Fence />
+    case 'barn':
+      return <Barn />
+    case 'windmill':
+      return <Windmill animate={ambient} />
+    case 'silo':
+      return <Silo />
+  }
+}
+
+const SWAYING: Decoration['kind'][] = ['tree', 'pine', 'bush']
+
+export function Decorations({ items, animate: ambient }: { items: Decoration[]; animate: boolean }) {
   return (
     <>
       {items.map((item, index) => (
         <group key={index} position={[item.x, 0, item.z]} rotation={[0, item.rotation, 0]} scale={item.scale}>
-          {item.kind === 'tree' && <Tree variant={item.variant} />}
-          {item.kind === 'pine' && <Pine />}
-          {item.kind === 'rock' && <Rock />}
-          {item.kind === 'bush' && <Bush />}
-          {item.kind === 'fence' && <Fence />}
-          {item.kind === 'barn' && <Barn />}
-          {item.kind === 'windmill' && <Windmill animate={animate} />}
-          {item.kind === 'silo' && <Silo />}
+          <Sway enabled={ambient && SWAYING.includes(item.kind)} seed={index}>
+            {item.kind === 'windmill' ? (
+              procedural(item, ambient)
+            ) : (
+              <Model id={decorationModelId(item.kind, item.variant)} fallback={procedural(item, ambient)} />
+            )}
+          </Sway>
         </group>
       ))}
     </>

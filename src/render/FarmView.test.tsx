@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS } from '@/services/storage/settingsStorage'
 
 describe('FarmView', () => {
   const props = {
+    growTicks: 3,
     state: makeState(['. .']),
     lastEvents: [],
     eventKey: 0,

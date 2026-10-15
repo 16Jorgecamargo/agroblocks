@@ -110,6 +110,7 @@ export default function HomeLandscape({ ambient, lowGraphics }: { ambient: boole
             position={[(index % 4) - 1.5, 0, Math.floor(index / 4) - 1]}
             isGoal={false}
             reducedMotion
+            growTicks={4}
           />
         ))}
       </group>

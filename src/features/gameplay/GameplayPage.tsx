@@ -134,6 +134,8 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             highlightCells={highlightCells}
             failed={snapshot.status === 'failed'}
             seedKey={mission.id}
+            growTicks={mission.growTicks}
+            celebrating={succeeded}
           />
           <AnimatePresence>
             {succeeded && (

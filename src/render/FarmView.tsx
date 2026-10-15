@@ -18,6 +18,8 @@ export interface FarmSceneProps {
   highlightCells: CellRef[]
   failed: boolean
   seedKey: string
+  growTicks: number
+  celebrating: boolean
   quarterTurns: number
   zoomLevel: number
   lowGraphics: boolean
@@ -33,6 +35,8 @@ interface FarmViewProps {
   highlightCells: CellRef[]
   failed: boolean
   seedKey: string
+  growTicks: number
+  celebrating?: boolean
 }
 
 const ZOOM_LEVELS = [0.7, 0.85, 1, 1.25, 1.5]
@@ -82,6 +86,7 @@ export function FarmView(props: FarmViewProps) {
           <Suspense fallback={<div className="farm-view__loading">Carregando fazenda 3D…</div>}>
             <FarmScene
               {...props}
+              celebrating={props.celebrating ?? false}
               quarterTurns={quarterTurns}
               zoomLevel={ZOOM_LEVELS[zoomIndex]}
               lowGraphics={lowGraphics}
