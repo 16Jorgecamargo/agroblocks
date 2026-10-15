@@ -50,6 +50,14 @@ export const DURATIONS = {
   robotLook: 6,
   windmill: 8,
   skySway: 14,
+  clipFade: 0.25,
+  animalIdleMin: 2,
+  animalIdleMax: 6,
+  animalStepMin: 0.6,
+  butterflyLoop: 6,
+  wingFlap: 0.25,
+  lilyBob: 3.2,
+  splashHold: 0.4,
 } as const
 
 export const fadeSlide: Variants = {
