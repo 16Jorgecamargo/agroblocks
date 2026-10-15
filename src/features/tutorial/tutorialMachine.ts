@@ -1,6 +1,6 @@
 import type { ExecutionSnapshot, ExecutionStatus } from '@/game/execution/types'
 
-export type TutorialSignal = 'blockAdded' | 'blockRemoved' | 'run' | 'pause' | 'resume' | 'error' | 'success'
+export type TutorialSignal = 'blockAdded' | 'blockRemoved' | 'run' | 'pause' | 'resume' | 'stop' | 'error' | 'success'
 
 export interface TutorialStep {
   id: string
@@ -31,9 +31,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     waitFor: 'run',
   },
   {
-    id: 'pause',
-    text: 'Enquanto o robô anda, clique em Pausar. Depois clique em Continuar.',
-    waitFor: 'resume',
+    id: 'stop',
+    text: 'Enquanto o robô anda, clique em Parar: a fazenda volta ao início. Depois clique em Executar de novo.',
+    waitFor: 'stop',
     skipOn: ['error'],
   },
   {
@@ -59,6 +59,7 @@ export function statusSignal(previous: ExecutionStatus, snapshot: ExecutionSnaps
   if (previous === next) return null
   if (next === 'running') return previous === 'paused' ? 'resume' : 'run'
   if (next === 'paused' && previous === 'running') return 'pause'
+  if (next === 'idle' && (previous === 'running' || previous === 'paused')) return 'stop'
   if (next === 'failed') return 'error'
   if (next === 'finished') return snapshot.validation?.success ? 'success' : 'error'
   return null

@@ -1,8 +1,6 @@
-import type { ExecStep } from '@/blocks/interpreter/interpreter'
-import { ACTION_LABELS } from '@/blocks/pseudocode/pseudocode'
 import { programToWorkspaceJson } from '@/blocks/serializer/programToWorkspaceJson'
 import type { WorkspaceJson } from '@/blocks/serializer/workspaceJson'
-import type { ExecutionSnapshot, ExecutionStatus } from '@/game/execution/types'
+import type { ExecutionSnapshot } from '@/game/execution/types'
 import { computeEfficiencyStars } from '@/game/missions/efficiency'
 import type { CellRef } from '@/game/missions/goals'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
@@ -62,30 +60,6 @@ export function canRevealHint(revealed: number, failed: number): boolean {
   if (revealed >= MAX_HINTS) return false
   if (revealed === MAX_HINTS - 1) return failed >= 2
   return true
-}
-
-export const STATUS_LABELS: Record<ExecutionStatus, string> = {
-  idle: 'Pronto para executar',
-  running: 'Executando',
-  paused: 'Pausado',
-  finished: 'Programa terminou',
-  failed: 'Execução interrompida por erro',
-}
-
-export function currentStepLabel(step: ExecStep | null): string {
-  if (!step) return '—'
-  switch (step.type) {
-    case 'action':
-      return ACTION_LABELS[step.action]
-    case 'check':
-      return `${step.label} → ${step.result ? 'sim' : 'não'}`
-    case 'loop':
-      return `repetição ${step.iteration} de ${step.total}`
-    case 'variable':
-      return `${step.name} = ${step.value}`
-    case 'call':
-      return `procedimento ${step.name}`
-  }
 }
 
 export type ShortcutAction = 'run' | 'toggle' | 'step' | 'stop'

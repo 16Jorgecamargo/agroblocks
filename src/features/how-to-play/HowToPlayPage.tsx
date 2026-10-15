@@ -43,9 +43,8 @@ export function HowToPlayPage() {
           <h2>Executando</h2>
           <ul>
             <li><Icon name="play" size={16} /> <strong>Executar</strong>: roda o programa no ritmo escolhido.</li>
-            <li><Icon name="pause" size={16} /> <strong>Pausar / Continuar</strong>: congela e retoma a execução.</li>
             <li><Icon name="step" size={16} /> <strong>Passo a passo</strong>: cada clique executa uma instrução, inclusive as perguntas dos sensores.</li>
-            <li><Icon name="stop" size={16} /> <strong>Parar</strong> e <Icon name="reset" size={16} /> <strong>Reiniciar</strong>: a fazenda volta ao estado inicial.</li>
+            <li><Icon name="stop" size={16} /> <strong>Parar</strong>: interrompe a execução e a fazenda volta ao estado inicial.</li>
           </ul>
           <p>Atalhos: Ctrl + Enter executa, Espaço pausa ou continua, ponto executa um passo e Esc para.</p>
         </section>

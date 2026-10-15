@@ -94,7 +94,7 @@ describe('GameplayPage', () => {
   it('starts the student program instead of resuming a paused demonstration', () => {
     renderAt('/jogar/m1-first-harvest')
     fireEvent.click(screen.getByRole('button', { name: /Ver demonstração/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
     act(() => {
       vi.advanceTimersByTime(10000)
@@ -103,21 +103,17 @@ describe('GameplayPage', () => {
     expect(useProgressStore.getState().save.attempts).toHaveLength(1)
   })
 
-  it('pauses and continues', () => {
+  it('stops a run and puts the farm back to its initial state', () => {
     renderAt('/jogar/m1-first-harvest')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
+    const initial = screen.getByRole('grid', { name: 'Mapa da fazenda' }).innerHTML
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }))
-    const before = screen.getByRole('grid', { name: 'Mapa da fazenda' }).innerHTML
     act(() => {
-      vi.advanceTimersByTime(5000)
+      vi.advanceTimersByTime(1500)
     })
-    expect(screen.getByRole('grid', { name: 'Mapa da fazenda' }).innerHTML).toBe(before)
-    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }))
-    act(() => {
-      vi.advanceTimersByTime(10000)
-    })
-    expect(screen.getByRole('log')).toHaveTextContent('Missão cumprida!')
+    fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
+    expect(screen.getByRole('log')).toHaveTextContent('Execução interrompida')
+    expect(screen.getByRole('grid', { name: 'Mapa da fazenda' }).innerHTML).toBe(initial)
   })
 
   it('launches a harvest flight toward the harvest counter when a plant is harvested', () => {

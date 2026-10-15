@@ -3,33 +3,19 @@ import { AnimatePresence, motion, useAnimate } from 'motion/react'
 import { GameButton } from '@/components/game/GameButton'
 import { GameToggle } from '@/components/game/GameToggle'
 import { Icon, type IconName } from '@/components/icons/Icon'
-import { STATUS_LABELS } from '@/features/gameplay/gameplayLogic'
 import { SPEEDS, type ExecutionStatus, type Speed } from '@/game/execution/types'
-import { BADGE_POP, DURATIONS, ERROR_SHAKE, snapIn } from '@/motion/presets'
+import { BADGE_POP, DURATIONS, ERROR_SHAKE } from '@/motion/presets'
 import { SPRINGS } from '@/motion/springs'
 
 interface ExecutionPanelProps {
   status: ExecutionStatus
   speed: Speed
   stepMode: boolean
-  actionCount: number
-  currentLabel: string
   onRun: () => void
   onStep: () => void
-  onPause: () => void
-  onResume: () => void
   onStop: () => void
-  onReset: () => void
   onSpeedChange: (speed: Speed) => void
   onStepModeChange: (enabled: boolean) => void
-}
-
-const STATUS_ICONS: Record<ExecutionStatus, string> = {
-  idle: '●',
-  running: '▶',
-  paused: '❚❚',
-  finished: '✓',
-  failed: '✕',
 }
 
 function SwapIcon({ name }: { name: IconName }) {
@@ -50,9 +36,8 @@ function SwapIcon({ name }: { name: IconName }) {
 }
 
 export function ExecutionPanel(props: ExecutionPanelProps) {
-  const { status, speed, stepMode, actionCount, currentLabel } = props
+  const { status, speed, stepMode } = props
   const running = status === 'running'
-  const paused = status === 'paused'
   const [scope, animatePanel] = useAnimate<HTMLElement>()
 
   useEffect(() => {
@@ -68,9 +53,8 @@ export function ExecutionPanel(props: ExecutionPanelProps) {
         <SwapIcon name={stepMode ? 'step' : 'play'} />
         {stepMode ? 'Próximo passo' : 'Executar'}
       </GameButton>
-      <GameButton tone="secondary" className="execution-panel__secondary" onClick={paused ? props.onResume : props.onPause} disabled={!running && !paused}>
-        <SwapIcon name={paused ? 'play' : 'pause'} />
-        {paused ? 'Continuar' : 'Pausar'}
+      <GameButton tone="secondary" icon="stop" className="execution-panel__secondary" onClick={props.onStop} disabled={status === 'idle'}>
+        Parar
       </GameButton>
       <GameToggle label="Passo a passo" checked={stepMode} onChange={props.onStepModeChange} />
       <label className="execution-panel__speed">
@@ -90,28 +74,6 @@ export function ExecutionPanel(props: ExecutionPanelProps) {
           {speed.toLocaleString('pt-BR')}x
         </motion.output>
       </label>
-      <div className="execution-panel__row">
-        <GameButton tone="secondary" icon="stop" onClick={props.onStop} disabled={status === 'idle'}>
-          Parar
-        </GameButton>
-        <GameButton tone="secondary" icon="reset" onClick={props.onReset}>
-          Reiniciar
-        </GameButton>
-      </div>
-      <dl className="execution-panel__status">
-        <dt>Estado</dt>
-        <dd className={`status status--${status}`}>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.span key={status} variants={snapIn} initial="hidden" animate="visible" exit="exit">
-              <span aria-hidden="true">{STATUS_ICONS[status]}</span> {STATUS_LABELS[status]}
-            </motion.span>
-          </AnimatePresence>
-        </dd>
-        <dt>Comandos executados</dt>
-        <dd>{actionCount}</dd>
-        <dt>Bloco atual</dt>
-        <dd>{currentLabel}</dd>
-      </dl>
     </section>
   )
 }

@@ -1,7 +1,6 @@
 import {
   buildAttemptInput,
   canRevealHint,
-  currentStepLabel,
   formatResource,
   loadInitialWorkspace,
   objectiveCells,
@@ -59,12 +58,6 @@ describe('gameplayLogic', () => {
     expect(canRevealHint(3, 1)).toBe(false)
     expect(canRevealHint(3, 2)).toBe(true)
     expect(canRevealHint(4, 9)).toBe(false)
-  })
-
-  it('labels the current step', () => {
-    expect(currentStepLabel(null)).toBe('—')
-    expect(currentStepLabel({ type: 'action', action: 'water', blockId: 'x' })).toBe('regar canteiro')
-    expect(currentStepLabel({ type: 'check', blockId: 'x', label: 'o solo está seco?', result: true })).toBe('o solo está seco? → sim')
   })
 
   it('maps keyboard shortcuts and ignores typing contexts', () => {

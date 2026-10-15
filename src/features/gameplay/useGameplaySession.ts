@@ -115,7 +115,7 @@ export function useGameplaySession(mission: MissionDefinition) {
     const demo = mission.briefing.demo
     if (!demo) return
     controller.reset()
-    controller.addLog('info', 'Demonstração: observe o que o robô faz. Depois clique em Reiniciar e monte o seu programa.')
+    controller.addLog('info', 'Demonstração: observe o que o robô faz. Depois clique em Parar e monte o seu programa.')
     controller.run(demo)
     demoRunId.current = controller.getSnapshot().runId
   }, [mission, controller])

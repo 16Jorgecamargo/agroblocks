@@ -11,14 +11,9 @@ if (!mission) throw new Error('mission missing')
 const panelProps = {
   speed: 1 as const,
   stepMode: false,
-  actionCount: 0,
-  currentLabel: '—',
   onRun: vi.fn(),
   onStep: vi.fn(),
-  onPause: vi.fn(),
-  onResume: vi.fn(),
   onStop: vi.fn(),
-  onReset: vi.fn(),
   onSpeedChange: vi.fn(),
   onStepModeChange: vi.fn(),
 }
@@ -40,20 +35,28 @@ describe('gameplay components', () => {
     expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument()
   })
 
-  it('enables controls according to the execution status', () => {
+  it('offers only run and stop, with stop enabled while a run is active', () => {
     const { rerender } = render(<ExecutionPanel {...panelProps} status="idle" />)
     expect(screen.getByRole('button', { name: 'Executar' })).toBeEnabled()
-    expect(screen.getByRole('button', { name: 'Pausar' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Parar' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Pausar' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Reiniciar' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Parar' })).toHaveLength(1)
 
     rerender(<ExecutionPanel {...panelProps} status="running" />)
     expect(screen.getByRole('button', { name: 'Executar' })).toBeDisabled()
-    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }))
-    expect(panelProps.onPause).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
+    expect(panelProps.onStop).toHaveBeenCalled()
 
     rerender(<ExecutionPanel {...panelProps} status="paused" />)
-    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }))
-    expect(panelProps.onResume).toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Parar' })).toBeEnabled()
+  })
+
+  it('drops the status, command counter and current block readouts', () => {
+    render(<ExecutionPanel {...panelProps} status="running" />)
+    expect(screen.queryByText('Estado')).not.toBeInTheDocument()
+    expect(screen.queryByText('Comandos executados')).not.toBeInTheDocument()
+    expect(screen.queryByText('Bloco atual')).not.toBeInTheDocument()
   })
 
   it('turns the main button into a single step in step mode', () => {

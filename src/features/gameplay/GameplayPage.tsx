@@ -12,7 +12,7 @@ import { GameHud } from '@/features/gameplay/components/GameHud'
 import { HarvestFlights } from '@/features/gameplay/components/HarvestFlights'
 import { HintsPanel } from '@/features/gameplay/components/HintsPanel'
 import { PseudocodePanel } from '@/features/gameplay/components/PseudocodePanel'
-import { currentStepLabel, objectiveCells } from '@/features/gameplay/gameplayLogic'
+import { objectiveCells } from '@/features/gameplay/gameplayLogic'
 import { useGameplaySession } from '@/features/gameplay/useGameplaySession'
 import { useGameplayShortcuts } from '@/features/gameplay/useGameplayShortcuts'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
@@ -168,14 +168,9 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             status={snapshot.status}
             speed={snapshot.speed}
             stepMode={stepMode}
-            actionCount={snapshot.state.actionCount}
-            currentLabel={currentStepLabel(snapshot.lastStep)}
             onRun={session.run}
             onStep={session.step}
-            onPause={() => controller.pause()}
-            onResume={() => controller.resume()}
             onStop={() => controller.stop()}
-            onReset={() => controller.reset()}
             onSpeedChange={(speed) => controller.setSpeed(speed)}
             onStepModeChange={setStepMode}
           />

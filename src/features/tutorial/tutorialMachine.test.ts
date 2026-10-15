@@ -5,8 +5,11 @@ const snapshot = (status: ExecutionSnapshot['status'], success = false) =>
   ({ status, validation: status === 'finished' ? { success, objectives: [], constraints: [] } : null }) as ExecutionSnapshot
 
 describe('tutorialMachine', () => {
-  it('has six steps', () => {
+  it('has six steps and asks for the Parar button, not Pausar', () => {
     expect(TUTORIAL_STEPS).toHaveLength(6)
+    const step = TUTORIAL_STEPS.find((item) => item.id === 'stop')
+    expect(step?.text).toContain('Parar')
+    expect(TUTORIAL_STEPS.some((item) => item.text.includes('Pausar'))).toBe(false)
   })
 
   it('advances only on the awaited signal', () => {
@@ -15,10 +18,10 @@ describe('tutorialMachine', () => {
     expect(advanceTutorial(2, 'blockRemoved')).toBe(3)
     expect(advanceTutorial(3, 'run')).toBe(4)
     expect(advanceTutorial(4, 'pause')).toBe(4)
-    expect(advanceTutorial(4, 'resume')).toBe(5)
+    expect(advanceTutorial(4, 'stop')).toBe(5)
   })
 
-  it('skips the pause step if the run already ended', () => {
+  it('skips the stop step if the run already ended', () => {
     expect(advanceTutorial(4, 'error')).toBe(5)
   })
 
@@ -35,6 +38,8 @@ describe('tutorialMachine', () => {
     expect(statusSignal('running', snapshot('failed'))).toBe('error')
     expect(statusSignal('running', snapshot('finished', true))).toBe('success')
     expect(statusSignal('running', snapshot('finished', false))).toBe('error')
+    expect(statusSignal('running', snapshot('idle'))).toBe('stop')
+    expect(statusSignal('paused', snapshot('idle'))).toBe('stop')
     expect(statusSignal('running', snapshot('running'))).toBeNull()
   })
 })

@@ -144,40 +144,9 @@
   color: #2f6fd6;
 }
 
-.execution-panel__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--space-2);
-}
-
-.execution-panel__row .button {
-  min-width: 0;
-  padding: 0 var(--space-2);
-}
-
 .execution-panel {
   min-width: 0;
 }
-
-.execution-panel__status {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-1) var(--space-3);
-  margin: 0;
-  font-size: var(--text-sm);
-}
-
-.execution-panel__status dt {
-  color: var(--color-text-muted);
-}
-
-.execution-panel__status dd {
-  margin: 0;
-  font-weight: 600;
-}
-
-.status--failed { color: var(--color-danger); }
-.status--finished { color: var(--color-success); }
 
 .console-panel__header {
   display: flex;
