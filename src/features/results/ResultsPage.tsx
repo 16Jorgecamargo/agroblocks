@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState } from 'react'
+import { lazy, useMemo, useState } from 'react'
 import { Navigate, useParams } from 'react-router'
 import { AnimatePresence, motion } from 'motion/react'
 import { Confetti } from '@/components/game/Confetti'
@@ -14,6 +14,7 @@ import { SPRINGS } from '@/motion/springs'
 import { overshoot, softRise, staggerContainer, staggerItem } from '@/motion/presets'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { hasWebGL } from '@/render/hasWebGL'
+import { SceneWithSplash } from '@/render/SceneWithSplash'
 import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './ResultsPage.css'
@@ -25,6 +26,7 @@ export function ResultsPage() {
   const mission = getMission(missionId)
   const save = useProgressStore((store) => store.save)
   const renderMode = useSettingsStore((store) => store.settings.renderMode)
+  const lowGraphics = useSettingsStore((store) => store.settings.lowGraphics)
   const { reduced } = useMotionPrefs()
   const webgl = useMemo(() => hasWebGL(), [])
   const [showSolution, setShowSolution] = useState(false)
@@ -43,9 +45,9 @@ export function ResultsPage() {
     <div className="results">
       <div className="results__scene" aria-hidden="true">
         {show3d ? (
-          <Suspense fallback={null}>
-            <CelebrationScene reducedMotion={reduced} />
-          </Suspense>
+          <SceneWithSplash label="Preparando a comemoração…">
+            {(onReady) => <CelebrationScene reducedMotion={reduced} lowGraphics={lowGraphics} onReady={onReady} />}
+          </SceneWithSplash>
         ) : (
           <div className="home-scene--fallback" />
         )}
@@ -138,14 +140,14 @@ export function ResultsPage() {
           )}
         </motion.section>
 
-        <motion.div className="results__actions" variants={staggerContainer(0.08, 0.6)} initial="hidden" animate="visible">
+        <motion.div className="results__actions" role="group" aria-label="Próximos passos" variants={staggerContainer(0.08, 0.6)} initial="hidden" animate="visible">
           <motion.div variants={staggerItem}>
-            <GameButton tone="dark" size="lg" icon="book" aria-expanded={showSolution} onClick={() => setShowSolution((value) => !value)}>
+            <GameButton tone="dark" icon="book" aria-expanded={showSolution} onClick={() => setShowSolution((value) => !value)}>
               {showSolution ? 'Ocultar solução' : 'Ver solução'}
             </GameButton>
           </motion.div>
           <motion.div variants={staggerItem}>
-            <GameLink to={`/jogar/${mission.id}`} tone="dark" size="lg" icon="reset">
+            <GameLink to={`/jogar/${mission.id}`} tone="dark" icon="reset">
               Tentar novamente
             </GameLink>
           </motion.div>

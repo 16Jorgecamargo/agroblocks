@@ -1,43 +1,63 @@
+import { useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { CameraRig } from '@/render/farm3d/CameraRig'
-import { Flat } from '@/render/farm3d/materials'
+import { PlotTile } from '@/render/farm3d/PlotTile'
 import { RobotShowcase } from '@/render/farm3d/RobotModel'
-import { Model } from '@/render/models/Model'
-import { SpinningProp } from '@/render/world/SpinningProp'
 import { PALETTE } from '@/render/palette'
+import { buildWorld } from '@/render/world/buildWorld'
+import { Butterflies } from '@/render/world/Butterflies'
+import { CELEBRATION_BED_CENTERS, CELEBRATION_ROBOT } from '@/render/world/celebrationLayout'
+import { Herd } from '@/render/world/Herd'
+import { WorldProps } from '@/render/world/WorldProps'
+import { WorldTerrain } from '@/render/world/WorldTerrain'
 
-export default function CelebrationScene({ reducedMotion }: { reducedMotion: boolean }) {
+interface CelebrationSceneProps {
+  reducedMotion: boolean
+  lowGraphics: boolean
+  onReady?: () => void
+}
+
+export default function CelebrationScene({ reducedMotion, lowGraphics, onReady }: CelebrationSceneProps) {
+  const world = useMemo(() => buildWorld({ layout: 'celebration', gridWidth: 0, gridHeight: 0, seed: 'celebration', density: lowGraphics ? 'light' : 'full' }), [lowGraphics])
+  const alive = !reducedMotion && !lowGraphics
+
   return (
-    <Canvas orthographic dpr={[1, 2]} camera={{ position: [10, 10, 10], zoom: 60, near: -100, far: 200 }} aria-hidden="true">
+    <Canvas
+      orthographic
+      shadows={!lowGraphics}
+      dpr={lowGraphics ? 1 : [1, 2]}
+      camera={{ position: [16, 16, 16], zoom: 60, near: -200, far: 400 }}
+      onCreated={() => onReady?.()}
+      aria-hidden="true"
+    >
       <color attach="background" args={[PALETTE.sky]} />
-      <CameraRig gridWidth={3} gridHeight={3} quarterTurns={0} zoomLevel={0.85} showcase reducedMotion={reducedMotion} />
-      <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 1]} />
-      <directionalLight position={[6, 10, 4]} intensity={1.4} />
-      <mesh position={[0, -0.05, 0]}>
-        <boxGeometry args={[14, 0.1, 14]} />
-        <Flat color={PALETTE.grassLight} />
-      </mesh>
-      <group scale={1.23}>
+      <CameraRig gridWidth={3} gridHeight={3} quarterTurns={0} zoomLevel={0.8} showcase={false} reducedMotion={reducedMotion} />
+      <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
+      <directionalLight
+        position={[10, 18, 8]}
+        intensity={1.5}
+        castShadow={!lowGraphics}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
+      />
+      <WorldTerrain world={world} />
+      <WorldProps world={world} shadows={!lowGraphics} ambient={alive} />
+      <Herd animals={world.animals} active={alive} />
+      <Butterflies points={world.butterflies} active={alive} />
+      {CELEBRATION_BED_CENTERS.map((center) => (
+        <PlotTile
+          key={`${center.x}:${center.z}`}
+          cell={{ terrain: 'soil', plot: 'mature', moisture: 'dry', growth: 0 }}
+          position={[center.x, 0, center.z]}
+          isGoal={false}
+          reducedMotion={reducedMotion}
+        />
+      ))}
+      <group position={[CELEBRATION_ROBOT.x, 0, CELEBRATION_ROBOT.z]} rotation={[0, Math.PI / 4, 0]} scale={1.6}>
         <RobotShowcase clip="success" tool="crate" reducedMotion={reducedMotion} />
-      </group>
-      <group position={[0.2, 0.55, 0.9]}>
-        <mesh>
-          <boxGeometry args={[0.9, 0.35, 0.55]} />
-          <Flat color={PALETTE.crate} />
-        </mesh>
-        {[-0.28, -0.08, 0.12, 0.3].map((x, index) => (
-          <mesh key={x} position={[x, 0.24, (index % 2) * 0.12 - 0.06]}>
-            <icosahedronGeometry args={[0.12, 1]} />
-            <Flat color={index % 3 === 0 ? PALETTE.fruitAlt : PALETTE.fruit} />
-          </mesh>
-        ))}
-      </group>
-      <group position={[-3.5, 0, -3]} rotation={[0, 0.6, 0]} scale={0.55}>
-        <Model id="barn" fallback={null} />
-      </group>
-      <SpinningProp prop={{ model: 'tower-windmill', x: 3.2, z: -3.2, rotation: 0, scale: 0.5 }} active={!reducedMotion} />
-      <group position={[-3, 0, 2.5]}>
-        <Model id="tree-a" fallback={null} />
       </group>
     </Canvas>
   )

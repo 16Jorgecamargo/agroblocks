@@ -91,3 +91,14 @@ test('the legend opens as a paged dialog with one 3D preview and closes', async 
   await expect(dialog).toHaveCount(0)
   expect(errors).toEqual([])
 })
+
+test('the success screen renders a full 3D celebration without errors', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution, ['m1-first-harvest']) })
+  await page.goto('/#/resultado/m1-first-harvest')
+  await expect(page.getByRole('heading', { name: 'Missão concluída!' })).toBeVisible()
+  await expect(page.locator('.results__scene canvas')).toBeVisible()
+  await expect(page.locator('.results__scene .scene-splash')).toHaveCount(0, { timeout: 30_000 })
+  expect(errors).toEqual([])
+})

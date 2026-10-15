@@ -54,6 +54,8 @@ describe('ResultsPage', () => {
     expect(screen.getByText('Sequenciamento')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Próxima fase' })).toHaveAttribute('href', '/jogar/m2-row-planting')
     expect(screen.getByRole('link', { name: 'Tentar novamente' })).toHaveAttribute('href', '/jogar/m1-first-harvest')
+    const actions = screen.getByRole('group', { name: 'Próximos passos' })
+    expect([...actions.querySelectorAll('button, a')].map((item) => item.textContent?.trim())).toEqual(['Ver solução', 'Tentar novamente', 'Próxima fase'])
   })
 
   it('reveals how it works with the robot steps when asking to see the solution', async () => {
