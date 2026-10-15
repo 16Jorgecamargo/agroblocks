@@ -74,25 +74,9 @@
   border: 3px solid #46e3ff;
   border-radius: 30%;
   font-size: 0.7em;
-  transition: transform var(--duration-base) ease;
 }
 
 .grid2d__robot--failed {
   border-color: #e5484d;
-  animation: grid2d-shake 300ms ease 2;
 }
 
-@keyframes grid2d-shake {
-  25% {
-    translate: -3px 0;
-  }
-  75% {
-    translate: 3px 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .grid2d__robot--failed {
-    animation: none;
-  }
-}

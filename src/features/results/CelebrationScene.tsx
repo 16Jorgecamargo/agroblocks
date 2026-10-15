@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { CameraRig } from '@/render/farm3d/CameraRig'
 import { Barn, Tree, Windmill } from '@/render/farm3d/Decorations'
 import { Flat } from '@/render/farm3d/materials'
-import { RobotBody } from '@/render/farm3d/RobotModel'
+import { RobotShowcase } from '@/render/farm3d/RobotModel'
 import { PALETTE } from '@/render/palette'
 
 export default function CelebrationScene({ reducedMotion }: { reducedMotion: boolean }) {
@@ -16,8 +16,8 @@ export default function CelebrationScene({ reducedMotion }: { reducedMotion: boo
         <boxGeometry args={[14, 0.1, 14]} />
         <Flat color={PALETTE.grassLight} />
       </mesh>
-      <group scale={1.6}>
-        <RobotBody />
+      <group scale={1.23}>
+        <RobotShowcase clip="success" />
       </group>
       <group position={[0.2, 0.55, 0.9]}>
         <mesh>

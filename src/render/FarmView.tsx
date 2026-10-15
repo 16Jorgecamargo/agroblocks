@@ -1,10 +1,14 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import type { CellRef } from '@/game/missions/goals'
 import type { GameEvent, GameState } from '@/game/world/types'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { describeRobot } from '@/render/cellDescription'
 import { Grid2D } from '@/render/grid2d/Grid2D'
 import { hasWebGL } from '@/render/hasWebGL'
+import { SceneLoading } from '@/render/SceneLoading'
+import { EASINGS } from '@/motion/easings'
+import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './FarmView.css'
 
@@ -44,6 +48,7 @@ const ZOOM_LEVELS = [0.7, 0.85, 1, 1.25, 1.5]
 export function FarmView(props: FarmViewProps) {
   const { renderMode, lowGraphics } = useSettingsStore((store) => store.settings)
   const reducedMotion = useReducedMotion()
+  const { decorative } = useMotionPrefs()
   const webgl = useMemo(() => hasWebGL(), [])
   const [quarterTurns, setQuarterTurns] = useState(0)
   const [zoomIndex, setZoomIndex] = useState(2)
@@ -83,7 +88,7 @@ export function FarmView(props: FarmViewProps) {
 
       <div className="farm-view__stage">
         {use3d ? (
-          <Suspense fallback={<div className="farm-view__loading">Carregando fazenda 3D…</div>}>
+          <Suspense fallback={<SceneLoading />}>
             <FarmScene
               {...props}
               celebrating={props.celebrating ?? false}
@@ -97,6 +102,19 @@ export function FarmView(props: FarmViewProps) {
           <Grid2D state={props.state} highlightCells={props.highlightCells} failed={props.failed} />
         )}
       </div>
+      <AnimatePresence>
+        {props.failed && decorative && (
+          <motion.div
+            key={`damage-${props.eventKey}`}
+            className="farm-view__damage"
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.9, 0.2, 0.7, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: EASINGS.easeOutExpo }}
+          />
+        )}
+      </AnimatePresence>
 
       {showLegend && (
         <ul className="farm-view__legend">

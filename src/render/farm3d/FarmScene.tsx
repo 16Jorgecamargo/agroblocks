@@ -20,6 +20,7 @@ export default function FarmScene({
   failed,
   seedKey,
   growTicks,
+  celebrating,
   quarterTurns,
   zoomLevel,
   lowGraphics,
@@ -51,6 +52,7 @@ export default function FarmScene({
         zoomLevel={zoomLevel}
         showcase={showcase}
         reducedMotion={reducedMotion}
+        kickKey={failed ? eventKey : 0}
       />
       <CellLocatorBridge width={width} height={height} />
       <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
@@ -72,7 +74,7 @@ export default function FarmScene({
         <boxGeometry args={[width + 0.6, 0.06, height + 0.6]} />
         <Flat color={PALETTE.grassDark} />
       </mesh>
-      <Decorations items={decorations} animate={!reducedMotion} />
+      <Decorations items={decorations} animate={!reducedMotion && !lowGraphics} />
       {state.cells.map((row, y) =>
         row.map((cell, x) => {
           const point = cellToWorld(x, y, width, height)
@@ -88,7 +90,15 @@ export default function FarmScene({
           )
         }),
       )}
-      <RobotModel robot={state.robot} gridWidth={width} gridHeight={height} durationMs={duration} failed={failed} />
+      <RobotModel
+        robot={state.robot}
+        gridWidth={width}
+        gridHeight={height}
+        durationMs={duration}
+        failed={failed}
+        celebrating={celebrating}
+        reducedMotion={reducedMotion}
+      />
       {!lowGraphics && !reducedMotion && (
         <EffectsLayer events={lastEvents} eventKey={eventKey} gridWidth={width} gridHeight={height} durationMs={stepDurationMs} />
       )}

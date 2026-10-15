@@ -6,7 +6,7 @@ import { EASINGS } from '@/motion/easings'
 import { Barn, Tree, Windmill } from '@/render/farm3d/Decorations'
 import { Flat } from '@/render/farm3d/materials'
 import { PlotTile } from '@/render/farm3d/PlotTile'
-import { RobotBody } from '@/render/farm3d/RobotModel'
+import { RobotShowcase } from '@/render/farm3d/RobotModel'
 import { PALETTE } from '@/render/palette'
 import { createRandom, hashString } from '@/render/seededRandom'
 import type { Cell } from '@/game/world/types'
@@ -52,8 +52,8 @@ function IdleRobot({ ambient }: { ambient: boolean }) {
     }
   }, [ambient])
   return (
-    <group ref={ref} position={[3.4, 0.2, 4.6]} rotation={[0, -0.55, 0]} scale={1.7}>
-      <RobotBody />
+    <group ref={ref} position={[3.4, 0.2, 4.6]} rotation={[0, -0.55, 0]} scale={1.31}>
+      <RobotShowcase clip="idle" />
     </group>
   )
 }
