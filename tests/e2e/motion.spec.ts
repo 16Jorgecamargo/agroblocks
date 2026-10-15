@@ -102,3 +102,19 @@ test('the success screen renders a full 3D celebration without errors', async ({
   await expect(page.locator('.results__scene .scene-splash')).toHaveCount(0, { timeout: 30_000 })
   expect(errors).toEqual([])
 })
+
+test('screens fill the window without page scroll or overscroll bounce', async ({ page }) => {
+  await seedStorage(page, { settings: { renderMode: '2d', motion: 'reduced' } })
+  for (const route of ['/', '/#/missoes', '/#/jogar/m1-first-harvest']) {
+    await page.goto(route)
+    await page.mouse.move(700, 450)
+    await page.mouse.wheel(0, 800)
+    await page.waitForTimeout(300)
+    const state = await page.evaluate(() => ({
+      scrollY: window.scrollY,
+      fits: document.documentElement.scrollHeight <= window.innerHeight,
+      overscroll: [getComputedStyle(document.documentElement).overscrollBehaviorY, getComputedStyle(document.body).overscrollBehaviorY],
+    }))
+    expect(state).toEqual({ scrollY: 0, fits: true, overscroll: ['none', 'none'] })
+  }
+})

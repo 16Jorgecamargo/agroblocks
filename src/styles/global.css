@@ -12,13 +12,25 @@ body,
   height: 100%;
 }
 
+html,
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--chrome-bg);
+}
+
+#root {
+  overflow-y: auto;
+  overscroll-behavior: none;
+  background: var(--color-bg);
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
   font-size: var(--text-md);
   line-height: 1.5;
   color: var(--color-text);
-  background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
 }
 
