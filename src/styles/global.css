@@ -118,3 +118,7 @@ a {
     padding: var(--space-4);
   }
 }
+
+.page-transition {
+  min-height: 100vh;
+}
