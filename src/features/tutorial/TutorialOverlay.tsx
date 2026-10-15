@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { Icon } from '@/components/icons/Icon'
+import { AnimatePresence, motion } from 'motion/react'
+import { GameButton } from '@/components/game/GameButton'
 import { advanceTutorial, statusSignal, TUTORIAL_STEPS, type TutorialSignal } from '@/features/tutorial/tutorialMachine'
 import type { ExecutionSnapshot } from '@/game/execution/types'
+import { EASINGS } from '@/motion/easings'
+import { NUDGE, overshoot, PRESSABLE } from '@/motion/presets'
+import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import './TutorialOverlay.css'
 
 interface TutorialOverlayProps {
@@ -11,6 +15,7 @@ interface TutorialOverlayProps {
 }
 
 export function TutorialOverlay({ snapshot, blockEvent }: TutorialOverlayProps) {
+  const { ambient } = useMotionPrefs()
   const [index, setIndex] = useState(0)
   const previousStatus = useRef(snapshot.status)
   const lastBlockEvent = useRef<number | null>(null)
@@ -29,40 +34,88 @@ export function TutorialOverlay({ snapshot, blockEvent }: TutorialOverlayProps) 
     signal(blockEvent.kind === 'added' ? 'blockAdded' : 'blockRemoved')
   }, [blockEvent])
 
-  if (index >= TUTORIAL_STEPS.length) {
+  const done = index >= TUTORIAL_STEPS.length
+  const step = done ? null : TUTORIAL_STEPS[index]
+  const waiting = step?.waitFor != null
+  const next = () => setIndex((current) => current + 1)
+
+  if (done) {
     return (
-      <div className="tutorial-bubble tutorial-bubble--done" role="status">
+      <motion.div className="tutorial-bubble tutorial-bubble--done" role="status" variants={overshoot} initial="hidden" animate="visible">
         <strong>Treinamento concluído!</strong>
         <p>Você montou, executou, pausou e corrigiu um programa. Agora é hora das missões.</p>
-        <Link className="button button--primary" to="/missoes">
-          Ir para as missões
-        </Link>
-      </div>
+        <motion.span {...PRESSABLE} style={{ display: 'inline-block' }}>
+          <Link className="game-button game-button--primary game-button--md" to="/missoes">
+            Ir para as missões
+          </Link>
+        </motion.span>
+      </motion.div>
     )
   }
 
-  const step = TUTORIAL_STEPS[index]
   return (
-    <div className="tutorial-bubble" role="region" aria-label="Tutorial" aria-live="polite">
-      <div className="tutorial-bubble__top">
-        <span className="tutorial-bubble__count">
-          {index + 1}/{TUTORIAL_STEPS.length}
+    <div className="tutorial" role="region" aria-label="Tutorial">
+      <motion.div className="tutorial__banner" initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+        <span className="tutorial__title">Tutorial</span>
+        <span className="tutorial__progress">
+          <span className="tutorial__count">
+            {index + 1}/{TUTORIAL_STEPS.length}
+          </span>
+          <span className="tutorial__dots" aria-hidden="true">
+            {TUTORIAL_STEPS.map((item, position) => (
+              <motion.span
+                key={item.id}
+                className={position < index ? 'is-done' : position === index ? 'is-current' : ''}
+                animate={position === index && ambient ? { y: [0, -4, 0] } : { y: 0 }}
+                transition={position === index && ambient ? { duration: 0.8, repeat: Infinity, ease: EASINGS.easeOutCubic } : { duration: 0.2 }}
+              />
+            ))}
+          </span>
         </span>
-        <span className="tutorial-bubble__dots" aria-hidden="true">
-          {TUTORIAL_STEPS.map((item, position) => (
-            <span key={item.id} className={position <= index ? 'is-done' : ''} />
-          ))}
-        </span>
-      </div>
-      <p className="tutorial-bubble__text">{step.text}</p>
-      {step.waitFor && <p className="tutorial-bubble__waiting">Faça a ação para continuar.</p>}
-      <div className="tutorial-bubble__actions">
-        <button type="button" className="button button--ghost" onClick={() => setIndex((current) => Math.max(0, current - 1))} disabled={index === 0} aria-label="Passo anterior">
-          <Icon name="back" />
-        </button>
-        <button type="button" className="button button--primary" disabled={step.waitFor !== null} onClick={() => setIndex((current) => current + 1)}>
+      </motion.div>
+
+      <AnimatePresence mode="wait" initial={false}>
+        {step && (
+          <motion.div
+            key={step.id}
+            className="tutorial-bubble"
+            aria-live="polite"
+            variants={overshoot}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, y: 12, transition: { duration: 0.2 } }}
+          >
+            <p className="tutorial-bubble__text">
+              {waiting && (
+                <motion.span
+                  className="tutorial-bubble__arrow"
+                  aria-hidden="true"
+                  animate={ambient ? NUDGE.keyframes : undefined}
+                  transition={ambient ? { ...NUDGE.options, repeat: Infinity, repeatDelay: 0.6 } : undefined}
+                >
+                  ➜
+                </motion.span>
+              )}
+              {step.text}
+            </p>
+            {waiting && <p className="tutorial-bubble__waiting">Faça a ação para continuar.</p>}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="tutorial__bar">
+        <GameButton
+          tone="dark"
+          icon="back"
+          className="tutorial__square"
+          onClick={() => setIndex((current) => Math.max(0, current - 1))}
+          disabled={index === 0}
+          aria-label="Passo anterior"
+        />
+        <GameButton tone="primary" size="lg" className="tutorial__next" disabled={waiting} onClick={next}>
           Próximo
-        </button>
+        </GameButton>
+        <GameButton tone="dark" icon="forward" className="tutorial__square" disabled={waiting} onClick={next} aria-label="Avançar passo" />
       </div>
     </div>
   )

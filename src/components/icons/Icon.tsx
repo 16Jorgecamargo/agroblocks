@@ -14,6 +14,7 @@ export type IconName =
   | 'reset'
   | 'trash'
   | 'back'
+  | 'forward'
   | 'lock'
   | 'check'
   | 'star'
@@ -81,6 +82,12 @@ const PATHS: Record<IconName, ReactNode> = {
     <>
       <path d="M19 12H5" />
       <path d="M11 6l-6 6 6 6" />
+    </>
+  ),
+  forward: (
+    <>
+      <path d="M5 12h14" />
+      <path d="M13 6l6 6-6 6" />
     </>
   ),
   lock: (

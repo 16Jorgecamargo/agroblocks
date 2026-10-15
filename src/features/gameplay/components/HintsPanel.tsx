@@ -1,5 +1,10 @@
+import { useRef } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { GameButton } from '@/components/game/GameButton'
 import { Icon } from '@/components/icons/Icon'
 import { HINT_LEVEL_LABELS } from '@/features/gameplay/gameplayLogic'
+import { HEARTBEAT, rowExpand } from '@/motion/presets'
+import { useMotionPrefs } from '@/motion/useMotionPrefs'
 
 interface HintsPanelProps {
   hints: [string, string, string, string]
@@ -10,7 +15,10 @@ interface HintsPanelProps {
 }
 
 export function HintsPanel({ hints, revealed, canReveal, failedAttempts, onReveal }: HintsPanelProps) {
+  const { ambient } = useMotionPrefs()
+  const initiallyRevealed = useRef(revealed)
   const lockedLast = revealed === 3 && failedAttempts < 2
+  const attention = canReveal && failedAttempts >= 2 && ambient
   return (
     <div className="hints-panel">
       <p className="hints-panel__intro">
@@ -18,18 +26,31 @@ export function HintsPanel({ hints, revealed, canReveal, failedAttempts, onRevea
       </p>
       <ol className="hints-panel__list">
         {hints.slice(0, revealed).map((hint, index) => (
-          <li key={index} className="hint">
+          <motion.li key={index} className="hint" variants={rowExpand} initial={index < initiallyRevealed.current ? false : 'hidden'} animate="visible">
             <strong>
               <Icon name="bulb" size={16} /> {HINT_LEVEL_LABELS[index]}
             </strong>
             <span>{hint}</span>
-          </li>
+          </motion.li>
         ))}
       </ol>
-      <button type="button" className="button button--accent" onClick={onReveal} disabled={!canReveal}>
-        <Icon name="bulb" /> Pedir dica ({revealed}/4)
-      </button>
-      {lockedLast && <p className="hints-panel__lock">O exemplo parcial libera depois de 2 tentativas sem sucesso.</p>}
+      <motion.div animate={attention ? HEARTBEAT.keyframes : { scale: 1 }} transition={attention ? HEARTBEAT.options : { duration: 0.2 }}>
+        <GameButton tone="accent" icon="bulb" onClick={onReveal} disabled={!canReveal}>
+          Pedir dica ({revealed}/4)
+        </GameButton>
+      </motion.div>
+      <AnimatePresence>
+        {lockedLast && (
+          <motion.p
+            className="hints-panel__lock"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 1.2, rotate: -8, transition: { duration: 0.35 } }}
+          >
+            <Icon name="lock" size={16} /> O exemplo parcial libera depois de 2 tentativas sem sucesso.
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

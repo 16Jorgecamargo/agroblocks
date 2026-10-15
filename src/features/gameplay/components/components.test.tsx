@@ -62,6 +62,13 @@ describe('gameplay components', () => {
     expect(panelProps.onStep).toHaveBeenCalled()
   })
 
+  it('animates new console entries but not the ones already shown', () => {
+    const { container, rerender } = render(<ConsolePanel entries={[{ id: 1, kind: 'info', text: 'A' }]} onClear={vi.fn()} />)
+    expect(container.querySelector('[data-new="true"]')).toBeNull()
+    rerender(<ConsolePanel entries={[{ id: 1, kind: 'info', text: 'A' }, { id: 2, kind: 'success', text: 'B' }]} onClear={vi.fn()} />)
+    expect(container.querySelector('[data-new="true"]')).toHaveTextContent('B')
+  })
+
   it('maps the speed slider to the four speeds', () => {
     render(<ExecutionPanel {...panelProps} status="idle" />)
     fireEvent.change(screen.getByRole('slider', { name: 'Velocidade' }), { target: { value: '3' } })
