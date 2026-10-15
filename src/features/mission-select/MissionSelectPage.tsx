@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { lazy, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Icon } from '@/components/icons/Icon'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -17,6 +17,7 @@ import { loadSeenUnlocks, saveSeenUnlocks } from '@/services/storage/seenUnlocks
 import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './MissionSelectPage.css'
+import { SceneWithSplash } from '@/render/SceneWithSplash'
 
 const MissionMapScene = lazy(() => import('@/features/mission-select/MissionMapScene'))
 
@@ -73,17 +74,20 @@ export function MissionSelectPage() {
       <div className={`mission-select__body${show3d ? '' : ' mission-select__body--flat'}`}>
         {show3d && (
           <div className="mission-select__map">
-            <Suspense fallback={<div className="mission-select__loading">Carregando mapa…</div>}>
-              <MissionMapScene
-                missions={MISSIONS}
-                statuses={statuses}
-                selectedId={selected.id}
-                onSelect={setSelectedId}
-                lowGraphics={lowGraphics}
-                ambient={ambient}
-                celebrateIds={celebrateIds}
-              />
-            </Suspense>
+            <SceneWithSplash label="Carregando mapa…">
+              {(onReady) => (
+                <MissionMapScene
+                  missions={MISSIONS}
+                  statuses={statuses}
+                  selectedId={selected.id}
+                  onSelect={setSelectedId}
+                  lowGraphics={lowGraphics}
+                  ambient={ambient}
+                  celebrateIds={celebrateIds}
+                  onReady={onReady}
+                />
+              )}
+            </SceneWithSplash>
           </div>
         )}
         <ol className={`mission-list${show3d ? ' mission-list--hidden' : ''}`} aria-label="Lista de fases">

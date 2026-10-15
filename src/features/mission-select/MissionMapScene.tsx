@@ -1,18 +1,21 @@
 import { useMemo, useRef, type RefObject } from 'react'
 import { motion } from 'motion/react'
-import { Icon } from '@/components/icons/Icon'
-import { EASINGS } from '@/motion/easings'
-import { SPRINGS } from '@/motion/springs'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
-import { CameraRig } from '@/render/farm3d/CameraRig'
-import { Barn, Tree } from '@/render/farm3d/Decorations'
-import { Flat } from '@/render/farm3d/materials'
-import { PALETTE } from '@/render/palette'
-import { BARN_POSITION, mapScenery, NODE_POSITIONS, pathStones, RIVER_POINTS } from '@/features/mission-select/missionMapLayout'
+import { Icon } from '@/components/icons/Icon'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import type { MissionStatus } from '@/game/progress/types'
+import { EASINGS } from '@/motion/easings'
 import { DURATIONS } from '@/motion/presets'
+import { SPRINGS } from '@/motion/springs'
+import { CameraRig } from '@/render/farm3d/CameraRig'
+import { PALETTE } from '@/render/palette'
+import { buildWorld } from '@/render/world/buildWorld'
+import { Butterflies } from '@/render/world/Butterflies'
+import { Herd } from '@/render/world/Herd'
+import { WorldProps } from '@/render/world/WorldProps'
+import { WorldTerrain } from '@/render/world/WorldTerrain'
+import type { Vec2 } from '@/render/world/worldTypes'
 
 interface MissionMapSceneProps {
   missions: MissionDefinition[]
@@ -22,6 +25,7 @@ interface MissionMapSceneProps {
   lowGraphics: boolean
   ambient: boolean
   celebrateIds: string[]
+  onReady?: () => void
 }
 
 const NODE_COLORS: Record<MissionStatus, string> = {
@@ -30,70 +34,50 @@ const NODE_COLORS: Record<MissionStatus, string> = {
   locked: '#6b7177',
 }
 
-
-function LabelProjector({ labels }: { labels: RefObject<(HTMLButtonElement | null)[]> }) {
+function LabelProjector({ labels, trail }: { labels: RefObject<(HTMLButtonElement | null)[]>; trail: Vec2[] }) {
   const camera = useThree((three) => three.camera)
   const size = useThree((three) => three.size)
   const point = useMemo(() => new Vector3(), [])
   useFrame(() => {
-    NODE_POSITIONS.forEach(([x, z], index) => {
+    trail.forEach(({ x, z }, index) => {
       const element = labels.current?.[index]
       if (!element) return
       point.set(x, 1.1, z).project(camera)
-      const left = ((point.x + 1) / 2) * size.width
-      const top = ((1 - point.y) / 2) * size.height
-      element.style.transform = `translate(-50%, -100%) translate(${left}px, ${top}px)`
+      element.style.transform = `translate(-50%, -100%) translate(${((point.x + 1) / 2) * size.width}px, ${((1 - point.y) / 2) * size.height}px)`
     })
   })
   return null
 }
 
-export default function MissionMapScene({ missions, statuses, selectedId, onSelect, lowGraphics, ambient, celebrateIds }: MissionMapSceneProps) {
-  const scenery = useMemo(() => mapScenery('mission-map', lowGraphics ? 14 : 38), [lowGraphics])
-  const stones = useMemo(() => pathStones(), [])
+export default function MissionMapScene({ missions, statuses, selectedId, onSelect, lowGraphics, ambient, celebrateIds, onReady }: MissionMapSceneProps) {
+  const world = useMemo(() => buildWorld({ layout: 'map', gridWidth: 0, gridHeight: 0, seed: 'mission-map', density: lowGraphics ? 'light' : 'full' }), [lowGraphics])
   const labels = useRef<(HTMLButtonElement | null)[]>([])
+  const alive = ambient && !lowGraphics
   return (
     <div className="map-scene">
-      <Canvas orthographic shadows={!lowGraphics} dpr={lowGraphics ? 1 : [1, 2]} camera={{ position: [16, 16, 16], zoom: 40, near: -200, far: 400 }} aria-hidden="true">
+      <Canvas
+        orthographic
+        shadows={!lowGraphics}
+        dpr={lowGraphics ? 1 : [1, 2]}
+        camera={{ position: [16, 16, 16], zoom: 40, near: -200, far: 400 }}
+        onCreated={() => onReady?.()}
+        aria-hidden="true"
+      >
         <color attach="background" args={['#131f29']} />
-        <LabelProjector labels={labels} />
+        <LabelProjector labels={labels} trail={world.trail} />
         <CameraRig gridWidth={18} gridHeight={10} quarterTurns={0} zoomLevel={1.32} showcase={false} reducedMotion />
         <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
-        <directionalLight position={[8, 14, 6]} intensity={1.4} castShadow={!lowGraphics} />
-        <mesh position={[0, -0.1, 0]} receiveShadow>
-          <boxGeometry args={[21, 0.2, 21]} />
-          <Flat color={PALETTE.grassMid} />
-        </mesh>
-        {RIVER_POINTS.slice(0, -1).map(([x1, z1], index) => {
-          const [x2, z2] = RIVER_POINTS[index + 1]
-          const length = Math.hypot(x2 - x1, z2 - z1)
-          return (
-            <mesh key={index} position={[(x1 + x2) / 2, 0.01, (z1 + z2) / 2]} rotation={[0, -Math.atan2(z2 - z1, x2 - x1), 0]}>
-              <boxGeometry args={[length + 0.4, 0.04, 1.1]} />
-              <Flat color={PALETTE.water} />
-            </mesh>
-          )
-        })}
-        {stones.map(([x, z], index) => (
-          <mesh key={index} position={[x, 0.04, z]}>
-            <cylinderGeometry args={[0.18, 0.2, 0.06, 6]} />
-            <Flat color={PALETTE.straw} />
-          </mesh>
-        ))}
-        {scenery.map((item, index) => (
-          <group key={index} position={[item.x, 0, item.z]} scale={item.scale}>
-            <Tree variant={item.variant} />
-          </group>
-        ))}
-        <group position={[BARN_POSITION[0], 0, BARN_POSITION[1]]} rotation={[0, Math.PI / 4, 0]} scale={0.8}>
-          <Barn />
-        </group>
+        <directionalLight position={[10, 18, 8]} intensity={1.5} castShadow={!lowGraphics} shadow-mapSize={[2048, 2048]} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={14} shadow-camera-bottom={-14} />
+        <WorldTerrain world={world} />
+        <WorldProps world={world} shadows={!lowGraphics} ambient={alive} />
+        <Herd animals={world.animals} active={alive} />
+        <Butterflies points={world.butterflies} active={alive} />
         {missions.map((mission) => {
-          const [x, z] = NODE_POSITIONS[mission.order]
+          const node = world.trail[mission.order]
           const status = statuses[mission.id] ?? 'locked'
           const selected = mission.id === selectedId
           return (
-            <group key={mission.id} position={[x, 0, z]}>
+            <group key={mission.id} position={[node.x, 0, node.z]}>
               <mesh
                 position={[0, selected ? 0.4 : 0.2, 0]}
                 castShadow
