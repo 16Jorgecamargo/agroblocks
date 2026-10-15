@@ -56,21 +56,26 @@
   position: absolute;
   left: 50%;
   top: 18%;
-  transform: translateX(-50%);
+  translate: -50% 0;
   padding: var(--space-4) var(--space-6);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   color: var(--color-text);
   box-shadow: var(--shadow-md);
   font-size: var(--text-lg);
-  animation: celebrate var(--duration-base) ease;
+  border: 4px solid #3fa34d;
+  box-shadow: 0 8px 0 #2b7a37, var(--shadow-md);
+  font-weight: 800;
+  overflow: visible;
+  z-index: 4;
 }
 
-@keyframes celebrate {
-  from {
-    transform: translateX(-50%) scale(0.7);
-    opacity: 0;
-  }
+.gameplay__celebration-burst {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  border: 4px solid var(--sun-400);
+  pointer-events: none;
 }
 
 .briefing__concept {

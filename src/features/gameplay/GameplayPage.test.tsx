@@ -4,6 +4,7 @@ import { GameplayPage } from '@/features/gameplay/GameplayPage'
 import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { DEFAULT_SETTINGS } from '@/services/storage/settingsStorage'
+import { useFlightStore } from '@/stores/flightStore'
 
 vi.mock('@/blocks/editor/BlocklyEditor', async () => {
   const { useEffect } = await import('react')
@@ -109,5 +110,16 @@ describe('GameplayPage', () => {
       vi.advanceTimersByTime(10000)
     })
     expect(screen.getByRole('log')).toHaveTextContent('Missão cumprida!')
+  })
+
+  it('launches a harvest flight toward the harvest counter when a plant is harvested', () => {
+    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, renderMode: '2d', motion: 'full' } })
+    renderAt('/jogar/m1-first-harvest')
+    fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
+    act(() => {
+      vi.advanceTimersByTime(10000)
+    })
+    expect(useFlightStore.getState().flights.length + useFlightStore.getState().arrivals).toBeGreaterThan(0)
   })
 })

@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'
+import { AnimatePresence, motion } from 'motion/react'
 import { BlocklyEditor } from '@/blocks/editor/BlocklyEditor'
+import { Confetti } from '@/components/game/Confetti'
+import { PillTabs, panelId, tabId, type TabItem } from '@/components/game/PillTabs'
 import { getMission } from '@/data/missions'
 import { BriefingDialog } from '@/features/gameplay/components/BriefingDialog'
 import { ConsolePanel } from '@/features/gameplay/components/ConsolePanel'
 import { ExecutionPanel } from '@/features/gameplay/components/ExecutionPanel'
 import { GameHud } from '@/features/gameplay/components/GameHud'
+import { HarvestFlights } from '@/features/gameplay/components/HarvestFlights'
 import { HintsPanel } from '@/features/gameplay/components/HintsPanel'
 import { PseudocodePanel } from '@/features/gameplay/components/PseudocodePanel'
 import { currentStepLabel, objectiveCells } from '@/features/gameplay/gameplayLogic'
@@ -13,13 +17,18 @@ import { useGameplaySession } from '@/features/gameplay/useGameplaySession'
 import { useGameplayShortcuts } from '@/features/gameplay/useGameplayShortcuts'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
 import { TutorialOverlay } from '@/features/tutorial/TutorialOverlay'
-import { PillTabs, panelId, tabId, type TabItem } from '@/components/game/PillTabs'
 import { stepDelayMs } from '@/game/execution/types'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { EASINGS } from '@/motion/easings'
+import { fadeSlide } from '@/motion/presets'
+import { SPRINGS } from '@/motion/springs'
+import { useMotionPrefs } from '@/motion/useMotionPrefs'
+import { locateCell } from '@/render/cellLocator'
 import { FarmView } from '@/render/FarmView'
-import { useProgressStore } from '@/stores/progressStore'
 import { useGameAudio } from '@/services/audio/useGameAudio'
+import { useFlightStore } from '@/stores/flightStore'
+import { useProgressStore } from '@/stores/progressStore'
 import './GameplayPage.css'
 
 const SIDE_TABS: TabItem[] = [
@@ -34,12 +43,21 @@ const PANE_TABS: TabItem[] = [
   { id: 'run', label: 'Execução' },
 ]
 
+function harvestTargetCenter(): { x: number; y: number } | null {
+  const target = document.querySelector('[data-flight-target="harvest"]')
+  if (!target) return null
+  const rect = target.getBoundingClientRect()
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+}
+
 function GameplayScreen({ mission }: { mission: MissionDefinition }) {
   const navigate = useNavigate()
   const reducedMotion = useReducedMotion()
+  const { decorative } = useMotionPrefs()
   const session = useGameplaySession(mission)
   const { snapshot, controller } = session
   useGameAudio(snapshot)
+  const launchFlight = useFlightStore((store) => store.launch)
   const [showBriefing, setShowBriefing] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [stepMode, setStepMode] = useState(false)
@@ -52,9 +70,19 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
 
   useEffect(() => {
     if (!succeeded || mission.tutorial || !session.lastAttempt || session.lastAttempt.outcome !== 'success') return
-    const timer = window.setTimeout(() => navigate(`/resultado/${mission.id}`), reducedMotion ? 600 : 1800)
+    const timer = window.setTimeout(() => navigate(`/resultado/${mission.id}`), reducedMotion ? 600 : 2200)
     return () => window.clearTimeout(timer)
   }, [succeeded, mission, session.lastAttempt, navigate, reducedMotion])
+
+  useEffect(() => {
+    if (!decorative) return
+    for (const event of snapshot.lastEvents) {
+      if (event.type !== 'plotChanged' || event.to !== 'harvested') continue
+      const from = locateCell(event.x, event.y)
+      const to = harvestTargetCenter()
+      if (from && to) launchFlight(from, to)
+    }
+  }, [snapshot.lastEvents, decorative, launchFlight])
 
   useGameplayShortcuts({
     run: () => (stepMode ? session.step() : session.run()),
@@ -107,12 +135,30 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             failed={snapshot.status === 'failed'}
             seedKey={mission.id}
           />
-          {succeeded && (
-            <div className="gameplay__celebration" role="status">
-              <strong>Missão concluída!</strong>
-              {mission.tutorial && <span> Você completou o treinamento.</span>}
-            </div>
-          )}
+          <AnimatePresence>
+            {succeeded && (
+              <motion.div
+                key="celebration"
+                className="gameplay__celebration"
+                role="status"
+                initial={{ scale: 0.3, opacity: 0, rotate: -8 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                exit={{ opacity: 0 }}
+                transition={SPRINGS.jelly}
+              >
+                <motion.span
+                  className="gameplay__celebration-burst"
+                  aria-hidden="true"
+                  initial={{ scale: 0.5, opacity: 0.9 }}
+                  animate={{ scale: 2.6, opacity: 0 }}
+                  transition={{ duration: 0.9, ease: EASINGS.easeOutCubic }}
+                />
+                <strong>Missão concluída!</strong>
+                {mission.tutorial && <span> Você completou o treinamento.</span>}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {succeeded && <Confetti seed={`${mission.id}-play`} pieces={40} />}
           {mission.tutorial && <TutorialOverlay snapshot={snapshot} blockEvent={blockEvent} />}
         </section>
         <aside className="gameplay__side" id={panelId('pane', 'run')} aria-labelledby={tabId('pane', 'run')}>
@@ -133,22 +179,35 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
           />
           <div className="gameplay__side-tabs">
             <PillTabs items={SIDE_TABS} active={sideTab} onChange={setSideTab} label="Informações da execução" idPrefix="side" variant="underline" />
-            <div role="tabpanel" id={panelId('side', sideTab)} aria-labelledby={tabId('side', sideTab)} className="gameplay__side-panel">
-              {sideTab === 'console' && <ConsolePanel entries={snapshot.log} onClear={() => controller.clearLog()} />}
-              {sideTab === 'hints' && (
-                <HintsPanel
-                  hints={mission.hints}
-                  revealed={session.hintsRevealed}
-                  canReveal={session.canReveal}
-                  failedAttempts={session.failed}
-                  onReveal={session.revealHint}
-                />
-              )}
-              {sideTab === 'pseudocode' && <PseudocodePanel text={session.pseudocode} valid={session.program !== null} />}
-            </div>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={sideTab}
+                role="tabpanel"
+                id={panelId('side', sideTab)}
+                aria-labelledby={tabId('side', sideTab)}
+                className="gameplay__side-panel"
+                variants={fadeSlide}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                {sideTab === 'console' && <ConsolePanel entries={snapshot.log} onClear={() => controller.clearLog()} />}
+                {sideTab === 'hints' && (
+                  <HintsPanel
+                    hints={mission.hints}
+                    revealed={session.hintsRevealed}
+                    canReveal={session.canReveal}
+                    failedAttempts={session.failed}
+                    onReveal={session.revealHint}
+                  />
+                )}
+                {sideTab === 'pseudocode' && <PseudocodePanel text={session.pseudocode} valid={session.program !== null} />}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </aside>
       </main>
+      <HarvestFlights />
       <BriefingDialog
         open={showBriefing}
         mission={mission}

@@ -28,10 +28,10 @@ export const agroTheme = Blockly.Theme.defineTheme('agroblocks', {
     procedure_category: { colour: '#e0508f' },
   },
   componentStyles: {
-    workspaceBackgroundColour: '#f5f7f0',
+    workspaceBackgroundColour: '#f7f8f9',
     toolboxBackgroundColour: '#ffffff',
     toolboxForegroundColour: '#13261c',
-    flyoutBackgroundColour: '#eef3ea',
+    flyoutBackgroundColour: '#eef1f4',
     flyoutForegroundColour: '#13261c',
     scrollbarColour: '#b9dca8',
     insertionMarkerColour: '#183d2d',

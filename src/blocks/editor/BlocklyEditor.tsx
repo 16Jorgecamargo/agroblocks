@@ -1,11 +1,15 @@
 import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
+import { animate, type AnimationPlaybackControls } from 'motion'
 import { defineCustomBlocks } from '@/blocks/definitions/customBlocks'
 import { agroTheme } from '@/blocks/definitions/theme'
 import { registerProcedureFlyout } from '@/blocks/toolbox/registerFlyouts'
+import { registerSwatchCategory } from '@/blocks/toolbox/swatchCategory'
 import type { ToolboxJson } from '@/blocks/toolbox/buildToolbox'
 import { loadWorkspaceSafely } from '@/blocks/editor/safeLoad'
 import type { WorkspaceJson } from '@/blocks/serializer/workspaceJson'
+import { ERROR_SHAKE, FOCUS_HALO } from '@/motion/presets'
+import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import './BlocklyEditor.css'
 
 interface BlocklyEditorProps {
@@ -26,6 +30,10 @@ function saveWorkspace(workspace: Blockly.Workspace): WorkspaceJson {
   return Blockly.serialization.workspaces.save(workspace) as WorkspaceJson
 }
 
+function blockPath(workspace: Blockly.WorkspaceSvg, id: string): SVGElement | null {
+  return workspace.getBlockById(id)?.getSvgRoot().querySelector<SVGElement>('.blocklyPath') ?? null
+}
+
 export function BlocklyEditor({
   toolbox,
   initialJson,
@@ -39,6 +47,8 @@ export function BlocklyEditor({
 }: BlocklyEditorProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
+  const haloRef = useRef<AnimationPlaybackControls | null>(null)
+  const { reduced } = useMotionPrefs()
   const callbacksRef = useRef({ onChange, onBlockEvent, onLoadFailed })
 
   useEffect(() => {
@@ -49,6 +59,7 @@ export function BlocklyEditor({
     const host = hostRef.current
     if (!host) return
     defineCustomBlocks()
+    registerSwatchCategory()
     const workspace = Blockly.inject(host, {
       toolbox,
       theme: agroTheme,
@@ -57,7 +68,7 @@ export function BlocklyEditor({
       sounds: false,
       move: { scrollbars: true, drag: true, wheel: true },
       zoom: { controls: true, wheel: false, startScale: 0.85, maxScale: 2, minScale: 0.4 },
-      grid: { spacing: 24, length: 2, colour: '#dfe8d6', snap: true },
+      grid: { spacing: 24, length: 2, colour: '#d5dbe1', snap: true },
     })
     registerProcedureFlyout(workspace)
     const restored = loadWorkspaceSafely(workspace, initialJson)
@@ -89,19 +100,34 @@ export function BlocklyEditor({
   }, [readOnly, toolbox, initialJson])
 
   useEffect(() => {
-    workspaceRef.current?.highlightBlock(highlightBlockId)
-  }, [highlightBlockId])
+    const workspace = workspaceRef.current
+    if (!workspace) return
+    workspace.highlightBlock(highlightBlockId)
+    haloRef.current?.stop()
+    const path = highlightBlockId ? blockPath(workspace, highlightBlockId) : null
+    if (path && !reduced) haloRef.current = animate(path, FOCUS_HALO.keyframes, FOCUS_HALO.options)
+    return () => {
+      haloRef.current?.stop()
+      if (path) path.style.filter = ''
+    }
+  }, [highlightBlockId, reduced])
 
   useEffect(() => {
     const workspace = workspaceRef.current
     if (!workspace) return
-    for (const block of workspace.getAllBlocks(false)) block.setWarningText(null)
+    for (const block of workspace.getAllBlocks(false)) {
+      block.setWarningText(null)
+      block.getSvgRoot().classList.remove('agro-error-block')
+    }
     if (errorBlock) {
       const block = workspace.getBlockById(errorBlock.id)
       block?.setWarningText(errorBlock.message)
+      block?.getSvgRoot().classList.add('agro-error-block')
       workspace.highlightBlock(errorBlock.id)
+      const path = blockPath(workspace, errorBlock.id)
+      if (path && !reduced) animate(path, ERROR_SHAKE.keyframes, ERROR_SHAKE.options)
     }
-  }, [errorBlock])
+  }, [errorBlock, reduced])
 
   useEffect(() => {
     const workspace = workspaceRef.current
