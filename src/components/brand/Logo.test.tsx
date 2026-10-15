@@ -11,6 +11,16 @@ describe('Logo', () => {
     rerender(<Logo />)
     expect(container.querySelector('.logo__sprout')).toBeNull()
     expect(container.querySelector('.logo--mono')).not.toBeNull()
-    expect(container.textContent).toBe('AgroBlocks')
+  })
+
+  it('exposes a single unbroken accessible name even when the word parts are laid out as blocks', () => {
+    const { container } = render(
+      <h1>
+        <Logo size="lg" />
+      </h1>,
+    )
+    expect(screen.getByRole('heading', { name: 'AgroBlocks' })).toBeInTheDocument()
+    expect(container.querySelector('.logo__word')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('.visually-hidden')).toHaveTextContent('AgroBlocks')
   })
 })

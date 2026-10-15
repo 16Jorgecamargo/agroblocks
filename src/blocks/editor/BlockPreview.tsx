@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
 import { defineCustomBlocks } from '@/blocks/definitions/customBlocks'
 import { agroTheme } from '@/blocks/definitions/theme'
+import { BLOCKLY_MEDIA_PATH } from '@/blocks/editor/blocklyMedia'
 import type { WorkspaceJson } from '@/blocks/serializer/workspaceJson'
 import './BlockPreview.css'
 
@@ -15,6 +16,7 @@ export function BlockPreview({ json, label }: { json: WorkspaceJson; label: stri
     const workspace = Blockly.inject(host, {
       readOnly: true,
       theme: agroTheme,
+      media: BLOCKLY_MEDIA_PATH,
       renderer: 'zelos',
       scrollbars: false,
       trashcan: false,

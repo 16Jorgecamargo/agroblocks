@@ -3,6 +3,7 @@ import * as Blockly from 'blockly'
 import { animate, type AnimationPlaybackControls } from 'motion'
 import { defineCustomBlocks } from '@/blocks/definitions/customBlocks'
 import { agroTheme } from '@/blocks/definitions/theme'
+import { BLOCKLY_MEDIA_PATH } from '@/blocks/editor/blocklyMedia'
 import { registerProcedureFlyout } from '@/blocks/toolbox/registerFlyouts'
 import { registerSwatchCategory } from '@/blocks/toolbox/swatchCategory'
 import type { ToolboxJson } from '@/blocks/toolbox/buildToolbox'
@@ -63,6 +64,7 @@ export function BlocklyEditor({
     const workspace = Blockly.inject(host, {
       toolbox,
       theme: agroTheme,
+      media: BLOCKLY_MEDIA_PATH,
       renderer: 'zelos',
       trashcan: true,
       sounds: false,

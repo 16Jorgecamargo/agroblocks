@@ -16,7 +16,8 @@ export function Logo({ size = 'sm', variant, animated = false }: LogoProps) {
         <path d="M3 21C3 11 9 4 21 3c0 12-7 18-18 18z" fill="#4caf43" />
         <path d="M3 21L14 10" stroke="#1f5a2c" strokeWidth="1.8" fill="none" />
       </svg>
-      <span className="logo__word">
+      <span className="visually-hidden">AgroBlocks</span>
+      <span className="logo__word" aria-hidden="true">
         <span className="logo__agro">Agro</span>
         <span className="logo__blocks">Blocks</span>
         {size === 'lg' && (
