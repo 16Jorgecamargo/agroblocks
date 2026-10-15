@@ -3,12 +3,15 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { animate } from 'motion'
 import type { Group, PerspectiveCamera } from 'three'
 import { EASINGS } from '@/motion/easings'
-import { Barn, Tree, Windmill } from '@/render/farm3d/Decorations'
 import { Flat } from '@/render/farm3d/materials'
 import { PlotTile } from '@/render/farm3d/PlotTile'
 import { RobotShowcase } from '@/render/farm3d/RobotModel'
 import { PALETTE } from '@/render/palette'
-import { createRandom, hashString } from '@/render/seededRandom'
+import { buildWorld } from '@/render/world/buildWorld'
+import { Butterflies } from '@/render/world/Butterflies'
+import { Herd } from '@/render/world/Herd'
+import { WorldProps } from '@/render/world/WorldProps'
+import { WorldTerrain } from '@/render/world/WorldTerrain'
 import type { Cell } from '@/game/world/types'
 import { DURATIONS } from '@/motion/presets'
 
@@ -59,26 +62,16 @@ function IdleRobot({ ambient }: { ambient: boolean }) {
   )
 }
 
-export default function HomeLandscape({ ambient, lowGraphics }: { ambient: boolean; lowGraphics: boolean }) {
-  const trees = useMemo(() => {
-    const random = createRandom(hashString('home-landscape'))
-    return Array.from({ length: lowGraphics ? 14 : 34 }, (_, index) => {
-      const side = index % 2 === 0 ? -1 : 1
-      return {
-        x: side * (4 + random() * 14),
-        z: -4 - random() * 16,
-        scale: 0.9 + random() * 0.9,
-        variant: index % 3,
-      }
-    })
-  }, [lowGraphics])
+export default function HomeLandscape({ ambient, lowGraphics, onReady }: { ambient: boolean; lowGraphics: boolean; onReady?: () => void }) {
+  const world = useMemo(() => buildWorld({ layout: 'home', gridWidth: 0, gridHeight: 0, seed: 'home-landscape', density: lowGraphics ? 'light' : 'full' }), [lowGraphics])
+  const alive = ambient && !lowGraphics
 
   return (
-    <Canvas shadows={!lowGraphics} dpr={lowGraphics ? 1 : [1, 2]} camera={{ fov: 42, position: [0, 2.6, 10.5], near: 0.1, far: 200 }} gl={{ alpha: true }} aria-hidden="true">
+    <Canvas shadows={!lowGraphics} dpr={lowGraphics ? 1 : [1, 2]} camera={{ fov: 42, position: [0, 2.6, 10.5], near: 0.1, far: 200 }} gl={{ alpha: true }} onCreated={() => onReady?.()} aria-hidden="true">
       <fog attach="fog" args={['#e9d8e6', 22, 60]} />
       <CameraDrift ambient={ambient} />
       <hemisphereLight args={['#fff4e6', '#5c8f3e', 1]} />
-      <directionalLight position={[-8, 12, 6]} intensity={1.6} color="#fff1d6" castShadow={!lowGraphics} shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[-8, 12, 6]} intensity={1.6} color="#fff1d6" castShadow={!lowGraphics} shadow-mapSize={[2048, 2048]} shadow-camera-left={-16} shadow-camera-right={16} shadow-camera-top={16} shadow-camera-bottom={-16} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -10]} receiveShadow>
         <planeGeometry args={[120, 80]} />
         <Flat color={PALETTE.grassLight} />
@@ -89,20 +82,10 @@ export default function HomeLandscape({ ambient, lowGraphics }: { ambient: boole
           <Flat color={color} />
         </mesh>
       ))}
-      {trees.map((tree, index) => (
-        <group key={index} position={[tree.x, 0, tree.z]} scale={tree.scale}>
-          <Tree variant={tree.variant} />
-        </group>
-      ))}
-      <group position={[-6, 0, -3.2]} rotation={[0, -1.15, 0]} scale={1.1}>
-        <Barn />
-      </group>
-      <group position={[-1.2, 0, -11]} rotation={[0, -1.4, 0]} scale={0.7}>
-        <Barn />
-      </group>
-      <group position={[6.8, 0, -3.5]} rotation={[0, -0.4, 0]} scale={1.3}>
-        <Windmill animate={ambient} />
-      </group>
+      <WorldTerrain world={world} withGround={false} />
+      <WorldProps world={world} shadows={!lowGraphics} ambient={alive} />
+      <Herd animals={world.animals} active={alive} />
+      <Butterflies points={world.butterflies} active={alive} />
       <group position={[0.6, 0, 1.6]} rotation={[0, -0.18, 0]}>
         {BED_CELLS.map((plot, index) => (
           <PlotTile
@@ -115,20 +98,6 @@ export default function HomeLandscape({ ambient, lowGraphics }: { ambient: boole
           />
         ))}
       </group>
-      {[-3, -2, -1, 0, 1, 2, 3].map((x) => (
-        <group key={x} position={[x + 0.6, 0, 3.4]}>
-          <mesh position={[-0.42, 0.25, 0]} castShadow>
-            <boxGeometry args={[0.1, 0.5, 0.1]} />
-            <Flat color={PALETTE.fence} />
-          </mesh>
-          {[0.18, 0.36].map((y) => (
-            <mesh key={y} position={[0, y, 0]} castShadow>
-              <boxGeometry args={[1, 0.07, 0.05]} />
-              <Flat color={PALETTE.fence} />
-            </mesh>
-          ))}
-        </group>
-      ))}
       <IdleRobot ambient={ambient} />
     </Canvas>
   )
