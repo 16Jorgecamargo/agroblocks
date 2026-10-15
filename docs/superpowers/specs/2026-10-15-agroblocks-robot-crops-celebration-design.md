@@ -88,7 +88,7 @@ const REST_POSE: RobotPose
 function clipForStep(input: { events: GameEvent[]; failed: boolean; celebrating: boolean; moving: boolean }): RobotClip
 ```
 
-Prioridade: `failed` → `error`; `celebrating` → `success`; eventos do último passo: `plotChanged` para `prepared` → `till`; para `seeded` → `plant`; `moistureChanged` → `water`; `plotChanged` para `harvested` → `harvest`; `resourcesCollected` → `collect`; `robotTurned` → `turn`; `robotMoved` ou `moving` → `move`; senão `idle`.
+Prioridade: `failed` → `error`; `celebrating` → `success`; eventos do último passo: `plotChanged` para `tilled` → `till`; para `seeded` → `plant`; `moistureChanged` para `wet` → `water`; `plotChanged` para `harvested` → `harvest`; `resourcesCollected` → `collect`; `robotTurned` → `turn`; `moving` (deslocamento em andamento) → `move`; senão `idle`. O evento `robotMoved` não decide o clip, porque continua em `lastEvents` depois que o deslocamento termina; mudanças de crescimento (`growing`, `mature`) e secagem também não. Com o robô parado em falha, os olhos ficam em `error` mesmo depois do clip terminar.
 
 ### 3.4 Execução — `RobotActor.tsx`
 
