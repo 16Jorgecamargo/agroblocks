@@ -1,201 +1,73 @@
 {
   "models": [
-    {
-      "id": "crop-1",
-      "pack": "crops",
-      "source": "FBX/Tomato_1.fbx",
-      "usage": "planta: semente",
-      "scale": 0.5,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "crop-2",
-      "pack": "crops",
-      "source": "FBX/Tomato_2.fbx",
-      "usage": "planta: broto",
-      "scale": 0.5,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "crop-3",
-      "pack": "crops",
-      "source": "FBX/Tomato_3.fbx",
-      "usage": "planta: crescendo",
-      "scale": 0.5,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "crop-4",
-      "pack": "crops",
-      "source": "FBX/Tomato_Harvested.fbx",
-      "usage": "planta: quase madura",
-      "scale": 0.5,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "crop-5",
-      "pack": "crops",
-      "source": "FBX/Tomato_4.fbx",
-      "usage": "planta: madura",
-      "scale": 0.5,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "straw",
-      "pack": "crops",
-      "source": "FBX/Tomato_Harvested.fbx",
-      "usage": "canteiro colhido",
-      "scale": 0.5,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "tree-a",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/tree_default.glb",
-      "usage": "árvore",
-      "scale": 1.1,
-      "yOffset": 0,
-      "rotationY": 0,
-      "tint": {
-        "leafsGreen": "#6cc04a",
-        "woodBark": "#8a5a33"
-      }
-    },
-    {
-      "id": "tree-b",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/tree_oak.glb",
-      "usage": "árvore",
-      "scale": 1.2,
-      "yOffset": 0,
-      "rotationY": 0,
-      "tint": {
-        "leafsGreen": "#5fb245",
-        "woodBark": "#8a5a33"
-      }
-    },
-    {
-      "id": "tree-c",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/tree_fat.glb",
-      "usage": "árvore",
-      "scale": 1.2,
-      "yOffset": 0,
-      "rotationY": 0,
-      "tint": {
-        "leafsGreen": "#78c850",
-        "woodBark": "#8a5a33"
-      }
-    },
-    {
-      "id": "pine",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/tree_pineDefaultA.glb",
-      "usage": "pinheiro",
-      "scale": 1.1,
-      "yOffset": 0,
-      "rotationY": 0,
-      "tint": {
-        "leafsDark": "#3f9e4f",
-        "woodBarkDark": "#6b4528"
-      }
-    },
-    {
-      "id": "rock-a",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/stone_largeA.glb",
-      "usage": "pedra grande (obstáculo)",
-      "scale": 1.1,
-      "yOffset": 0,
-      "rotationY": 0,
-      "tint": {
-        "stone": "#a9b0b6"
-      }
-    },
-    {
-      "id": "rock-b",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/stone_smallA.glb",
-      "usage": "pedra pequena",
-      "scale": 1.5,
-      "yOffset": 0,
-      "rotationY": 0,
-      "tint": {
-        "stone": "#9aa0a6"
-      }
-    },
-    {
-      "id": "bush",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/plant_bush.glb",
-      "usage": "arbusto",
-      "scale": 2,
-      "yOffset": 0,
-      "rotationY": 0,
-      "tint": {
-        "grass": "#4fae46"
-      }
-    },
-    {
-      "id": "fence",
-      "pack": "nature-kit",
-      "source": "Models/GLTF format/fence_simple.glb",
-      "usage": "cerca",
-      "scale": 1,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "barn",
-      "pack": "farm-buildings",
-      "source": "FBX/Barn.fbx",
-      "usage": "celeiro",
-      "scale": 0.32,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "silo",
-      "pack": "farm-buildings",
-      "source": "FBX/Silo.fbx",
-      "usage": "silo",
-      "scale": 0.3,
-      "yOffset": 0,
-      "rotationY": 0
-    },
-    {
-      "id": "reservoir",
-      "pack": "farm-buildings",
-      "source": "FBX/Well.fbx",
-      "usage": "reservatório de água",
-      "scale": 0.4,
-      "yOffset": 0,
-      "rotationY": 0
-    },
+    { "id": "crop-5", "pack": "crops", "source": "FBX/Tomato_4.fbx", "usage": "planta: madura", "targetHeight": 0.8, "rotationY": 0 },
+    { "id": "crop-1", "pack": "crops", "source": "FBX/Tomato_1.fbx", "usage": "planta: semente", "scaleLike": "crop-5", "rotationY": 0 },
+    { "id": "crop-2", "pack": "crops", "source": "FBX/Tomato_2.fbx", "usage": "planta: broto", "scaleLike": "crop-5", "rotationY": 0 },
+    { "id": "crop-3", "pack": "crops", "source": "FBX/Tomato_3.fbx", "usage": "planta: crescendo", "scaleLike": "crop-5", "rotationY": 0 },
+    { "id": "crop-4", "pack": "crops", "source": "FBX/Tomato_Harvested.fbx", "usage": "planta: quase madura", "scaleLike": "crop-5", "rotationY": 0 },
+    { "id": "straw", "pack": "crops", "source": "FBX/Tomato_Harvested.fbx", "usage": "canteiro colhido", "scaleLike": "crop-5", "rotationY": 0 },
+    { "id": "apple-tree", "pack": "crops", "source": "FBX/Apple_4.fbx", "usage": "macieira do pomar", "targetHeight": 2.2, "rotationY": 0 },
+    { "id": "corn-row", "pack": "crops", "source": "FBX/Corn_4.fbx", "usage": "fileira de milho", "targetHeight": 0.95, "rotationY": 0 },
+    { "id": "wheat-row", "pack": "crops", "source": "FBX/Wheat_4.fbx", "usage": "fileira de trigo", "targetHeight": 0.6, "rotationY": 0 },
+    { "id": "lettuce-row", "pack": "crops", "source": "FBX/Lettuce_4.fbx", "usage": "fileira de alface", "targetHeight": 0.3, "rotationY": 0 },
+    { "id": "pumpkin-row", "pack": "crops", "source": "FBX/Pumpkin_4.fbx", "usage": "fileira de abóbora", "targetHeight": 0.45, "rotationY": 0 },
+    { "id": "carrot-row", "pack": "crops", "source": "FBX/Carrot_4.fbx", "usage": "fileira de cenoura", "targetHeight": 0.4, "rotationY": 0 },
+    { "id": "tree-a", "pack": "nature-kit", "source": "Models/GLTF format/tree_default.glb", "usage": "árvore", "targetHeight": 2.6, "rotationY": 0, "tint": { "leafsGreen": "#6cc04a", "woodBark": "#8a5a33" } },
+    { "id": "tree-b", "pack": "nature-kit", "source": "Models/GLTF format/tree_oak.glb", "usage": "árvore", "targetHeight": 2.4, "rotationY": 0, "tint": { "leafsGreen": "#5fb245", "woodBark": "#8a5a33" } },
+    { "id": "tree-c", "pack": "nature-kit", "source": "Models/GLTF format/tree_fat.glb", "usage": "árvore", "targetHeight": 2.5, "rotationY": 0, "tint": { "leafsGreen": "#78c850", "woodBark": "#8a5a33" } },
+    { "id": "tree-d", "pack": "nature-kit", "source": "Models/GLTF format/tree_detailed.glb", "usage": "árvore", "targetHeight": 3, "rotationY": 0, "tint": { "leafsGreen": "#66bb48", "woodBark": "#8a5a33" } },
+    { "id": "pine", "pack": "nature-kit", "source": "Models/GLTF format/tree_pineDefaultA.glb", "usage": "pinheiro", "targetHeight": 3, "rotationY": 0, "tint": { "leafsDark": "#3f9e4f", "woodBarkDark": "#6b4528" } },
+    { "id": "pine-round", "pack": "nature-kit", "source": "Models/GLTF format/tree_pineRoundB.glb", "usage": "pinheiro", "targetHeight": 2.8, "rotationY": 0, "tint": { "leafsDark": "#46a656", "woodBarkDark": "#6b4528" } },
+    { "id": "rock-a", "pack": "nature-kit", "source": "Models/GLTF format/stone_largeA.glb", "usage": "pedra grande (obstáculo)", "targetHeight": 0.7, "rotationY": 0, "tint": { "stone": "#a9b0b6" } },
+    { "id": "rock-b", "pack": "nature-kit", "source": "Models/GLTF format/stone_smallA.glb", "usage": "pedra pequena", "targetHeight": 0.3, "rotationY": 0, "tint": { "stone": "#9aa0a6" } },
+    { "id": "bush", "pack": "nature-kit", "source": "Models/GLTF format/plant_bush.glb", "usage": "arbusto", "targetHeight": 0.6, "rotationY": 0, "tint": { "grass": "#4fae46" } },
+    { "id": "bush-large", "pack": "nature-kit", "source": "Models/GLTF format/plant_bushLarge.glb", "usage": "arbusto grande", "targetHeight": 0.9, "rotationY": 0, "tint": { "grass": "#4caa44" } },
+    { "id": "fence", "pack": "nature-kit", "source": "Models/GLTF format/fence_simple.glb", "usage": "cerca", "targetWidth": 1, "rotationY": 0 },
+    { "id": "fence-gate", "pack": "nature-kit", "source": "Models/GLTF format/fence_gate.glb", "usage": "porteira", "targetWidth": 1, "rotationY": 0 },
+    { "id": "bridge", "pack": "nature-kit", "source": "Models/GLTF format/bridge_wood.glb", "usage": "ponte de madeira", "targetWidth": 2.6, "rotationY": 0 },
+    { "id": "log-stack", "pack": "nature-kit", "source": "Models/GLTF format/log_stack.glb", "usage": "pilha de toras", "targetHeight": 0.6, "rotationY": 0 },
+    { "id": "sign", "pack": "nature-kit", "source": "Models/GLTF format/sign.glb", "usage": "placa", "targetHeight": 0.8, "rotationY": 0 },
+    { "id": "lily", "pack": "nature-kit", "source": "Models/GLTF format/lily_large.glb", "usage": "vitória-régia", "targetWidth": 0.6, "rotationY": 0 },
+    { "id": "mushrooms", "pack": "nature-kit", "source": "Models/GLTF format/mushroom_redGroup.glb", "usage": "cogumelos", "targetHeight": 0.25, "rotationY": 0 },
+    { "id": "flower-red", "pack": "nature-kit", "source": "Models/GLTF format/flower_redA.glb", "usage": "flor", "targetHeight": 0.3, "rotationY": 0 },
+    { "id": "flower-yellow", "pack": "nature-kit", "source": "Models/GLTF format/flower_yellowA.glb", "usage": "flor", "targetHeight": 0.3, "rotationY": 0 },
+    { "id": "flower-purple", "pack": "nature-kit", "source": "Models/GLTF format/flower_purpleA.glb", "usage": "flor", "targetHeight": 0.3, "rotationY": 0 },
+    { "id": "mega-tree-a", "pack": "megakit", "source": "glTF/CommonTree_1.gltf", "usage": "árvore", "targetHeight": 2.9, "rotationY": 0 },
+    { "id": "mega-tree-b", "pack": "megakit", "source": "glTF/CommonTree_3.gltf", "usage": "árvore", "targetHeight": 2.7, "rotationY": 0 },
+    { "id": "mega-pine", "pack": "megakit", "source": "glTF/Pine_2.gltf", "usage": "pinheiro", "targetHeight": 3, "rotationY": 0 },
+    { "id": "bush-flowers", "pack": "megakit", "source": "glTF/Bush_Common_Flowers.gltf", "usage": "arbusto florido", "targetHeight": 0.7, "rotationY": 0 },
+    { "id": "flower-patch", "pack": "megakit", "source": "glTF/Flower_4_Group.gltf", "usage": "canteiro de flores", "targetHeight": 0.35, "rotationY": 0 },
+    { "id": "grass-short", "pack": "megakit", "source": "glTF/Grass_Common_Short.gltf", "usage": "tufo de grama", "targetHeight": 0.25, "rotationY": 0 },
+    { "id": "grass-tall", "pack": "megakit", "source": "glTF/Grass_Wispy_Tall.gltf", "usage": "grama alta", "targetHeight": 0.45, "rotationY": 0 },
+    { "id": "clover", "pack": "megakit", "source": "glTF/Clover_1.gltf", "usage": "trevos", "targetHeight": 0.12, "rotationY": 0 },
+    { "id": "fern", "pack": "megakit", "source": "glTF/Fern_1.gltf", "usage": "samambaia", "targetHeight": 0.5, "rotationY": 0 },
+    { "id": "pebble", "pack": "megakit", "source": "glTF/Pebble_Round_1.gltf", "usage": "pedrinha", "targetHeight": 0.12, "rotationY": 0 },
+    { "id": "rock-medium", "pack": "megakit", "source": "glTF/Rock_Medium_1.gltf", "usage": "rocha", "targetHeight": 0.9, "rotationY": 0 },
+    { "id": "barn", "pack": "farm-buildings", "source": "FBX/BigBarn.fbx", "usage": "celeiro grande", "targetHeight": 4.5, "rotationY": 0, "tint": { "RoofBlack": "#8b8f87", "DarkRed": "#a8352a", "LightRed": "#c4473a" } },
+    { "id": "small-barn", "pack": "farm-buildings", "source": "FBX/SmallBarn.fbx", "usage": "celeiro pequeno", "targetHeight": 2.6, "rotationY": 0, "tint": { "RoofBlack": "#8b8f87", "DarkRed": "#a8352a", "LightRed": "#c4473a" } },
+    { "id": "open-barn", "pack": "farm-buildings", "source": "FBX/OpenBarn.fbx", "usage": "galpão aberto", "targetHeight": 2.8, "rotationY": 0, "tint": { "RoofBlack": "#8b8f87", "DarkRed": "#a8352a", "LightRed": "#c4473a" } },
+    { "id": "chicken-coop", "pack": "farm-buildings", "source": "FBX/ChickenCoop.fbx", "usage": "galinheiro", "targetHeight": 1.2, "rotationY": 0, "tint": { "RoofBlack": "#8b8f87", "DarkRed": "#a8352a", "LightRed": "#c4473a" } },
+    { "id": "silo", "pack": "farm-buildings", "source": "FBX/Silo.fbx", "usage": "silo", "targetHeight": 6, "rotationY": 0, "tint": { "DarkRed": "#a8352a", "LightRed": "#c4473a" } },
+    { "id": "silo-house", "pack": "farm-buildings", "source": "FBX/Silo_House.fbx", "usage": "silo com casinha", "targetHeight": 6, "rotationY": 0, "tint": { "DarkRed": "#a8352a", "LightRed": "#c4473a" } },
+    { "id": "tower-windmill", "pack": "farm-buildings", "source": "FBX/TowerWindmill.fbx", "usage": "cata-vento de torre", "targetHeight": 6, "rotationY": 0 },
+    { "id": "windmill", "pack": "farm-buildings", "source": "FBX/Windmill.fbx", "usage": "moinho de pedra", "targetHeight": 6, "rotationY": 0 },
+    { "id": "water-tower", "pack": "farm-buildings", "source": "FBX/WaterTower.fbx", "usage": "caixa-d'água", "targetHeight": 5, "rotationY": 0 },
+    { "id": "reservoir", "pack": "farm-buildings", "source": "FBX/Well.fbx", "usage": "poço / reservatório", "targetHeight": 1.4, "rotationY": 0 },
+    { "id": "cow", "pack": "farm-animals", "source": "FBX/Cow.fbx", "usage": "vaca", "targetHeight": 1.1, "rotationY": 0, "clips": { "idle": "Armature|Idle", "move": "Armature|WalkSlow" } },
+    { "id": "horse", "pack": "farm-animals", "source": "FBX/Horse.fbx", "usage": "cavalo", "targetHeight": 1.5, "rotationY": 0, "clips": { "idle": "Armature|Idle", "move": "Armature|Walk" } },
+    { "id": "pig", "pack": "farm-animals", "source": "FBX/Pig.fbx", "usage": "porco", "targetHeight": 0.6, "rotationY": 0, "clips": { "idle": "Armature|Idle", "move": "Armature|Jump" } },
+    { "id": "sheep", "pack": "farm-animals", "source": "FBX/Sheep.fbx", "usage": "ovelha", "targetHeight": 0.75, "rotationY": 0, "clips": { "idle": "Armature|Idle", "move": "Armature|Jump" } },
+    { "id": "llama", "pack": "farm-animals", "source": "FBX/Llama.fbx", "usage": "lhama", "targetHeight": 1.4, "rotationY": 0, "clips": { "idle": "Armature|Idle", "move": "Armature|Jump" } },
+    { "id": "pug", "pack": "farm-animals", "source": "FBX/Pug.fbx", "usage": "cachorro", "targetHeight": 0.45, "rotationY": 0, "clips": { "idle": "Armature|Idle", "move": "Armature|Jump" } },
     {
       "id": "robot",
       "pack": "robot",
       "source": "FBX/Robot.fbx",
       "usage": "robô agrícola",
-      "scale": 0.24,
-      "yOffset": 0,
+      "targetHeight": 0.9,
       "rotationY": 0,
-      "clips": {
-        "idle": "RobotArmature|Robot_Idle",
-        "move": "RobotArmature|Robot_Walking",
-        "success": "RobotArmature|Robot_ThumbsUp",
-        "error": "RobotArmature|Robot_No"
-      },
-      "recolor": {
-        "Main": "#f4f6f5",
-        "Grey": "#9aa7b0"
-      }
+      "clips": { "idle": "RobotArmature|Robot_Idle", "move": "RobotArmature|Robot_Walking", "success": "RobotArmature|Robot_ThumbsUp", "error": "RobotArmature|Robot_No" },
+      "recolor": { "Main": "#f4f6f5", "Grey": "#9aa7b0" }
     }
   ]
 }

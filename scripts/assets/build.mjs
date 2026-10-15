@@ -2,12 +2,16 @@ import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import obj2gltf from 'obj2gltf'
 import convertFbx from 'fbx2gltf'
-import { NodeIO } from '@gltf-transform/core'
+import sharp from 'sharp'
+import { Box3 } from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { getBounds, NodeIO } from '@gltf-transform/core'
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions'
-import { dedup, prune, quantize, resample, weld } from '@gltf-transform/functions'
+import { dedup, prune, quantize, resample, textureCompress, weld } from '@gltf-transform/functions'
+import { fitToTarget, fitWithScale } from '../../src/render/models/fit.ts'
 
 const REQUIRED = ['crop-1', 'crop-2', 'crop-3', 'crop-4', 'crop-5', 'tree-a', 'tree-b', 'tree-c', 'pine', 'rock-a', 'rock-b', 'bush', 'fence', 'robot']
-const BUDGET = 5 * 1024 * 1024
+const BUDGET = 10 * 1024 * 1024
 const OUT = 'public/models'
 const TMP = 'assets-src/tmp'
 
@@ -64,8 +68,42 @@ function matte(document) {
   }
 }
 
+function measureWithThree(file, bytes) {
+  const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+  return new Promise((resolve, reject) => {
+    new GLTFLoader().parse(
+      buffer,
+      '',
+      (gltf) => {
+        gltf.scene.updateMatrixWorld(true)
+        const box = new Box3().setFromObject(gltf.scene, true)
+        resolve({ min: box.min.toArray(), max: box.max.toArray() })
+      },
+      (error) => reject(new Error(`${file}: ${error.message}`)),
+    )
+  })
+}
+
+async function measure(document, file) {
+  if (document.getRoot().listSkins().length > 0) return measureWithThree(file, await readFile(file))
+  const bounds = getBounds(document.getRoot().listScenes()[0])
+  return { min: bounds.min, max: bounds.max }
+}
+
+async function slimTextures(document) {
+  if (document.getRoot().listTextures().length === 0) return
+  for (const material of document.getRoot().listMaterials()) {
+    material.setNormalTexture(null)
+    material.setOcclusionTexture(null)
+    material.setMetallicRoughnessTexture(null)
+  }
+  await document.transform(prune(), textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [512, 512] }))
+}
+
 const manifest = []
-for (const model of config.models) {
+const fits = new Map()
+const ordered = [...config.models.filter((model) => !model.scaleLike), ...config.models.filter((model) => model.scaleLike)]
+for (const model of ordered) {
   const pack = packs.get(model.pack)
   if (!pack) throw new Error(`Pacote desconhecido: ${model.pack}`)
   const input = path.join(pack.dir, model.source)
@@ -75,8 +113,14 @@ for (const model of config.models) {
   const document = await io.read(raw)
   matte(document)
   if (model.tint) tint(document, model.tint)
+  await slimTextures(document)
   await document.transform(dedup(), prune(), weld(), resample(), quantize())
   await io.write(output, document)
+  const bounds = await measure(document, output)
+  const reference = model.scaleLike ? fits.get(model.scaleLike) : null
+  if (model.scaleLike && !reference) throw new Error(`scaleLike sem referência: ${model.id}`)
+  const fit = reference ? fitWithScale(bounds, reference.scale) : fitToTarget(bounds, { targetHeight: model.targetHeight, targetWidth: model.targetWidth })
+  fits.set(model.id, fit)
   const bytes = (await stat(output)).size
   manifest.push({
     id: model.id,
@@ -85,14 +129,14 @@ for (const model of config.models) {
     author: pack.author,
     license: pack.license,
     page: pack.page,
-    scale: model.scale,
-    yOffset: model.yOffset,
+    scale: fit.scale,
+    yOffset: fit.yOffset,
     rotationY: model.rotationY,
     bytes,
     ...(model.clips ? { clips: model.clips } : {}),
     ...(model.recolor ? { recolor: model.recolor } : {}),
   })
-  console.log(`${model.id}: ${(bytes / 1024).toFixed(1)} KB`)
+  console.log(`${model.id}: ${(bytes / 1024).toFixed(1)} KB, escala ${fit.scale}`)
 }
 
 const total = manifest.reduce((sum, entry) => sum + entry.bytes, 0)
