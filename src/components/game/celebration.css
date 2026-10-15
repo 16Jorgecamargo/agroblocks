@@ -1,0 +1,33 @@
+.star-row {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+}
+
+.star-row__star {
+  display: inline-grid;
+  color: #c9d0cc;
+}
+
+.star-row__star.is-on {
+  color: var(--sun-400);
+  filter: drop-shadow(0 2px 0 #c98b12);
+}
+
+.count-up {
+  font-variant-numeric: tabular-nums;
+}
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti__piece {
+  position: absolute;
+  top: 0;
+  border-radius: 2px;
+}
