@@ -83,7 +83,9 @@ O engine (`src/game`) e o interpretador não importam React, Three.js nem Blockl
 ## Movimento e assets
 
 - **Animações:** toda animação usa [Motion](https://motion.dev) — `motion/react` na interface e `animate()` sobre objetos Three.js na cena 3D. Molas, durações e easings ficam em `src/motion/` e seguem a [Motion Reference](https://motion-reference.takayustudio.jp). Tabela completa em `docs/motion.md`. "Reduzir animações" (ou `prefers-reduced-motion`) desliga movimento, confete, voos e efeitos.
-- **Mundo 3D:** `src/render/world/buildWorld.ts` gera, de forma determinística, o ambiente das três cenas (fazenda do jogo, mapa de missões e tela inicial): pátio com celeiros, silos e moinhos, pasto cercado com animais que passeiam, pomar, rio com ponte, caminhos de terra, floresta e chão coberto de grama e flores. Os modelos são CC0 (Kenney Nature Kit, Quaternius Nature Crops, Farm Buildings, Farm Animals, Stylized Nature MegaKit e Animated Robot), convertidos para GLB em `public/models/` (≤ 10 MB) com escala calculada pela altura real de cada objeto. Uma tela de carregamento cobre cada cena até os modelos chegarem.
+- **Mundo 3D:** `src/render/world/buildWorld.ts` gera, de forma determinística, o ambiente das três cenas (fazenda do jogo, mapa de missões e tela inicial): pátio com celeiros, silos e moinhos, pasto cercado com animais que passeiam, pomar, rio com ponte, caminhos de terra, floresta e chão coberto de grama e flores. Os modelos são CC0 (Kenney Nature Kit, Quaternius Nature Crops, Farm Buildings, Farm Animals e Stylized Nature MegaKit), convertidos para GLB em `public/models/` (≤ 10 MB) com escala calculada pela altura real de cada objeto. Uma tela de carregamento cobre cada cena até os modelos chegarem. O robô, o tomateiro (plantado, crescendo, pronto para colher) e as cercas são desenhados em código, com animações de pose para cada ação do robô.
+- **Legenda:** o botão "Legenda" da fazenda abre um painel com uma página por estado do solo (vazio, preparado, molhado, plantado, crescendo, pronto para colher) e pelos elementos da fazenda, cada uma com o canteiro em 3D, o bloco que leva até ali e o próximo passo.
+- **Recursos no HUD:** sementes, água, energia e colheita só aparecem nas fases que usam o recurso.
 - **Offline:** nenhum recurso é buscado de fora em tempo de execução (as imagens do Blockly ficam em `public/blockly-media/`), exceto as fontes do Google Fonts.
 
 Os pacotes de origem (Kenney Nature Kit, Quaternius Nature Crops Pack, Animated Robot e Farm Buildings) ficam extraídos em `assets-src/` (fora do git, caminhos em `scripts/assets/sources.json`). Para regenerar os GLB (só em desenvolvimento):
@@ -107,6 +109,7 @@ Veja `docs/decisions/`:
 6. Motion como camada única de animação.
 7. Assets CC0 em GLB com fallback procedural.
 8. Mundo compartilhado gerado por função pura, com instancing.
+9. Robô, tomateiro e cercas procedurais com poses calculadas por funções puras.
 
 ## Missões
 

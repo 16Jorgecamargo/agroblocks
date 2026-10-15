@@ -56,7 +56,7 @@ function IdleRobot({ ambient }: { ambient: boolean }) {
     }
   }, [ambient])
   return (
-    <group ref={ref} position={[3.4, 0.2, 4.6]} rotation={[0, -0.55, 0]} scale={1.31}>
+    <group ref={ref} position={[3.1, 0.2, 4.4]} rotation={[0, -0.55, 0]} scale={1.05}>
       <RobotShowcase clip="idle" reducedMotion={!ambient} />
     </group>
   )
