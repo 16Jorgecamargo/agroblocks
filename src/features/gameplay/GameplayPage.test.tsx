@@ -48,6 +48,14 @@ describe('GameplayPage', () => {
     vi.useRealTimers()
   })
 
+  it('swaps the side panel at once when changing tabs, without an empty gap', () => {
+    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, renderMode: '2d', motion: 'full' } })
+    renderAt('/jogar/m1-first-harvest')
+    fireEvent.click(screen.getByRole('tab', { name: 'Dicas' }))
+    const panels = screen.getAllByRole('tabpanel', { hidden: true }).filter((panel) => panel.id.startsWith('side-panel'))
+    expect(panels.map((panel) => panel.id)).toEqual(['side-panel-hints'])
+  })
+
   it('redirects locked missions to the mission map', () => {
     renderAt('/jogar/m6-efficient-farm')
     expect(screen.getByText('Mapa de missões')).toBeInTheDocument()

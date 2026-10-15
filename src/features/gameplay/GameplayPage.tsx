@@ -21,7 +21,7 @@ import { stepDelayMs } from '@/game/execution/types'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { EASINGS } from '@/motion/easings'
-import { DURATIONS, fadeSlide } from '@/motion/presets'
+import { DURATIONS } from '@/motion/presets'
 import { SPRINGS } from '@/motion/springs'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { locateCell } from '@/render/cellLocator'
@@ -181,31 +181,28 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
           />
           <div className="gameplay__side-tabs">
             <PillTabs items={SIDE_TABS} active={sideTab} onChange={setSideTab} label="Informações da execução" idPrefix="side" variant="underline" />
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={sideTab}
-                role="tabpanel"
-                id={panelId('side', sideTab)}
-                aria-labelledby={tabId('side', sideTab)}
-                className="gameplay__side-panel"
-                variants={fadeSlide}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-              >
-                {sideTab === 'console' && <ConsolePanel entries={snapshot.log} onClear={() => controller.clearLog()} />}
-                {sideTab === 'hints' && (
-                  <HintsPanel
-                    hints={mission.hints}
-                    revealed={session.hintsRevealed}
-                    canReveal={session.canReveal}
-                    failedAttempts={session.failed}
-                    onReveal={session.revealHint}
-                  />
-                )}
-                {sideTab === 'pseudocode' && <PseudocodePanel text={session.pseudocode} valid={session.program !== null} />}
-              </motion.div>
-            </AnimatePresence>
+            <motion.div
+              key={sideTab}
+              role="tabpanel"
+              id={panelId('side', sideTab)}
+              aria-labelledby={tabId('side', sideTab)}
+              className="gameplay__side-panel"
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: DURATIONS.quickExit }}
+            >
+              {sideTab === 'console' && <ConsolePanel entries={snapshot.log} onClear={() => controller.clearLog()} />}
+              {sideTab === 'hints' && (
+                <HintsPanel
+                  hints={mission.hints}
+                  revealed={session.hintsRevealed}
+                  canReveal={session.canReveal}
+                  failedAttempts={session.failed}
+                  onReveal={session.revealHint}
+                />
+              )}
+              {sideTab === 'pseudocode' && <PseudocodePanel text={session.pseudocode} valid={session.program !== null} />}
+            </motion.div>
           </div>
         </aside>
       </main>
