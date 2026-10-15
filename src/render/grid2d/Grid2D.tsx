@@ -1,6 +1,8 @@
+import { useEffect, useRef } from 'react'
 import type { CellRef } from '@/game/missions/goals'
 import type { Cell, GameState } from '@/game/world/types'
 import { describeCell, FACING_LABELS } from '@/render/cellDescription'
+import { registerCellLocator } from '@/render/cellLocator'
 import './Grid2D.css'
 
 interface Grid2DProps {
@@ -29,8 +31,20 @@ const FACING_ROTATION = { N: 0, E: 90, S: 180, W: 270 }
 
 export function Grid2D({ state, highlightCells, failed }: Grid2DProps) {
   const highlighted = new Set(highlightCells.map(([x, y]) => `${x},${y}`))
+  const gridRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    return registerCellLocator((x, y) => {
+      const cell = gridRef.current?.querySelector<HTMLElement>(`[data-cell="${x},${y}"]`)
+      if (!cell) return null
+      const rect = cell.getBoundingClientRect()
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+    })
+  }, [])
+
   return (
     <div
+      ref={gridRef}
       role="grid"
       aria-label="Mapa da fazenda"
       className="grid2d"
@@ -49,6 +63,7 @@ export function Grid2D({ state, highlightCells, failed }: Grid2DProps) {
               <div
                 role="gridcell"
                 key={x}
+                data-cell={`${x},${y}`}
                 aria-label={parts.join(', ')}
                 className={[
                   'grid2d__cell',

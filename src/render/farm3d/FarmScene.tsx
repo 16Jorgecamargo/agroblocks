@@ -4,6 +4,7 @@ import type { FarmSceneProps } from '@/render/FarmView'
 import { PALETTE } from '@/render/palette'
 import { cellToWorld, generateDecorations } from '@/render/sceneLayout'
 import { CameraRig } from '@/render/farm3d/CameraRig'
+import { CellLocatorBridge } from '@/render/farm3d/CellLocatorBridge'
 import { Decorations } from '@/render/farm3d/Decorations'
 import { EffectsLayer } from '@/render/farm3d/Effects'
 import { Flat } from '@/render/farm3d/materials'
@@ -50,6 +51,7 @@ export default function FarmScene({
         showcase={showcase}
         reducedMotion={reducedMotion}
       />
+      <CellLocatorBridge width={width} height={height} />
       <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
       <directionalLight
         position={[8, 14, 6]}
