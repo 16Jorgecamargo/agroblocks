@@ -2,6 +2,7 @@ import { HashRouter, useRoutes } from 'react-router'
 import { appRoutes } from '@/app/routes'
 import { PreferenceSync } from '@/app/PreferenceSync'
 import { MusicPlayer } from '@/app/MusicPlayer'
+import { MotionProvider } from '@/motion/MotionProvider'
 
 function AppRoutes() {
   return useRoutes(appRoutes)
@@ -10,9 +11,11 @@ function AppRoutes() {
 export function App() {
   return (
     <HashRouter>
-      <PreferenceSync />
-      <MusicPlayer />
-      <AppRoutes />
+      <MotionProvider>
+        <PreferenceSync />
+        <MusicPlayer />
+        <AppRoutes />
+      </MotionProvider>
     </HashRouter>
   )
 }
