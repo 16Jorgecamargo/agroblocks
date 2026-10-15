@@ -266,7 +266,7 @@ export const toastItem: Variants = {
 export const dialogBackdrop: Variants = {
   hidden: { opacity: 0, backdropFilter: 'blur(0px)' },
   visible: { opacity: 1, backdropFilter: 'blur(4px)', transition: { duration: 0.3, ease: EASINGS.easeOutCubic } },
-  exit: { opacity: 0, backdropFilter: 'blur(0px)', transition: { duration: 0.3, ease: EASINGS.easeInCubic } },
+  exit: { opacity: 0, backdropFilter: 'blur(0px)', pointerEvents: 'none', transition: { duration: 0.3, ease: EASINGS.easeInCubic } },
 }
 
 export const dialogSheet: Variants = {

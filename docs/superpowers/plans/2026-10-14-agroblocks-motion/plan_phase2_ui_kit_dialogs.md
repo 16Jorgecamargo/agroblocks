@@ -1007,6 +1007,8 @@ import { describeConstraint, describeObjective } from '@/game/missions/goals'
 import { CONCEPT_LABELS, type MissionDefinition } from '@/game/missions/missionTypes'
 import { formatResource } from '@/features/gameplay/gameplayLogic'
 import { questBanner, staggerContainer, staggerItem } from '@/motion/presets'
+import { EASINGS } from '@/motion/easings'
+import { useMotionPrefs } from '@/motion/useMotionPrefs'
 
 interface BriefingDialogProps {
   open: boolean
@@ -1016,6 +1018,7 @@ interface BriefingDialogProps {
 }
 
 export function BriefingDialog({ open, mission, onStart, onDemo }: BriefingDialogProps) {
+  const { ambient } = useMotionPrefs()
   const title = mission.tutorial ? mission.title : `Fase ${mission.order} - ${mission.title}`
   const { resources } = mission
   return (
@@ -1056,14 +1059,22 @@ export function BriefingDialog({ open, mission, onStart, onDemo }: BriefingDialo
             Ver demonstração
           </GameButton>
         )}
-        <GameButton tone="primary" size="lg" icon="play" onClick={onStart}>
-          Começar
-        </GameButton>
+        <motion.span
+          className="briefing__start"
+          animate={ambient ? { boxShadow: ['0 0 0 0 rgba(63,163,77,0.55)', '0 0 0 12px rgba(63,163,77,0)'] } : undefined}
+          transition={ambient ? { duration: 1.6, repeat: Infinity, ease: EASINGS.easeOutCubic } : undefined}
+        >
+          <GameButton tone="primary" size="lg" icon="play" onClick={onStart}>
+            Começar
+          </GameButton>
+        </motion.span>
       </DialogSection>
     </GameDialog>
   )
 }
 ```
+
+Acrescentar ao CSS do gameplay (`src/features/gameplay/GameplayPage.css`): `.briefing__start { display: inline-flex; border-radius: 18px; }`.
 
 - [ ] **Step 8: Migrar os chamadores**
 
