@@ -5,15 +5,18 @@
   pointer-events: none;
 }
 
-.tutorial > * {
+.tutorial-bubble,
+.tutorial__bar {
   pointer-events: auto;
 }
 
 .tutorial__banner {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 60px;
+  left: 8px;
+  right: 8px;
+  border-radius: 12px;
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +64,7 @@
 
 .tutorial-bubble {
   position: absolute;
-  top: 18%;
+  top: calc(60px + 18%);
   left: 50%;
   translate: -50% 0;
   width: min(440px, calc(100% - 32px));
