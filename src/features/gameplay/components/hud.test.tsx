@@ -9,9 +9,6 @@ import { locateCell } from '@/render/cellLocator'
 import { Grid2D } from '@/render/grid2d/Grid2D'
 import { makeState } from '@/game/testing/makeState'
 
-const mission = getMission('m5-limited-resources')
-if (!mission) throw new Error('missing')
-
 describe('animated HUD', () => {
   it('exposes the real value of a rolling number to assistive tech', () => {
     const { container } = render(<RollingNumber value="12" />)
@@ -20,11 +17,23 @@ describe('animated HUD', () => {
   })
 
   it('marks low and empty resources', () => {
-    render(<GameHud mission={mission} resources={{ seeds: 1, water: 0, energy: null, harvested: 0 }} onHelp={vi.fn()} onSettings={vi.fn()} onExit={vi.fn()} />)
+    const efficient = getMission('m6-efficient-farm')
+    if (!efficient) throw new Error('missing')
+    render(<GameHud mission={efficient} resources={{ seeds: 1, water: 0, energy: 70, harvested: 0 }} onHelp={vi.fn()} onSettings={vi.fn()} onExit={vi.fn()} />)
     expect(screen.getByLabelText('Sementes: 1')).toHaveAttribute('data-level', 'low')
     expect(screen.getByLabelText('Água: 0')).toHaveAttribute('data-level', 'empty')
-    expect(screen.getByLabelText('Energia: ilimitada')).toHaveAttribute('data-level', 'ok')
-    expect(screen.getByLabelText('Colheita: 0')).toHaveAttribute('data-flight-target', 'harvest')
+    expect(screen.getByLabelText('Energia: 70')).toHaveAttribute('data-level', 'ok')
+    expect(screen.queryByLabelText(/^Colheita/)).not.toBeInTheDocument()
+  })
+
+  it('shows only the harvest chip in a harvest-only mission', () => {
+    const harvest = getMission('m4-auto-harvest')
+    if (!harvest) throw new Error('missing')
+    render(<GameHud mission={harvest} resources={{ seeds: null, water: null, energy: null, harvested: 2 }} onHelp={vi.fn()} onSettings={vi.fn()} onExit={vi.fn()} />)
+    expect(screen.getByLabelText('Colheita: 2')).toHaveAttribute('data-flight-target', 'harvest')
+    expect(screen.queryByLabelText(/^Sementes/)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/^Água/)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/^Energia/)).not.toBeInTheDocument()
   })
 
   it('flies harvested fruit and lands it', async () => {

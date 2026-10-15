@@ -1,3 +1,4 @@
+import { programBlockTypes } from '@/blocks/analysis/programBlockTypes'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 
 export type ResourceLevel = 'ok' | 'low' | 'empty'
@@ -26,4 +27,17 @@ export function arcKeyframes(from: Point, to: Point, lift = 120): { x: number[];
   const dx = to.x - from.x
   const dy = to.y - from.y
   return { x: [0, dx / 2, dx], y: [0, Math.min(0, dy) / 2 - lift, dy] }
+}
+
+export type HudResource = 'seeds' | 'water' | 'energy' | 'harvest'
+
+export function visibleResources(mission: MissionDefinition): HudResource[] {
+  const blocks = programBlockTypes(mission.referenceSolution)
+  const { resources } = mission
+  const visible: HudResource[] = []
+  if (blocks.has('farm_plant') || resources.seeds !== null) visible.push('seeds')
+  if (blocks.has('farm_water') || resources.water !== null) visible.push('water')
+  if (resources.energy !== null) visible.push('energy')
+  if (blocks.has('farm_harvest')) visible.push('harvest')
+  return visible
 }

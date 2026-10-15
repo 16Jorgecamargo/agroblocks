@@ -36,7 +36,7 @@ describe('gameplay components', () => {
     )
     expect(screen.getByRole('heading', { name: 'Fase 2 - Plantação em série' })).toBeInTheDocument()
     expect(screen.getByLabelText('Sementes: 5')).toBeInTheDocument()
-    expect(screen.getByLabelText('Água: ilimitada')).toBeInTheDocument()
+    expect(screen.queryByLabelText(/^Água/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument()
   })
 

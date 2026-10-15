@@ -5,7 +5,7 @@ import { RollingNumber } from '@/components/game/RollingNumber'
 import { Icon, type IconName } from '@/components/icons/Icon'
 import { Logo } from '@/components/brand/Logo'
 import { formatResource } from '@/features/gameplay/gameplayLogic'
-import { resourceLevel, resourceMaxima } from '@/features/gameplay/hudLogic'
+import { resourceLevel, resourceMaxima, visibleResources } from '@/features/gameplay/hudLogic'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import type { Resources } from '@/game/world/types'
 import { EASINGS } from '@/motion/easings'
@@ -85,6 +85,7 @@ interface GameHudProps {
 
 export function GameHud({ mission, resources, onHelp, onSettings, onExit }: GameHudProps) {
   const maxima = useMemo(() => resourceMaxima(mission), [mission])
+  const visible = useMemo(() => new Set(visibleResources(mission)), [mission])
   const arrivals = useFlightStore((store) => store.arrivals)
   return (
     <motion.header className="game-hud" initial={{ y: -80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={SPRINGS.modal}>
@@ -94,10 +95,12 @@ export function GameHud({ mission, resources, onHelp, onSettings, onExit }: Game
         <p className="game-hud__goal">{mission.briefing.goalText}</p>
       </div>
       <div className="game-hud__resources" aria-label="Recursos">
-        <ResourceChip icon="seed" label="Sementes" value={resources.seeds} max={maxima.seeds} tone="seed" />
-        <ResourceChip icon="drop" label="Água" value={resources.water} max={maxima.water} tone="water" />
-        <ResourceChip icon="bolt" label="Energia" value={resources.energy} max={maxima.energy} tone="energy" />
-        <ResourceChip icon="basket" label="Colheita" value={resources.harvested} max={null} tone="harvest" flightTarget popKey={arrivals} />
+        {visible.has('seeds') && <ResourceChip icon="seed" label="Sementes" value={resources.seeds} max={maxima.seeds} tone="seed" />}
+        {visible.has('water') && <ResourceChip icon="drop" label="Água" value={resources.water} max={maxima.water} tone="water" />}
+        {visible.has('energy') && <ResourceChip icon="bolt" label="Energia" value={resources.energy} max={maxima.energy} tone="energy" />}
+        {visible.has('harvest') && (
+          <ResourceChip icon="basket" label="Colheita" value={resources.harvested} max={null} tone="harvest" flightTarget popKey={arrivals} />
+        )}
       </div>
       <div className="game-hud__actions">
         <GameButton tone="dark" icon="help" className="hud-button hud-button--square" onClick={onHelp} aria-label="Ver objetivo e conceito da fase" />
