@@ -1,0 +1,8 @@
+{
+  "packs": [
+    { "id": "nature-kit", "dir": "assets-src/kenney_nature-kit", "page": "https://kenney.nl/assets/nature-kit", "author": "Kenney (kenney.nl)", "license": "CC0-1.0" },
+    { "id": "crops", "dir": "assets-src/Nature Crops Pack - Jan 2020", "page": "https://quaternius.com/packs/ultimatecrops.html", "author": "Quaternius", "license": "CC0-1.0" },
+    { "id": "robot", "dir": "assets-src/Animated Robot by Quaternius", "page": "https://quaternius.itch.io/lowpoly-robot", "author": "Quaternius", "license": "CC0-1.0" },
+    { "id": "farm-buildings", "dir": "assets-src/Farm Buildings by Quaternius", "page": "https://quaternius.com/packs/farmbuildings.html", "author": "Quaternius", "license": "CC0-1.0" }
+  ]
+}

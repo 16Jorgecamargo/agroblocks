@@ -1,1 +1,230 @@
-{ "models": [] }
+{
+  "models": [
+    {
+      "id": "crop-1",
+      "file": "models/crop-1.glb",
+      "usage": "planta: semente",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/ultimatecrops.html",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 3684
+    },
+    {
+      "id": "crop-2",
+      "file": "models/crop-2.glb",
+      "usage": "planta: broto",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/ultimatecrops.html",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 11996
+    },
+    {
+      "id": "crop-3",
+      "file": "models/crop-3.glb",
+      "usage": "planta: crescendo",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/ultimatecrops.html",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 48924
+    },
+    {
+      "id": "crop-4",
+      "file": "models/crop-4.glb",
+      "usage": "planta: quase madura",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/ultimatecrops.html",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 55492
+    },
+    {
+      "id": "crop-5",
+      "file": "models/crop-5.glb",
+      "usage": "planta: madura",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/ultimatecrops.html",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 64824
+    },
+    {
+      "id": "straw",
+      "file": "models/straw.glb",
+      "usage": "canteiro colhido",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/ultimatecrops.html",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 55492
+    },
+    {
+      "id": "tree-a",
+      "file": "models/tree-a.glb",
+      "usage": "árvore",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 1.1,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 5640
+    },
+    {
+      "id": "tree-b",
+      "file": "models/tree-b.glb",
+      "usage": "árvore",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 1.2,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 8260
+    },
+    {
+      "id": "tree-c",
+      "file": "models/tree-c.glb",
+      "usage": "árvore",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 1.2,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 3708
+    },
+    {
+      "id": "pine",
+      "file": "models/pine.glb",
+      "usage": "pinheiro",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 1.1,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 8524
+    },
+    {
+      "id": "rock-a",
+      "file": "models/rock-a.glb",
+      "usage": "pedra grande (obstáculo)",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 1.1,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 3976
+    },
+    {
+      "id": "rock-b",
+      "file": "models/rock-b.glb",
+      "usage": "pedra pequena",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 1.5,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 1800
+    },
+    {
+      "id": "bush",
+      "file": "models/bush.glb",
+      "usage": "arbusto",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 2,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 2696
+    },
+    {
+      "id": "fence",
+      "file": "models/fence.glb",
+      "usage": "cerca",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 1,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 3704
+    },
+    {
+      "id": "barn",
+      "file": "models/barn.glb",
+      "usage": "celeiro",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/farmbuildings.html",
+      "scale": 0.32,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 102972
+    },
+    {
+      "id": "silo",
+      "file": "models/silo.glb",
+      "usage": "silo",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/farmbuildings.html",
+      "scale": 0.3,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 61676
+    },
+    {
+      "id": "reservoir",
+      "file": "models/reservoir.glb",
+      "usage": "reservatório de água",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.com/packs/farmbuildings.html",
+      "scale": 0.4,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 111908
+    },
+    {
+      "id": "robot",
+      "file": "models/robot.glb",
+      "usage": "robô agrícola",
+      "author": "Quaternius",
+      "license": "CC0-1.0",
+      "page": "https://quaternius.itch.io/lowpoly-robot",
+      "scale": 0.24,
+      "yOffset": 0,
+      "rotationY": 0,
+      "bytes": 276168,
+      "clips": {
+        "idle": "RobotArmature|Robot_Idle",
+        "move": "RobotArmature|Robot_Walking",
+        "success": "RobotArmature|Robot_ThumbsUp",
+        "error": "RobotArmature|Robot_No"
+      },
+      "recolor": {
+        "Main": "#f4f6f5",
+        "Grey": "#9aa7b0"
+      }
+    }
+  ]
+}

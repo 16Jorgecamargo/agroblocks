@@ -86,7 +86,14 @@ O engine (`src/game`) e o interpretador não importam React, Three.js nem Blockl
 - **Modelos 3D:** a cena aceita pacotes CC0 (Kenney Nature Kit, Quaternius Ultimate Crops e Animated Robot) convertidos para GLB em `public/models/`, descritos em `src/render/models/manifest.generated.json` (validado com Zod, orçamento de 5 MB). Se o manifesto estiver vazio ou um modelo falhar, a cena usa os modelos procedurais.
 - **Offline:** nenhum recurso é buscado de fora em tempo de execução (as imagens do Blockly ficam em `public/blockly-media/`), exceto as fontes do Google Fonts.
 
-Os pacotes de modelos são baixados manualmente (alguns sites bloqueiam downloads automáticos) e salvos em `assets-src/` como `nature-kit.zip`, `crops.zip` e `robot.zip`; a conversão para GLB (scripts em `scripts/assets/`) ainda está pendente — até lá a cena usa os modelos procedurais.
+Os pacotes de origem (Kenney Nature Kit, Quaternius Nature Crops Pack, Animated Robot e Farm Buildings) ficam extraídos em `assets-src/` (fora do git, caminhos em `scripts/assets/sources.json`). Para regenerar os GLB (só em desenvolvimento):
+
+```bash
+npm run assets:inspect
+npm run assets:build
+```
+
+`scripts/assets/assets.config.json` define qual arquivo vira cada modelo, escala, cores e clipes do robô. Créditos em `CREDITS.md`.
 
 ## Decisões técnicas
 

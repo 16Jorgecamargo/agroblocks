@@ -1,0 +1,201 @@
+{
+  "models": [
+    {
+      "id": "crop-1",
+      "pack": "crops",
+      "source": "FBX/Tomato_1.fbx",
+      "usage": "planta: semente",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "crop-2",
+      "pack": "crops",
+      "source": "FBX/Tomato_2.fbx",
+      "usage": "planta: broto",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "crop-3",
+      "pack": "crops",
+      "source": "FBX/Tomato_3.fbx",
+      "usage": "planta: crescendo",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "crop-4",
+      "pack": "crops",
+      "source": "FBX/Tomato_Harvested.fbx",
+      "usage": "planta: quase madura",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "crop-5",
+      "pack": "crops",
+      "source": "FBX/Tomato_4.fbx",
+      "usage": "planta: madura",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "straw",
+      "pack": "crops",
+      "source": "FBX/Tomato_Harvested.fbx",
+      "usage": "canteiro colhido",
+      "scale": 0.5,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "tree-a",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/tree_default.glb",
+      "usage": "árvore",
+      "scale": 1.1,
+      "yOffset": 0,
+      "rotationY": 0,
+      "tint": {
+        "leafsGreen": "#6cc04a",
+        "woodBark": "#8a5a33"
+      }
+    },
+    {
+      "id": "tree-b",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/tree_oak.glb",
+      "usage": "árvore",
+      "scale": 1.2,
+      "yOffset": 0,
+      "rotationY": 0,
+      "tint": {
+        "leafsGreen": "#5fb245",
+        "woodBark": "#8a5a33"
+      }
+    },
+    {
+      "id": "tree-c",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/tree_fat.glb",
+      "usage": "árvore",
+      "scale": 1.2,
+      "yOffset": 0,
+      "rotationY": 0,
+      "tint": {
+        "leafsGreen": "#78c850",
+        "woodBark": "#8a5a33"
+      }
+    },
+    {
+      "id": "pine",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/tree_pineDefaultA.glb",
+      "usage": "pinheiro",
+      "scale": 1.1,
+      "yOffset": 0,
+      "rotationY": 0,
+      "tint": {
+        "leafsDark": "#3f9e4f",
+        "woodBarkDark": "#6b4528"
+      }
+    },
+    {
+      "id": "rock-a",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/stone_largeA.glb",
+      "usage": "pedra grande (obstáculo)",
+      "scale": 1.1,
+      "yOffset": 0,
+      "rotationY": 0,
+      "tint": {
+        "stone": "#a9b0b6"
+      }
+    },
+    {
+      "id": "rock-b",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/stone_smallA.glb",
+      "usage": "pedra pequena",
+      "scale": 1.5,
+      "yOffset": 0,
+      "rotationY": 0,
+      "tint": {
+        "stone": "#9aa0a6"
+      }
+    },
+    {
+      "id": "bush",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/plant_bush.glb",
+      "usage": "arbusto",
+      "scale": 2,
+      "yOffset": 0,
+      "rotationY": 0,
+      "tint": {
+        "grass": "#4fae46"
+      }
+    },
+    {
+      "id": "fence",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/fence_simple.glb",
+      "usage": "cerca",
+      "scale": 1,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "barn",
+      "pack": "farm-buildings",
+      "source": "FBX/Barn.fbx",
+      "usage": "celeiro",
+      "scale": 0.32,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "silo",
+      "pack": "farm-buildings",
+      "source": "FBX/Silo.fbx",
+      "usage": "silo",
+      "scale": 0.3,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "reservoir",
+      "pack": "farm-buildings",
+      "source": "FBX/Well.fbx",
+      "usage": "reservatório de água",
+      "scale": 0.4,
+      "yOffset": 0,
+      "rotationY": 0
+    },
+    {
+      "id": "robot",
+      "pack": "robot",
+      "source": "FBX/Robot.fbx",
+      "usage": "robô agrícola",
+      "scale": 0.24,
+      "yOffset": 0,
+      "rotationY": 0,
+      "clips": {
+        "idle": "RobotArmature|Robot_Idle",
+        "move": "RobotArmature|Robot_Walking",
+        "success": "RobotArmature|Robot_ThumbsUp",
+        "error": "RobotArmature|Robot_No"
+      },
+      "recolor": {
+        "Main": "#f4f6f5",
+        "Grey": "#9aa7b0"
+      }
+    }
+  ]
+}

@@ -6,4 +6,4 @@
 
 **Consequências:** qualidade visual muito maior, funcionamento offline, licença livre inclusive comercial; o download dos pacotes é manual quando a rede bloqueia os sites de origem.
 
-**Status:** aceita. Manifesto, componente `Model` e fallback já estão no código; a conversão (Task 5.2) aguarda o download manual dos pacotes.
+**Status:** aceita e implementada: 18 modelos, cerca de 0,8 MB. Materiais convertidos para fosco e recoloridos na conversão para seguir a paleta do jogo.
