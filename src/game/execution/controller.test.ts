@@ -1,5 +1,6 @@
 import { ExecutionController } from '@/game/execution/controller'
 import { ManualScheduler } from '@/game/execution/manualScheduler'
+import { REWIND_DELAY_MS } from '@/game/execution/controller'
 import type { ControllerMission } from '@/game/execution/types'
 import { act, program, whileDo, bool } from '@/blocks/interpreter/programBuilder'
 import { makeState } from '@/game/testing/makeState'
@@ -98,6 +99,31 @@ describe('ExecutionController', () => {
     expect(controller.getSnapshot().state).toBe(mission.initialState)
   })
 
+  it('waits for the robot to return to the start before running again after a finished run', () => {
+    const { controller, scheduler } = setup()
+    controller.run(solution)
+    scheduler.runAll()
+    expect(controller.getSnapshot().status).toBe('finished')
+    controller.run(solution)
+    expect(controller.getSnapshot().status).toBe('running')
+    expect(controller.getSnapshot().stepCount).toBe(0)
+    expect(scheduler.delays.at(-1)).toBe(REWIND_DELAY_MS)
+    scheduler.runNext()
+    expect(controller.getSnapshot().stepCount).toBe(1)
+    scheduler.runAll()
+    expect(controller.getSnapshot().status).toBe('finished')
+  })
+
+  it('also waits after Parar, but not on the very first run', () => {
+    const { controller, scheduler } = setup()
+    controller.run(solution)
+    expect(controller.getSnapshot().stepCount).toBe(1)
+    controller.stop()
+    controller.run(solution)
+    expect(controller.getSnapshot().stepCount).toBe(0)
+    expect(scheduler.delays.at(-1)).toBe(REWIND_DELAY_MS)
+  })
+
   it('reset restores the initial state and clears the log', () => {
     const { controller } = setup()
     controller.run(solution)
@@ -139,8 +165,10 @@ describe('ExecutionController', () => {
     controller.run(solution)
     scheduler.runAll()
     controller.run(solution)
-    expect(controller.getSnapshot().state.robot.x).toBe(1)
+    expect(controller.getSnapshot().state.robot.x).toBe(0)
     expect(controller.getSnapshot().state.resources.harvested).toBe(0)
+    scheduler.runNext()
+    expect(controller.getSnapshot().state.robot.x).toBe(1)
   })
 
   it('reschedules with the new speed', () => {

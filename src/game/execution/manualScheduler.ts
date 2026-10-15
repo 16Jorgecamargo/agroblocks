@@ -7,8 +7,10 @@ interface Task {
 
 export class ManualScheduler implements Scheduler {
   private tasks: Task[] = []
+  readonly delays: number[] = []
 
-  schedule(callback: () => void): () => void {
+  schedule(callback: () => void, delayMs: number): () => void {
+    this.delays.push(delayMs)
     const task: Task = { callback, cancelled: false }
     this.tasks.push(task)
     return () => {

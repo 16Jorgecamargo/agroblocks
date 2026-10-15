@@ -15,6 +15,8 @@ import { applyAction } from '@/game/rules/applyAction'
 
 const MAX_LOG_ENTRIES = 200
 
+export const REWIND_DELAY_MS = 900
+
 type ProgramGenerator = Generator<ExecStep, ExecOutcome, ActionFeedback | undefined>
 
 export class ExecutionController {
@@ -25,6 +27,7 @@ export class ExecutionController {
   private cancelTimer: (() => void) | null = null
   private runId = 0
   private logId = 0
+  private rewindPending = false
 
   constructor(
     private readonly mission: ControllerMission,
@@ -53,6 +56,11 @@ export class ExecutionController {
     if (status === 'finished' || status === 'failed') this.restore(false)
     this.start(program)
     this.patch({ status: 'running' })
+    if (this.rewindPending) {
+      this.rewindPending = false
+      this.scheduleNext(REWIND_DELAY_MS)
+      return
+    }
     this.advance()
     this.scheduleNext()
   }
@@ -138,6 +146,7 @@ export class ExecutionController {
   }
 
   private restore(keepLog: boolean): void {
+    if (this.snapshot.stepCount > 0) this.rewindPending = true
     this.cancel()
     this.runId += 1
     this.generator = null
@@ -215,7 +224,7 @@ export class ExecutionController {
     this.patch({ status: 'finished', validation, currentBlockId: null, log: this.appendLog(entries) })
   }
 
-  private scheduleNext(): void {
+  private scheduleNext(delayMs = stepDelayMs(this.snapshot.speed)): void {
     if (this.snapshot.status !== 'running') return
     const runId = this.runId
     this.cancelTimer = this.scheduler.schedule(() => {
@@ -223,7 +232,7 @@ export class ExecutionController {
       if (runId !== this.runId || this.snapshot.status !== 'running') return
       this.advance()
       this.scheduleNext()
-    }, stepDelayMs(this.snapshot.speed))
+    }, delayMs)
   }
 
   private cancel(): void {
