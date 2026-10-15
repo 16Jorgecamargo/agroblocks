@@ -62,3 +62,15 @@ test('the running block glows and the harvest flies to the counter in full motio
   await expect(page.locator('.harvest-flight')).toHaveCount(1, { timeout: 20_000 })
   await expect(page.getByRole('group', { name: 'Colheita: 1' })).toBeVisible({ timeout: 20_000 })
 })
+test('the mission map and the home screen render their 3D worlds without errors', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await page.goto('/')
+  await expect(page.locator('.home-scene canvas')).toBeVisible()
+  await expect(page.locator('.home-scene .scene-splash')).toHaveCount(0, { timeout: 30_000 })
+  await page.goto('/#/missoes')
+  await expect(page.locator('.map-scene canvas')).toBeVisible()
+  await expect(page.locator('.mission-select__map .scene-splash')).toHaveCount(0, { timeout: 30_000 })
+  expect(errors).toEqual([])
+})

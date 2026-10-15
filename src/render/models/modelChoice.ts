@@ -1,5 +1,4 @@
 import type { ModelId } from '@/render/models/manifest'
-import type { DecorationKind } from '@/render/sceneLayout'
 import type { PlotState } from '@/game/world/types'
 
 export type CropStage = 1 | 2 | 3 | 4 | 5
@@ -14,29 +13,6 @@ export function cropStageFor(plot: PlotState, growth: number, growTicks: number)
 
 export function cropModelId(stage: CropStage): ModelId {
   return `crop-${stage}` as ModelId
-}
-
-const TREES: ModelId[] = ['tree-a', 'tree-b', 'tree-c']
-
-export function decorationModelId(kind: DecorationKind, variant: number): ModelId {
-  switch (kind) {
-    case 'tree':
-      return TREES[variant % TREES.length]
-    case 'pine':
-      return 'pine'
-    case 'rock':
-      return variant % 2 === 0 ? 'rock-a' : 'rock-b'
-    case 'bush':
-      return 'bush'
-    case 'fence':
-      return 'fence'
-    case 'barn':
-      return 'barn'
-    case 'windmill':
-      return 'windmill'
-    case 'silo':
-      return 'silo'
-  }
 }
 
 export type RobotClip = 'idle' | 'move' | 'success' | 'error'

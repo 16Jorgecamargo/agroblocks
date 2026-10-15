@@ -1,4 +1,5 @@
-import { cropModelId, cropStageFor, decorationModelId, robotClipFor } from '@/render/models/modelChoice'
+import * as modelChoice from '@/render/models/modelChoice'
+import { cropModelId, cropStageFor, robotClipFor } from '@/render/models/modelChoice'
 
 describe('modelChoice', () => {
   it('maps plot states and growth to the five crop stages', () => {
@@ -13,13 +14,8 @@ describe('modelChoice', () => {
     expect(cropModelId(5)).toBe('crop-5')
   })
 
-  it('picks decoration models by kind and variant', () => {
-    expect(decorationModelId('tree', 0)).toBe('tree-a')
-    expect(decorationModelId('tree', 4)).toBe('tree-b')
-    expect(decorationModelId('pine', 2)).toBe('pine')
-    expect(decorationModelId('rock', 1)).toBe('rock-b')
-    expect(decorationModelId('fence', 0)).toBe('fence')
-    expect(decorationModelId('barn', 0)).toBe('barn')
+  it('no longer maps old decoration kinds', () => {
+    expect('decorationModelId' in modelChoice).toBe(false)
   })
 
   it('chooses the robot clip by priority', () => {

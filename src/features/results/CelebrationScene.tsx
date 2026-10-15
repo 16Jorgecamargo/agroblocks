@@ -1,8 +1,8 @@
 import { Canvas } from '@react-three/fiber'
 import { CameraRig } from '@/render/farm3d/CameraRig'
-import { Barn, Tree, Windmill } from '@/render/farm3d/Decorations'
 import { Flat } from '@/render/farm3d/materials'
 import { RobotShowcase } from '@/render/farm3d/RobotModel'
+import { Model } from '@/render/models/Model'
 import { PALETTE } from '@/render/palette'
 
 export default function CelebrationScene({ reducedMotion }: { reducedMotion: boolean }) {
@@ -31,14 +31,14 @@ export default function CelebrationScene({ reducedMotion }: { reducedMotion: boo
           </mesh>
         ))}
       </group>
-      <group position={[-3.5, 0, -3]} scale={0.8}>
-        <Barn />
+      <group position={[-3.5, 0, -3]} rotation={[0, 0.6, 0]} scale={0.55}>
+        <Model id="barn" fallback={null} />
       </group>
-      <group position={[3.2, 0, -3.2]} scale={0.8}>
-        <Windmill animate={!reducedMotion} />
+      <group position={[3.2, 0, -3.2]} scale={0.5}>
+        <Model id="tower-windmill" fallback={null} />
       </group>
       <group position={[-3, 0, 2.5]}>
-        <Tree />
+        <Model id="tree-a" fallback={null} />
       </group>
     </Canvas>
   )
