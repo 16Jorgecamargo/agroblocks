@@ -34,7 +34,8 @@ function InstancedPart({ part, matrices, shadows }: { part: MeshPart; matrices: 
     mesh.instanceMatrix.needsUpdate = true
     mesh.computeBoundingSphere()
   }, [matrices, part])
-  return <instancedMesh key={matrices.length} ref={ref} args={[part.geometry, part.material, matrices.length]} castShadow={shadows} receiveShadow />
+  const cutout = (Array.isArray(part.material) ? part.material : [part.material]).some((material) => material.alphaTest > 0)
+  return <instancedMesh key={matrices.length} ref={ref} args={[part.geometry, part.material, matrices.length]} castShadow={shadows && !cutout} receiveShadow={!cutout} />
 }
 
 function InstancedParts({ entry, props, shadows }: { entry: ModelEntry; props: PropItem[]; shadows: boolean }) {

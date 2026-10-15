@@ -163,8 +163,8 @@
       "author": "Kenney (kenney.nl)",
       "license": "CC0-1.0",
       "page": "https://kenney.nl/assets/nature-kit",
-      "scale": 2.6951,
-      "yOffset": 0.1347,
+      "scale": 0.8371,
+      "yOffset": 0.0418,
       "rotationY": 0,
       "bytes": 3976
     },
@@ -325,54 +325,6 @@
       "bytes": 4448
     },
     {
-      "id": "mega-tree-a",
-      "file": "models/mega-tree-a.glb",
-      "usage": "árvore",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/stylizednaturemegakit.html",
-      "scale": 0.3992,
-      "yOffset": 0.0969,
-      "rotationY": 0,
-      "bytes": 335080
-    },
-    {
-      "id": "mega-tree-b",
-      "file": "models/mega-tree-b.glb",
-      "usage": "árvore",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/stylizednaturemegakit.html",
-      "scale": 0.2865,
-      "yOffset": 0.0695,
-      "rotationY": 0,
-      "bytes": 215616
-    },
-    {
-      "id": "mega-pine",
-      "file": "models/mega-pine.glb",
-      "usage": "pinheiro",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/stylizednaturemegakit.html",
-      "scale": 0.4067,
-      "yOffset": 0.0956,
-      "rotationY": 0,
-      "bytes": 178888
-    },
-    {
-      "id": "bush-flowers",
-      "file": "models/bush-flowers.glb",
-      "usage": "arbusto florido",
-      "author": "Quaternius",
-      "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/stylizednaturemegakit.html",
-      "scale": 0.4425,
-      "yOffset": 0.1039,
-      "rotationY": 0,
-      "bytes": 149664
-    },
-    {
       "id": "flower-patch",
       "file": "models/flower-patch.glb",
       "usage": "canteiro de flores",
@@ -382,7 +334,7 @@
       "scale": 0.1407,
       "yOffset": 0.008,
       "rotationY": 0,
-      "bytes": 141976
+      "bytes": 136548
     },
     {
       "id": "grass-short",
@@ -394,7 +346,7 @@
       "scale": 0.1874,
       "yOffset": 0.0042,
       "rotationY": 0,
-      "bytes": 7664
+      "bytes": 7020
     },
     {
       "id": "grass-tall",
@@ -406,7 +358,7 @@
       "scale": 0.2692,
       "yOffset": 0.0097,
       "rotationY": 0,
-      "bytes": 22256
+      "bytes": 19648
     },
     {
       "id": "clover",
@@ -418,7 +370,7 @@
       "scale": 0.1048,
       "yOffset": 0.0013,
       "rotationY": 0,
-      "bytes": 62216
+      "bytes": 61040
     },
     {
       "id": "fern",
@@ -430,7 +382,7 @@
       "scale": 0.595,
       "yOffset": 0.0461,
       "rotationY": 0,
-      "bytes": 61084
+      "bytes": 60000
     },
     {
       "id": "pebble",
@@ -448,13 +400,13 @@
       "id": "rock-medium",
       "file": "models/rock-medium.glb",
       "usage": "rocha",
-      "author": "Quaternius",
+      "author": "Kenney (kenney.nl)",
       "license": "CC0-1.0",
-      "page": "https://quaternius.com/packs/stylizednaturemegakit.html",
-      "scale": 0.3983,
-      "yOffset": 0.108,
+      "page": "https://kenney.nl/assets/nature-kit",
+      "scale": 0.9037,
+      "yOffset": 0.0452,
       "rotationY": 0,
-      "bytes": 32192
+      "bytes": 6268
     },
     {
       "id": "barn",

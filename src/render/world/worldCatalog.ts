@@ -2,9 +2,9 @@ import type { ModelId } from '@/render/models/manifest'
 
 export const CLUTTER_MODELS = ['grass-short', 'grass-tall', 'clover', 'flower-patch', 'flower-red', 'flower-yellow', 'flower-purple', 'fern', 'mushrooms', 'pebble'] as const satisfies readonly ModelId[]
 
-export const TREE_MODELS = ['tree-a', 'tree-b', 'tree-c', 'tree-d', 'mega-tree-a', 'mega-tree-b', 'pine', 'pine-round', 'mega-pine'] as const satisfies readonly ModelId[]
+export const TREE_MODELS = ['tree-a', 'tree-b', 'tree-c', 'tree-d', 'pine', 'pine-round'] as const satisfies readonly ModelId[]
 
-export const FOREST_MODELS: readonly ModelId[] = [...TREE_MODELS, ...TREE_MODELS, 'bush-large', 'bush-flowers', 'bush', 'rock-medium', 'rock-a']
+export const FOREST_MODELS: readonly ModelId[] = [...TREE_MODELS, ...TREE_MODELS, 'bush-large', 'bush', 'rock-medium', 'rock-a']
 
 export const TALL_MODELS: ReadonlySet<ModelId> = new Set<ModelId>([
   ...TREE_MODELS,
@@ -38,7 +38,6 @@ const FOOTPRINTS: Partial<Record<ModelId, number>> = {
   'rock-medium': 0.7,
   'rock-a': 0.6,
   'bush-large': 0.6,
-  'bush-flowers': 0.5,
   bush: 0.4,
   'corn-row': 0.4,
   'wheat-row': 0.4,

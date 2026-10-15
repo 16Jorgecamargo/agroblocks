@@ -2,14 +2,16 @@ import { useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import type { FarmSceneProps } from '@/render/FarmView'
 import { PALETTE } from '@/render/palette'
-import { cellToWorld, generateDecorations } from '@/render/sceneLayout'
+import { cellToWorld } from '@/render/sceneLayout'
 import { CameraRig } from '@/render/farm3d/CameraRig'
 import { CellLocatorBridge } from '@/render/farm3d/CellLocatorBridge'
-import { Decorations } from '@/render/farm3d/Decorations'
 import { EffectsLayer } from '@/render/farm3d/Effects'
 import { Flat } from '@/render/farm3d/materials'
 import { PlotTile } from '@/render/farm3d/PlotTile'
 import { RobotModel } from '@/render/farm3d/RobotModel'
+import { buildWorld } from '@/render/world/buildWorld'
+import { WorldProps } from '@/render/world/WorldProps'
+import { WorldTerrain } from '@/render/world/WorldTerrain'
 
 export default function FarmScene({
   state,
@@ -26,10 +28,11 @@ export default function FarmScene({
   lowGraphics,
   reducedMotion,
   showcase = false,
+  onReady,
 }: FarmSceneProps) {
   const { width, height } = state
-  const decorations = useMemo(
-    () => generateDecorations(width, height, seedKey, { dense: !lowGraphics }),
+  const world = useMemo(
+    () => buildWorld({ layout: 'farm', gridWidth: width, gridHeight: height, seed: seedKey, density: lowGraphics ? 'light' : 'full' }),
     [width, height, seedKey, lowGraphics],
   )
   const goals = useMemo(() => new Set(highlightCells.map(([x, y]) => `${x},${y}`)), [highlightCells])
@@ -42,6 +45,7 @@ export default function FarmScene({
       dpr={lowGraphics ? 1 : [1, 2]}
       camera={{ position: [16, 16, 16], zoom: 40, near: -200, far: 400 }}
       gl={{ antialias: !lowGraphics, preserveDrawingBuffer: false }}
+      onCreated={() => onReady?.()}
       aria-hidden="true"
     >
       <color attach="background" args={[PALETTE.sky]} />
@@ -57,24 +61,21 @@ export default function FarmScene({
       <CellLocatorBridge width={width} height={height} />
       <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
       <directionalLight
-        position={[8, 14, 6]}
+        position={[10, 18, 8]}
         intensity={1.5}
         castShadow={!lowGraphics}
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-14}
-        shadow-camera-right={14}
-        shadow-camera-top={14}
-        shadow-camera-bottom={-14}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-26}
+        shadow-camera-right={26}
+        shadow-camera-top={26}
+        shadow-camera-bottom={-26}
       />
-      <mesh position={[0, -0.05, 0]} receiveShadow>
-        <boxGeometry args={[width + 18, 0.1, height + 16]} />
-        <Flat color={PALETTE.grassLight} />
-      </mesh>
       <mesh position={[0, -0.01, 0]} receiveShadow>
         <boxGeometry args={[width + 0.6, 0.06, height + 0.6]} />
         <Flat color={PALETTE.grassDark} />
       </mesh>
-      <Decorations items={decorations} animate={!reducedMotion && !lowGraphics} />
+      <WorldTerrain world={world} />
+      <WorldProps world={world} shadows={!lowGraphics} ambient={!reducedMotion && !lowGraphics} />
       {state.cells.map((row, y) =>
         row.map((cell, x) => {
           const point = cellToWorld(x, y, width, height)

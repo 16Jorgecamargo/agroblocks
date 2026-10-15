@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import obj2gltf from 'obj2gltf'
@@ -30,10 +31,21 @@ await rm(OUT, { recursive: true, force: true })
 await mkdir(OUT, { recursive: true })
 await mkdir(TMP, { recursive: true })
 
+async function useColoredTextures(document, directory) {
+  for (const texture of document.getRoot().listTextures()) {
+    const uri = texture.getURI()
+    if (!uri) continue
+    const colored = path.join(directory, uri.replace(/\.png$/i, '_C.png'))
+    if (existsSync(colored)) texture.setImage(new Uint8Array(await readFile(colored)))
+  }
+}
+
 async function toGlb(input, output) {
   const extension = path.extname(input).toLowerCase()
   if (extension === '.glb' || extension === '.gltf') {
-    await io.write(output, await io.read(input))
+    const document = await io.read(input)
+    await useColoredTextures(document, path.dirname(input))
+    await io.write(output, document)
     return
   }
   if (extension === '.obj') {
@@ -92,6 +104,11 @@ async function measure(document, file) {
 
 async function slimTextures(document) {
   if (document.getRoot().listTextures().length === 0) return
+  for (const mesh of document.getRoot().listMeshes()) {
+    for (const primitive of mesh.listPrimitives()) {
+      if (primitive.getMaterial()?.getBaseColorTexture()) primitive.setAttribute('COLOR_0', null)
+    }
+  }
   for (const material of document.getRoot().listMaterials()) {
     material.setNormalTexture(null)
     material.setOcclusionTexture(null)

@@ -30,6 +30,7 @@ export interface FarmSceneProps {
   lowGraphics: boolean
   reducedMotion: boolean
   showcase?: boolean
+  onReady?: () => void
 }
 
 interface FarmViewProps {
