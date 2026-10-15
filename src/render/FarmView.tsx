@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState } from 'react'
+import { lazy, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { CellRef } from '@/game/missions/goals'
 import type { GameEvent, GameState } from '@/game/world/types'
@@ -6,7 +6,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { describeRobot } from '@/render/cellDescription'
 import { Grid2D } from '@/render/grid2d/Grid2D'
 import { hasWebGL } from '@/render/hasWebGL'
-import { SceneLoading } from '@/render/SceneLoading'
+import { SceneWithSplash } from '@/render/SceneWithSplash'
 import { EASINGS } from '@/motion/easings'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -90,16 +90,19 @@ export function FarmView(props: FarmViewProps) {
 
       <div className="farm-view__stage">
         {use3d ? (
-          <Suspense fallback={<SceneLoading />}>
-            <FarmScene
-              {...props}
-              celebrating={props.celebrating ?? false}
-              quarterTurns={quarterTurns}
-              zoomLevel={ZOOM_LEVELS[zoomIndex]}
-              lowGraphics={lowGraphics}
-              reducedMotion={reducedMotion}
-            />
-          </Suspense>
+          <SceneWithSplash>
+            {(onReady) => (
+              <FarmScene
+                {...props}
+                celebrating={props.celebrating ?? false}
+                quarterTurns={quarterTurns}
+                zoomLevel={ZOOM_LEVELS[zoomIndex]}
+                lowGraphics={lowGraphics}
+                reducedMotion={reducedMotion}
+                onReady={onReady}
+              />
+            )}
+          </SceneWithSplash>
         ) : (
           <Grid2D state={props.state} highlightCells={props.highlightCells} failed={props.failed} />
         )}
