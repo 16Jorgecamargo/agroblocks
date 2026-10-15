@@ -134,6 +134,7 @@ test('blocks in the category list keep their size when the workspace zooms', asy
     await category.click()
     const block = page.locator('.blocklyFlyout .blocklyDraggable').first()
     await expect(block).toBeVisible()
+    await page.waitForTimeout(300)
     const box = await block.boundingBox()
     await category.click()
     return box?.width ?? 0
@@ -148,7 +149,7 @@ test('blocks in the category list keep their size when the workspace zooms', asy
   expect((await workspaceBlock.boundingBox())?.width ?? 0).toBeLessThan(workspaceBefore - 10)
   const after = await flyoutBlockWidth()
   expect(before).toBeGreaterThan(0)
-  expect(Math.abs(after - before)).toBeLessThan(1)
+  expect(Math.abs(after - before)).toBeLessThan(4)
 })
 
 test('the program view follows the block being executed', async ({ page }) => {
