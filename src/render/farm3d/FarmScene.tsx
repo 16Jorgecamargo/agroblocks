@@ -10,6 +10,7 @@ import { Flat } from '@/render/farm3d/materials'
 import { PlotTile } from '@/render/farm3d/PlotTile'
 import { RobotModel } from '@/render/farm3d/RobotModel'
 import { buildWorld } from '@/render/world/buildWorld'
+import { Herd } from '@/render/world/Herd'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 
@@ -76,6 +77,7 @@ export default function FarmScene({
       </mesh>
       <WorldTerrain world={world} />
       <WorldProps world={world} shadows={!lowGraphics} ambient={!reducedMotion && !lowGraphics} />
+      <Herd animals={world.animals} active={!reducedMotion && !lowGraphics} />
       {state.cells.map((row, y) =>
         row.map((cell, x) => {
           const point = cellToWorld(x, y, width, height)
