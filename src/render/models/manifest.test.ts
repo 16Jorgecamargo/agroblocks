@@ -1,4 +1,4 @@
-import { MODEL_BUDGET_BYTES, parseManifest, REQUIRED_MODEL_IDS, WORLD_MODEL_IDS } from '@/render/models/manifest'
+import { isProceduralModel, MODEL_BUDGET_BYTES, parseManifest, PROCEDURAL_MODEL_IDS, REQUIRED_MODEL_IDS, WORLD_MODEL_IDS } from '@/render/models/manifest'
 
 const entry = {
   id: 'robot',
@@ -38,5 +38,12 @@ describe('model manifest', () => {
     expect(WORLD_MODEL_IDS).toContain('cow')
     expect(WORLD_MODEL_IDS).toContain('grass-short')
     expect(new Set(WORLD_MODEL_IDS).size).toBe(WORLD_MODEL_IDS.length)
+  })
+
+  it('draws fences procedurally instead of loading a model', () => {
+    expect(PROCEDURAL_MODEL_IDS).toEqual(['fence', 'fence-gate'])
+    expect(isProceduralModel('fence')).toBe(true)
+    expect(isProceduralModel('cow')).toBe(false)
+    expect([...REQUIRED_MODEL_IDS, ...WORLD_MODEL_IDS]).not.toContain('fence')
   })
 })

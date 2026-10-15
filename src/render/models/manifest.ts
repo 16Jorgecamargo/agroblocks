@@ -9,7 +9,6 @@ export const REQUIRED_MODEL_IDS = [
   'rock-a',
   'rock-b',
   'bush',
-  'fence',
   'robot',
 ] as const
 
@@ -31,7 +30,6 @@ export const WORLD_MODEL_IDS = [
   'tree-d',
   'pine-round',
   'bush-large',
-  'fence-gate',
   'bridge',
   'log-stack',
   'sign',
@@ -50,7 +48,21 @@ export const WORLD_MODEL_IDS = [
   'apple-tree',
 ] as const
 
-export type ModelId = (typeof REQUIRED_MODEL_IDS)[number] | (typeof OPTIONAL_MODEL_IDS)[number] | (typeof WORLD_MODEL_IDS)[number]
+export const PROCEDURAL_MODEL_IDS = ['fence', 'fence-gate'] as const
+
+export type ProceduralModelId = (typeof PROCEDURAL_MODEL_IDS)[number]
+
+export type ModelId =
+  | (typeof REQUIRED_MODEL_IDS)[number]
+  | (typeof OPTIONAL_MODEL_IDS)[number]
+  | (typeof WORLD_MODEL_IDS)[number]
+  | ProceduralModelId
+
+const PROCEDURAL_SET: ReadonlySet<string> = new Set(PROCEDURAL_MODEL_IDS)
+
+export function isProceduralModel(id: ModelId): boolean {
+  return PROCEDURAL_SET.has(id)
+}
 
 export const MODEL_BUDGET_BYTES = 10 * 1024 * 1024
 

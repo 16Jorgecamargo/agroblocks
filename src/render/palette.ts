@@ -29,6 +29,8 @@ export const PALETTE = {
   barnTrim: '#f5f1e8',
   roof: '#6f7b7f',
   fence: '#a57b52',
+  fenceWood: '#8a5a33',
+  fenceWoodDark: '#6b4325',
   trunk: '#7a5230',
   bush: '#3e7d3a',
   arrow: '#3d8bfd',
