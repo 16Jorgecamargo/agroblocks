@@ -8,6 +8,7 @@ import { registerProcedureFlyout } from '@/blocks/toolbox/registerFlyouts'
 import { registerSwatchCategory } from '@/blocks/toolbox/swatchCategory'
 import type { ToolboxJson } from '@/blocks/toolbox/buildToolbox'
 import { loadWorkspaceSafely } from '@/blocks/editor/safeLoad'
+import { FIXED_SCALE_FLYOUT, FLYOUT_SCALE, registerFixedScaleFlyout } from '@/blocks/editor/fixedScaleFlyout'
 import type { WorkspaceJson } from '@/blocks/serializer/workspaceJson'
 import { ERROR_SHAKE, FOCUS_HALO, RUNNING_BLOCK } from '@/motion/presets'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
@@ -61,15 +62,17 @@ export function BlocklyEditor({
     if (!host) return
     defineCustomBlocks()
     registerSwatchCategory()
+    registerFixedScaleFlyout()
     const workspace = Blockly.inject(host, {
       toolbox,
+      plugins: { flyoutsVerticalToolbox: FIXED_SCALE_FLYOUT },
       theme: agroTheme,
       media: BLOCKLY_MEDIA_PATH,
       renderer: 'zelos',
       trashcan: true,
       sounds: false,
       move: { scrollbars: true, drag: true, wheel: true },
-      zoom: { controls: true, wheel: false, startScale: 0.85, maxScale: 2, minScale: 0.4 },
+      zoom: { controls: true, wheel: false, startScale: FLYOUT_SCALE, maxScale: 2, minScale: 0.4 },
       grid: { spacing: 24, length: 2, colour: '#d5dbe1', snap: true },
     })
     registerProcedureFlyout(workspace)

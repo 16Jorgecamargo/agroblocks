@@ -125,3 +125,28 @@ test('the workspace cannot be edited while the program runs', async ({ page }) =
   await page.getByRole('tab', { name: 'Pseudocódigo' }).click()
   await expect(page.locator('.pseudocode-panel__code')).toContainText('colher planta')
 })
+
+test('blocks in the category list keep their size when the workspace zooms', async ({ page }) => {
+  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
+  await openMission(page, 'm1-first-harvest')
+  const category = page.getByRole('treeitem', { name: 'Movimento' })
+  const flyoutBlockWidth = async () => {
+    await category.click()
+    const block = page.locator('.blocklyFlyout .blocklyDraggable').first()
+    await expect(block).toBeVisible()
+    const box = await block.boundingBox()
+    await category.click()
+    return box?.width ?? 0
+  }
+  const workspaceBlock = page.locator('.injectionDiv > .blocklySvg .blocklyBlockCanvas .blocklyDraggable').first()
+  const before = await flyoutBlockWidth()
+  const workspaceBefore = (await workspaceBlock.boundingBox())?.width ?? 0
+  for (let index = 0; index < 2; index += 1) {
+    await page.locator('.blocklyZoomOut').dispatchEvent('pointerdown', { isPrimary: true, button: 0, pointerType: 'mouse' })
+    await page.waitForTimeout(300)
+  }
+  expect((await workspaceBlock.boundingBox())?.width ?? 0).toBeLessThan(workspaceBefore - 10)
+  const after = await flyoutBlockWidth()
+  expect(before).toBeGreaterThan(0)
+  expect(Math.abs(after - before)).toBeLessThan(1)
+})
