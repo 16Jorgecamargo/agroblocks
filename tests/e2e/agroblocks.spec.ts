@@ -150,3 +150,29 @@ test('blocks in the category list keep their size when the workspace zooms', asy
   expect(before).toBeGreaterThan(0)
   expect(Math.abs(after - before)).toBeLessThan(1)
 })
+
+test('the program view follows the block being executed', async ({ page }) => {
+  const mission = getMission('m6-efficient-farm')
+  if (!mission) throw new Error('mission missing')
+  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 1 }, save: saveWithProgram(mission.id, mission.referenceSolution, ['m0-training', 'm1-first-harvest', 'm2-row-planting', 'm3-smart-irrigation', 'm4-auto-harvest', 'm5-limited-resources']) })
+  await openMission(page, mission.id)
+  for (let index = 0; index < 6; index += 1) {
+    await page.locator('.blocklyZoomIn').dispatchEvent('pointerdown', { isPrimary: true, button: 0, pointerType: 'mouse' })
+    await page.waitForTimeout(120)
+  }
+  await page.getByRole('button', { name: 'Executar' }).click()
+  const insideView = async () =>
+    page.evaluate(() => {
+      const host = document.querySelector('.blockly-editor__host')?.getBoundingClientRect()
+      const block = document.querySelector('.agro-running-block')?.getBoundingClientRect()
+      if (!host || !block) return false
+      const cy = block.top + Math.min(block.height, 48) / 2
+      const cx = block.left + Math.min(block.width, 60) / 2
+      const marginY = host.height * 0.2
+      return cx > host.left && cx < host.right && cy > host.top + marginY && cy < host.bottom - marginY
+    })
+  for (let sample = 0; sample < 4; sample += 1) {
+    await page.waitForTimeout(1500)
+    await expect.poll(insideView, { timeout: 2000 }).toBe(true)
+  }
+})

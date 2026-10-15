@@ -12,6 +12,7 @@ import { GameHud } from '@/features/gameplay/components/GameHud'
 import { HarvestFlights } from '@/features/gameplay/components/HarvestFlights'
 import { HintsPanel } from '@/features/gameplay/components/HintsPanel'
 import { PseudocodePanel } from '@/features/gameplay/components/PseudocodePanel'
+import { IDLE_COLUMNS, RUNNING_COLUMNS } from '@/features/gameplay/gameplayLayout'
 import { objectiveCells } from '@/features/gameplay/gameplayLogic'
 import { useGameplaySession } from '@/features/gameplay/useGameplaySession'
 import { useGameplayShortcuts } from '@/features/gameplay/useGameplayShortcuts'
@@ -53,7 +54,7 @@ function harvestTargetCenter(): { x: number; y: number } | null {
 function GameplayScreen({ mission }: { mission: MissionDefinition }) {
   const navigate = useNavigate()
   const reducedMotion = useReducedMotion()
-  const { decorative } = useMotionPrefs()
+  const { decorative, reduced } = useMotionPrefs()
   const session = useGameplaySession(mission)
   const { snapshot, controller } = session
   useGameAudio(snapshot)
@@ -92,6 +93,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
   })
 
   const locked = snapshot.status === 'running' || snapshot.status === 'paused'
+  const columns = locked ? RUNNING_COLUMNS : IDLE_COLUMNS
 
   return (
     <div className="gameplay" data-pane={pane}>
@@ -108,7 +110,14 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
       <div className="gameplay__pane-tabs">
         <PillTabs items={PANE_TABS} active={pane} onChange={setPane} label="Áreas da tela" idPrefix="pane" />
       </div>
-      <main className="gameplay__body">
+      <motion.main
+        className="gameplay__body"
+        data-running={locked}
+        initial={false}
+        style={reduced ? { gridTemplateColumns: columns } : undefined}
+        animate={reduced ? undefined : { gridTemplateColumns: columns }}
+        transition={{ duration: DURATIONS.layoutShift, ease: EASINGS.easeInOutCubic }}
+      >
         <section className="gameplay__editor" aria-label="Programa" id={panelId('pane', 'program')} aria-labelledby={tabId('pane', 'program')}>
           <BlocklyEditor
             toolbox={session.toolbox}
@@ -200,7 +209,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             </motion.div>
           </div>
         </aside>
-      </main>
+      </motion.main>
       <HarvestFlights />
       <BriefingDialog
         open={showBriefing}

@@ -10,7 +10,8 @@ import type { ToolboxJson } from '@/blocks/toolbox/buildToolbox'
 import { loadWorkspaceSafely } from '@/blocks/editor/safeLoad'
 import { FIXED_SCALE_FLYOUT, FLYOUT_SCALE, registerFixedScaleFlyout } from '@/blocks/editor/fixedScaleFlyout'
 import type { WorkspaceJson } from '@/blocks/serializer/workspaceJson'
-import { ERROR_SHAKE, FOCUS_HALO, RUNNING_BLOCK } from '@/motion/presets'
+import { DURATIONS, ERROR_SHAKE, FOCUS_HALO, RUNNING_BLOCK } from '@/motion/presets'
+import { EASINGS } from '@/motion/easings'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import './BlocklyEditor.css'
 
@@ -114,6 +115,23 @@ export function BlocklyEditor({
     root?.classList.add('agro-running-block')
     const controls: AnimationPlaybackControls[] = []
     let active = true
+    if (highlightBlockId && root) {
+      const startX = workspace.scrollX
+      const startY = workspace.scrollY
+      workspace.centerOnBlock(highlightBlockId, true)
+      const endX = workspace.scrollX
+      const endY = workspace.scrollY
+      if (!reduced && Math.hypot(endX - startX, endY - startY) > 1) {
+        workspace.scroll(startX, startY)
+        controls.push(
+          animate(0, 1, {
+            duration: DURATIONS.blockFollow,
+            ease: EASINGS.easeInOutCubic,
+            onUpdate: (progress) => workspace.scroll(startX + (endX - startX) * progress, startY + (endY - startY) * progress),
+          }),
+        )
+      }
+    }
     if (path && !reduced) {
       controls.push(animate(path, RUNNING_BLOCK.march.keyframes, RUNNING_BLOCK.march.options))
       const flash = animate(path, RUNNING_BLOCK.flash.keyframes, RUNNING_BLOCK.flash.options)
