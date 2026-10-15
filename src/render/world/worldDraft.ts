@@ -9,6 +9,7 @@ export interface DraftRules {
   river: Polyline | null
   keepOut: Vec2[][]
   frontGuard: Rect | null
+  bounds?: Rect
 }
 
 const SPIRAL_STEP = 0.5
@@ -24,19 +25,20 @@ export class WorldDraft {
     private readonly rules: DraftRules,
   ) {}
 
-  isFree(model: ModelId, point: Vec2): boolean {
-    const radius = footprint(model)
-    const { grid, paths, river, keepOut, frontGuard } = this.rules
+  isFree(model: ModelId, point: Vec2, scale = 1): boolean {
+    const radius = footprint(model) * scale
+    const { grid, paths, river, keepOut, frontGuard, bounds } = this.rules
+    if (bounds && (point.x < bounds.minX || point.x > bounds.maxX || point.z < bounds.minZ || point.z > bounds.maxZ)) return false
     if (grid && rectDistance(point, grid) < GRID_CLEARANCE + radius) return false
     if (frontGuard && TALL_MODELS.has(model) && point.x + point.z > 0 && rectDistance(point, frontGuard) < FRONT_CLEARANCE) return false
     for (const path of paths) if (distanceToPolyline(point, path.points) < path.width / 2 + radius) return false
     if (river && distanceToPolyline(point, river.points) < river.width / 2 + radius + RIVER_BANK) return false
     if (!isClutter(model) && keepOut.some((zone) => pointInPolygon(point, zone))) return false
-    return this.props.every((prop) => EXEMPT_MODELS.has(prop.model) || Math.hypot(prop.x - point.x, prop.z - point.z) >= footprint(prop.model) + radius)
+    return this.props.every((prop) => EXEMPT_MODELS.has(prop.model) || Math.hypot(prop.x - point.x, prop.z - point.z) >= footprint(prop.model) * prop.scale + radius)
   }
 
   place(model: ModelId, point: Vec2, rotation: number, scale: number): boolean {
-    if (!this.isFree(model, point)) return false
+    if (!this.isFree(model, point, scale)) return false
     this.props.push({ model, x: point.x, z: point.z, rotation, scale })
     return true
   }

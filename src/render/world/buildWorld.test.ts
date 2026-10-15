@@ -3,6 +3,8 @@ import { buildWorld, gridSizeOf } from '@/render/world/buildWorld'
 import { distanceToPolyline, pointInPolygon, rectDistance } from '@/render/world/geometry'
 import { CLUTTER_MODELS, EXEMPT_MODELS, GRID_CLEARANCE, TALL_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import type { World } from '@/render/world/worldTypes'
+import { HOME_BEDS, HOME_ROBOT } from '@/render/world/homeLayout'
+import { MAP_ISLAND } from '@/render/world/mapLayout'
 
 const BUILDINGS = ['barn', 'small-barn', 'open-barn', 'silo', 'silo-house', 'tower-windmill', 'windmill', 'water-tower', 'reservoir', 'chicken-coop']
 
@@ -61,5 +63,53 @@ describe('buildWorld farm', () => {
 
   it('reads mission grid sizes from the map rows', () => {
     expect(gridSizeOf(['. . . m .', '. # . . .'])).toEqual({ width: 5, height: 2 })
+  })
+})
+
+describe('buildWorld map', () => {
+  const world = buildWorld({ layout: 'map', gridWidth: 0, gridHeight: 0, seed: 'mission-map', density: 'full' })
+
+  it('lays the seven mission nodes along a path on an island', () => {
+    expect(world.island).toBe(true)
+    expect(world.trail).toHaveLength(7)
+    expect(world.paths[0].points).toEqual(world.trail)
+  })
+
+  it('bridges the river where the trail crosses it', () => {
+    expect(world.props.filter((prop) => prop.model === 'bridge').length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('keeps nodes clear of props and the river', () => {
+    for (const node of world.trail) {
+      for (const prop of world.props) if (!EXEMPT_MODELS.has(prop.model)) expect(Math.hypot(prop.x - node.x, prop.z - node.z)).toBeGreaterThanOrEqual(1.2)
+      if (world.river) expect(distanceToPolyline(node, world.river.points)).toBeGreaterThanOrEqual(1.2)
+    }
+  })
+
+  it('keeps everything on the island', () => {
+    for (const prop of world.props) expect(rectDistance(prop, MAP_ISLAND)).toBe(0)
+  })
+
+  it('is dense', () => {
+    expect(world.props.filter((prop) => (TREE_MODELS as readonly string[]).includes(prop.model)).length).toBeGreaterThanOrEqual(90)
+    expect(world.animals.length).toBeGreaterThanOrEqual(5)
+  })
+})
+
+describe('buildWorld home', () => {
+  const world = buildWorld({ layout: 'home', gridWidth: 0, gridHeight: 0, seed: 'home', density: 'full' })
+
+  it('keeps the crop beds and the robot spot clear', () => {
+    for (const prop of world.props) {
+      if (EXEMPT_MODELS.has(prop.model)) continue
+      expect(rectDistance(prop, HOME_BEDS)).toBeGreaterThan(0.3)
+      expect(Math.hypot(prop.x - HOME_ROBOT.x, prop.z - HOME_ROBOT.z)).toBeGreaterThanOrEqual(1)
+    }
+  })
+
+  it('has the reference buildings and animals', () => {
+    const models = new Set(world.props.map((prop) => prop.model))
+    for (const model of ['barn', 'water-tower', 'tower-windmill', 'small-barn'] as const) expect(models.has(model)).toBe(true)
+    expect(world.animals.length).toBeGreaterThanOrEqual(4)
   })
 })
