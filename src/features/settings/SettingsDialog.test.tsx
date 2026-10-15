@@ -8,7 +8,7 @@ import { DEFAULT_SETTINGS } from '@/services/storage/settingsStorage'
 function renderDialog() {
   return render(
     <MemoryRouter>
-      <SettingsDialog onClose={() => undefined} />
+      <SettingsDialog open onClose={() => undefined} />
     </MemoryRouter>,
   )
 }
@@ -25,20 +25,19 @@ describe('SettingsDialog', () => {
     expect(useSettingsStore.getState().settings.theme).toBe('dark')
   })
 
-  it('switches tabs and changes the render mode', () => {
+  it('switches tabs and changes the render mode', async () => {
     renderDialog()
     fireEvent.click(screen.getByRole('tab', { name: /Visual/ }))
-    fireEvent.change(screen.getByLabelText('Visualização da fazenda'), { target: { value: '2d' } })
+    fireEvent.change(await screen.findByLabelText('Visualização da fazenda'), { target: { value: '2d' } })
     expect(useSettingsStore.getState().settings.renderMode).toBe('2d')
   })
 
-  it('asks for confirmation before resetting progress', () => {
+  it('asks for confirmation before resetting progress', async () => {
     useProgressStore.getState().registerHint('m1-first-harvest')
     renderDialog()
-    fireEvent.click(screen.getByRole('tab', { name: /Dados/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Reiniciar progresso' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Reiniciar progresso' }))
     expect(useProgressStore.getState().save.missions['m1-first-harvest'].hintsUsed).toBe(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Sim, apagar tudo' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Sim, apagar tudo' }))
     expect(useProgressStore.getState().save.missions['m1-first-harvest'].hintsUsed).toBe(0)
   })
 })

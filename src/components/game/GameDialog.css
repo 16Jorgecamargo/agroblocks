@@ -1,0 +1,119 @@
+.game-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: rgb(9 16 22 / 0.62);
+}
+
+.game-dialog {
+  --dialog-tone: #3fa34d;
+  position: relative;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  background: #f7f6f2;
+  color: #1b2630;
+  border-radius: 18px;
+  box-shadow:
+    0 2px 0 rgb(255 255 255 / 0.6) inset,
+    0 24px 60px rgb(0 0 0 / 0.38);
+  outline: none;
+  overflow: hidden;
+}
+
+.game-dialog--lg {
+  width: min(760px, 100%);
+}
+
+.game-dialog--info {
+  --dialog-tone: #4c8df6;
+}
+
+.game-dialog--danger {
+  --dialog-tone: #e5484d;
+}
+
+.game-dialog--warning {
+  --dialog-tone: #e0a526;
+}
+
+.game-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid #e3e1da;
+}
+
+.game-dialog__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: #4a5560;
+}
+
+.game-dialog--success .game-dialog__icon,
+.game-dialog--danger .game-dialog__icon,
+.game-dialog--warning .game-dialog__icon {
+  color: var(--dialog-tone);
+}
+
+.game-dialog__title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.game-dialog__close {
+  display: grid;
+  place-items: center;
+  width: var(--tap-size);
+  height: var(--tap-size);
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #3a4550;
+  cursor: pointer;
+}
+
+.game-dialog__close:hover {
+  background: #ebe9e2;
+}
+
+.game-dialog__body {
+  display: grid;
+  gap: var(--space-3);
+  overflow: auto;
+  padding: var(--space-5);
+}
+
+.game-dialog__section > :first-child {
+  margin-top: 0;
+}
+
+.game-dialog__section > :last-child {
+  margin-bottom: 0;
+}
+
+.game-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding-top: var(--space-2);
+}
+
+:root[data-theme='dark'] .game-dialog {
+  background: #1c2a35;
+  color: #eef3f6;
+}
+
+:root[data-theme='dark'] .game-dialog__header {
+  border-bottom-color: #2a3b48;
+}

@@ -1,5 +1,5 @@
 import { Icon } from '@/components/icons/Icon'
-import { Toggle } from '@/components/ui/Toggle'
+import { GameToggle } from '@/components/game/GameToggle'
 import { STATUS_LABELS } from '@/features/gameplay/gameplayLogic'
 import { SPEEDS, type ExecutionStatus, type Speed } from '@/game/execution/types'
 
@@ -56,7 +56,7 @@ export function ExecutionPanel(props: ExecutionPanelProps) {
           <Icon name="pause" /> Pausar
         </button>
       )}
-      <Toggle label="Passo a passo" checked={stepMode} onChange={props.onStepModeChange} />
+      <GameToggle label="Passo a passo" checked={stepMode} onChange={props.onStepModeChange} />
       <label className="execution-panel__speed">
         <span>Velocidade</span>
         <input

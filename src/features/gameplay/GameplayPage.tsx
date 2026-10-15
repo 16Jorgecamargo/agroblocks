@@ -13,7 +13,7 @@ import { useGameplaySession } from '@/features/gameplay/useGameplaySession'
 import { useGameplayShortcuts } from '@/features/gameplay/useGameplayShortcuts'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
 import { TutorialOverlay } from '@/features/tutorial/TutorialOverlay'
-import { Tabs, panelId, tabId, type TabItem } from '@/components/ui/Tabs'
+import { PillTabs, panelId, tabId, type TabItem } from '@/components/game/PillTabs'
 import { stepDelayMs } from '@/game/execution/types'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -78,7 +78,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
         A experiência completa de programação funciona melhor em telas a partir de 768 px (computador ou tablet).
       </p>
       <div className="gameplay__pane-tabs">
-        <Tabs items={PANE_TABS} active={pane} onChange={setPane} label="Áreas da tela" idPrefix="pane" />
+        <PillTabs items={PANE_TABS} active={pane} onChange={setPane} label="Áreas da tela" idPrefix="pane" />
       </div>
       <main className="gameplay__body">
         <section className="gameplay__editor" aria-label="Programa" id={panelId('pane', 'program')} aria-labelledby={tabId('pane', 'program')}>
@@ -132,7 +132,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             onStepModeChange={setStepMode}
           />
           <div className="gameplay__side-tabs">
-            <Tabs items={SIDE_TABS} active={sideTab} onChange={setSideTab} label="Informações da execução" idPrefix="side" />
+            <PillTabs items={SIDE_TABS} active={sideTab} onChange={setSideTab} label="Informações da execução" idPrefix="side" variant="underline" />
             <div role="tabpanel" id={panelId('side', sideTab)} aria-labelledby={tabId('side', sideTab)} className="gameplay__side-panel">
               {sideTab === 'console' && <ConsolePanel entries={snapshot.log} onClear={() => controller.clearLog()} />}
               {sideTab === 'hints' && (
@@ -149,17 +149,16 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
           </div>
         </aside>
       </main>
-      {showBriefing && (
-        <BriefingDialog
-          mission={mission}
-          onStart={() => setShowBriefing(false)}
-          onDemo={() => {
-            setShowBriefing(false)
-            session.runDemo()
-          }}
-        />
-      )}
-      {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
+      <BriefingDialog
+        open={showBriefing}
+        mission={mission}
+        onStart={() => setShowBriefing(false)}
+        onDemo={() => {
+          setShowBriefing(false)
+          session.runDemo()
+        }}
+      />
+      <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   )
 }

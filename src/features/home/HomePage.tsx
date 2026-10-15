@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Icon } from '@/components/icons/Icon'
 import { Logo } from '@/components/brand/Logo'
-import { Modal } from '@/components/ui/Modal'
+import { GameButton } from '@/components/game/GameButton'
+import { DialogSection, GameDialog } from '@/components/game/GameDialog'
 import { getMission, MISSIONS } from '@/data/missions'
 import { HomeScene } from '@/features/home/HomeScene'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
@@ -84,27 +85,26 @@ export function HomePage() {
           </Link>
         </nav>
       </main>
-      {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}
-      {confirmNew && (
-        <Modal title="Começar uma nova fazenda?" onClose={() => setConfirmNew(false)}>
+      <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
+      <GameDialog open={confirmNew} title="Começar uma nova fazenda?" icon="trash" tone="danger" onClose={() => setConfirmNew(false)}>
+        <DialogSection>
           <p>Isso apaga o progresso, as tentativas e as respostas de avaliação salvas neste navegador.</p>
-          <div className="home__confirm">
-            <button type="button" className="button" onClick={() => setConfirmNew(false)}>
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="button button--danger"
-              onClick={() => {
-                resetProgress()
-                navigate(`/jogar/${TRAINING_ID}`)
-              }}
-            >
-              Apagar e começar
-            </button>
-          </div>
-        </Modal>
-      )}
+        </DialogSection>
+        <DialogSection className="game-dialog__actions">
+          <GameButton tone="secondary" onClick={() => setConfirmNew(false)}>
+            Cancelar
+          </GameButton>
+          <GameButton
+            tone="danger"
+            onClick={() => {
+              resetProgress()
+              navigate(`/jogar/${TRAINING_ID}`)
+            }}
+          >
+            Apagar e começar
+          </GameButton>
+        </DialogSection>
+      </GameDialog>
     </div>
   )
 }
