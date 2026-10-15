@@ -143,3 +143,19 @@ Motion em toda animação de interface e 3D · diálogos no estilo painel de jog
 
 ## 7. Fora de escopo
 Novas missões, mudanças no motor ou nas regras, novos idiomas, música nova, efeitos de pós-processamento pesados (bloom, SSAO).
+
+## 8. Fidelidade à referência visual (revisão de 2026-10-14)
+
+O usuário pediu que jogo, logo e telas fiquem bem parecidos com `reference/AgroBlocks_ Fazenda Inteligente em Ação.png`, que contém 7 telas. Onde esta spec divergir da imagem, **a imagem prevalece**. Recortes de cada painel: início, mapa, tutorial, gameplay, resultado, "Como funciona?", configurações.
+
+| Tela | Exigências da referência |
+|---|---|
+| Identidade | Logo com "Agro" verde (degradê, contorno escuro) e "Blocks" marrom (#5b3a1e), broto de duas folhas acima do fim da palavra e folha junto ao "A"; fonte arredondada grossa (Baloo 2 800). No HUD o logo é todo verde. Cromo escuro azul-marinho/ardósia (`#131f29` fundo, `#1c2a35` superfícies), cartões claros (`#f7f6f2`/branco). |
+| Diálogos | Cartão claro limpo, cantos ~18px, sombra suave; cabeçalho com ícone + título em negrito + botão X; divisória; corpo. Sem fita. Animação Motion mantida (mola `sheet`, cascata). |
+| Configurações | Abas laterais (Geral, Som, Visual, Controles, Dados) com pílula azul na selecionada; **Geral** mostra Idioma (select à direita), Música, Efeitos sonoros, Reduzir animações, Modo escuro (interruptores verdes) e botão "Reiniciar progresso" largo, contorno e texto vermelhos sobre fundo vermelho claro. |
+| Início | Cena 3D clara em tela cheia (celeiro, casa, silo, moinho, robô em primeiro plano à direita); logo e textos escuros no topo, sem painel escuro; botões translúcidos no canto inferior esquerdo: "Iniciar nova fazenda" (verde), "Continuar missão" (escuro translúcido, subtítulo "Fase N - título"), "Como jogar" e "Configurações" (pequenos, escuros). Indicador de progresso discreto. |
+| Mapa | Fundo azul-marinho; "Voltar" em pílula à esquerda; título "Seus desafios" e subtítulo centralizados em branco; nós hexagonais com número e ícone (verde com check = concluída, azul brilhante = atual, cinza com cadeado = bloqueada) e rótulo ao lado; cartão branco à direita com miniatura, "Fase N", título, descrição, conceito com lâmpada, "Dificuldade" com estrelas laranja e botão verde "Iniciar fase". A lista acessível fica visualmente oculta quando o mapa 3D aparece (visível ao receber foco). |
+| Tutorial | Balão de fala branco com ponta apontando para o robô sobre a fazenda; topo com "Tutorial", "n/6" e pontos (atual verde); navegação inferior centralizada: botão escuro ←, botão verde "Próximo", botão escuro →. |
+| Gameplay | HUD azul-marinho com chips escuros (ícone colorido + rótulo + valor), botões quadrados de ajuda e engrenagem, "Sair" vermelho; categorias do Blockly em painel branco com quadrados coloridos arredondados e categoria selecionada em pílula azul; flyout cinza claro; workspace claro pontilhado; painel direito branco "Execução" com "Executar" verde, "Pausar" cinza, "Passo a passo", **slider de Velocidade azul** e cartão "Console" com lixeira. |
+| Resultado | Cena de celebração à esquerda (robô com caixa de tomates, celeiro, moinho, confete retangular colorido); cartão branco com estrela amarela, "Missão concluída!", frase do objetivo; caixas: "Comandos executados" + "Recursos consumidos" (ícones) e "Tentativas" + selo verde "Conceito aprendido"; botões "Ver solução" e "Tentar novamente" escuros e "Próxima fase" verde grande. |
+| Como funciona? | Cartão claro: título, frase explicando o conceito; à esquerda os **blocos do programa do aluno desenhados** (Blockly somente leitura); à direita caixa cinza "O que o robô fez?" com passos numerados em círculos; abaixo caixa bege "Dica" com lâmpada. |
