@@ -1,0 +1,66 @@
+import type { ModelId } from '@/render/models/manifest'
+
+export const CLUTTER_MODELS = ['grass-short', 'grass-tall', 'clover', 'flower-patch', 'flower-red', 'flower-yellow', 'flower-purple', 'fern', 'mushrooms', 'pebble'] as const satisfies readonly ModelId[]
+
+export const TREE_MODELS = ['tree-a', 'tree-b', 'tree-c', 'tree-d', 'mega-tree-a', 'mega-tree-b', 'pine', 'pine-round', 'mega-pine'] as const satisfies readonly ModelId[]
+
+export const FOREST_MODELS: readonly ModelId[] = [...TREE_MODELS, ...TREE_MODELS, 'bush-large', 'bush-flowers', 'bush', 'rock-medium', 'rock-a']
+
+export const TALL_MODELS: ReadonlySet<ModelId> = new Set<ModelId>([
+  ...TREE_MODELS,
+  'apple-tree',
+  'barn',
+  'small-barn',
+  'open-barn',
+  'silo',
+  'silo-house',
+  'tower-windmill',
+  'windmill',
+  'water-tower',
+  'reservoir',
+])
+
+export const EXEMPT_MODELS: ReadonlySet<ModelId> = new Set<ModelId>(['fence', 'fence-gate', 'bridge', 'sign', 'lily'])
+
+const FOOTPRINTS: Partial<Record<ModelId, number>> = {
+  barn: 3.2,
+  'small-barn': 1.8,
+  'open-barn': 2.2,
+  silo: 1.3,
+  'silo-house': 2,
+  'tower-windmill': 1.4,
+  windmill: 1.8,
+  'water-tower': 1.4,
+  reservoir: 0.9,
+  'chicken-coop': 0.9,
+  'log-stack': 0.7,
+  'apple-tree': 1.1,
+  'rock-medium': 0.7,
+  'rock-a': 0.6,
+  'bush-large': 0.6,
+  'bush-flowers': 0.5,
+  bush: 0.4,
+  'corn-row': 0.4,
+  'wheat-row': 0.4,
+  'lettuce-row': 0.4,
+  'pumpkin-row': 0.4,
+  'carrot-row': 0.4,
+}
+
+const CLUTTER_SET: ReadonlySet<ModelId> = new Set<ModelId>(CLUTTER_MODELS)
+
+export function isClutter(model: ModelId): boolean {
+  return CLUTTER_SET.has(model)
+}
+
+export function footprint(model: ModelId): number {
+  if (CLUTTER_SET.has(model)) return 0.15
+  if ((TREE_MODELS as readonly ModelId[]).includes(model)) return 0.8
+  return FOOTPRINTS[model] ?? 0.4
+}
+
+export const GRID_CLEARANCE = 1.2
+
+export const FRONT_CLEARANCE = 5
+
+export const RIVER_BANK = 0.3
