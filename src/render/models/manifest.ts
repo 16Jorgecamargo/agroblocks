@@ -2,11 +2,6 @@ import { z } from 'zod'
 import generated from '@/render/models/manifest.generated.json'
 
 export const REQUIRED_MODEL_IDS = [
-  'crop-1',
-  'crop-2',
-  'crop-3',
-  'crop-4',
-  'crop-5',
   'tree-a',
   'tree-b',
   'tree-c',
@@ -18,7 +13,7 @@ export const REQUIRED_MODEL_IDS = [
   'robot',
 ] as const
 
-export const OPTIONAL_MODEL_IDS = ['barn', 'silo', 'windmill', 'reservoir', 'seed-depot', 'straw'] as const
+export const OPTIONAL_MODEL_IDS = ['barn', 'silo', 'windmill', 'reservoir', 'seed-depot'] as const
 
 export const WORLD_MODEL_IDS = [
   'small-barn',

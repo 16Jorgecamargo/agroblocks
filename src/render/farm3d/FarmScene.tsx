@@ -23,7 +23,6 @@ export default function FarmScene({
   highlightCells,
   failed,
   seedKey,
-  growTicks,
   celebrating,
   quarterTurns,
   zoomLevel,
@@ -90,7 +89,6 @@ export default function FarmScene({
               position={[point.x, 0, point.z]}
               isGoal={goals.has(`${x},${y}`)}
               reducedMotion={reducedMotion}
-              growTicks={growTicks}
             />
           )
         }),

@@ -13,6 +13,8 @@ export const PALETTE = {
   leafDark: '#2f7a37',
   fruit: '#e2533b',
   fruitAlt: '#f29b38',
+  fruitUnripe: '#9ccc4a',
+  readyGlow: '#ffe27a',
   straw: '#d9b86a',
   rock: '#9aa0a6',
   rockDark: '#737a80',

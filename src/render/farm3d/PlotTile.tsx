@@ -4,9 +4,9 @@ import { Color, type MeshStandardMaterial } from "three";
 import { PALETTE } from "@/render/palette";
 import { Flat } from "@/render/farm3d/materials";
 import { SpringIn } from "@/render/farm3d/motion3d";
-import { PlantModel } from "@/render/farm3d/PlantModel";
 import { Model } from "@/render/models/Model";
-import { cropModelId, cropStageFor } from "@/render/models/modelChoice";
+import { CropPlant, HarvestedStubble } from "@/render/crops/CropPlant";
+import { cropStageFor } from "@/render/crops/cropShape";
 import type { Cell } from "@/game/world/types";
 import { EASINGS } from "@/motion/easings";
 import { DURATIONS } from '@/motion/presets'
@@ -16,7 +16,6 @@ interface PlotTileProps {
   position: [number, number, number];
   isGoal: boolean;
   reducedMotion: boolean;
-  growTicks: number;
 }
 
 const BED_HEIGHT = 0.18;
@@ -121,8 +120,8 @@ function Soil({
   cell,
   isGoal,
   reducedMotion,
-  growTicks,
-}: Omit<PlotTileProps, "position">) {
+  seed,
+}: Omit<PlotTileProps, "position"> & { seed: number }) {
   const prepared = cell.plot !== "untilled";
   const wet = cell.moisture === "wet";
   const color = !prepared
@@ -138,31 +137,19 @@ function Soil({
       {wet && <WetMarker />}
       {isGoal && <GoalMarker />}
       {(() => {
-        const stage = cropStageFor(cell.plot, cell.growth, growTicks);
+        const stage = cropStageFor(cell.plot);
         if (stage === null) return null;
-        const legacy =
-          cell.plot === "seeded"
-            ? "seeded"
-            : cell.plot === "growing"
-              ? "growing"
-              : "mature";
         return (
           <group position={[0, BED_HEIGHT, 0]}>
             <SpringIn key={stage} enabled={!reducedMotion}>
-              <Model
-                id={cropModelId(stage)}
-                fallback={<PlantModel stage={legacy} reducedMotion />}
-              />
+              <CropPlant stage={stage} seed={seed} reducedMotion={reducedMotion} />
             </SpringIn>
           </group>
         );
       })()}
       {cell.plot === "harvested" && (
         <group position={[0, BED_HEIGHT, 0]}>
-          <Model
-            id="straw"
-            fallback={<PlantModel stage="harvested" reducedMotion />}
-          />
+          <HarvestedStubble />
         </group>
       )}
     </>
@@ -183,8 +170,8 @@ export function PlotTile({
   position,
   isGoal,
   reducedMotion,
-  growTicks,
 }: PlotTileProps) {
+  const seed = Math.abs(position[0] * 12.9898 + position[2] * 78.233) % (Math.PI * 2);
   return (
     <group position={position}>
       {cell.terrain === "soil" && (
@@ -192,7 +179,7 @@ export function PlotTile({
           cell={cell}
           isGoal={isGoal}
           reducedMotion={reducedMotion}
-          growTicks={growTicks}
+          seed={seed}
         />
       )}
       {cell.terrain === "obstacle" && (

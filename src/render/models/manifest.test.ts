@@ -16,9 +16,9 @@ const entry = {
 }
 
 describe('model manifest', () => {
-  it('lists the models the scene needs', () => {
+  it('lists the models the scene needs without crop models', () => {
     expect(REQUIRED_MODEL_IDS).toContain('robot')
-    expect(REQUIRED_MODEL_IDS.filter((id) => id.startsWith('crop-'))).toHaveLength(5)
+    expect(REQUIRED_MODEL_IDS.filter((id) => id.startsWith('crop-'))).toHaveLength(0)
   })
 
   it('accepts a valid CC0 entry', () => {

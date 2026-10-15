@@ -7,7 +7,7 @@ const ANIMALS = ['cow', 'horse', 'pig', 'sheep', 'llama', 'pug']
 describe('generated models', () => {
   it('has every required and world model in the manifest', () => {
     const ids = MODEL_MANIFEST.map((entry) => entry.id)
-    for (const id of [...REQUIRED_MODEL_IDS, ...WORLD_MODEL_IDS, 'barn', 'silo', 'windmill', 'reservoir', 'straw']) expect(ids).toContain(id)
+    for (const id of [...REQUIRED_MODEL_IDS, ...WORLD_MODEL_IDS, 'barn', 'silo', 'windmill', 'reservoir']) expect(ids).toContain(id)
   })
 
   it('ships every GLB and stays within the budget', () => {
