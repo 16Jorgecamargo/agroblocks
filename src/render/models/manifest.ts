@@ -1,0 +1,59 @@
+import { z } from 'zod'
+import generated from '@/render/models/manifest.generated.json'
+
+export const REQUIRED_MODEL_IDS = [
+  'crop-1',
+  'crop-2',
+  'crop-3',
+  'crop-4',
+  'crop-5',
+  'tree-a',
+  'tree-b',
+  'tree-c',
+  'pine',
+  'rock-a',
+  'rock-b',
+  'bush',
+  'fence',
+  'robot',
+] as const
+
+export const OPTIONAL_MODEL_IDS = ['barn', 'silo', 'windmill', 'reservoir', 'seed-depot', 'straw'] as const
+
+export type ModelId = (typeof REQUIRED_MODEL_IDS)[number] | (typeof OPTIONAL_MODEL_IDS)[number]
+
+export const MODEL_BUDGET_BYTES = 5 * 1024 * 1024
+
+const entrySchema = z.object({
+  id: z.string(),
+  file: z.string(),
+  usage: z.string(),
+  author: z.string(),
+  license: z.literal('CC0-1.0'),
+  page: z.string().url(),
+  scale: z.number().positive(),
+  yOffset: z.number(),
+  rotationY: z.number(),
+  bytes: z.number().int().positive(),
+  clips: z.object({ idle: z.string(), move: z.string(), success: z.string(), error: z.string() }).partial().optional(),
+  recolor: z.record(z.string(), z.string()).optional(),
+})
+
+export const manifestSchema = z.object({ models: z.array(entrySchema) })
+
+export type ModelEntry = z.infer<typeof entrySchema>
+
+export function parseManifest(raw: unknown): ModelEntry[] {
+  const parsed = manifestSchema.safeParse(raw)
+  return parsed.success ? parsed.data.models : []
+}
+
+export const MODEL_MANIFEST: ModelEntry[] = parseManifest(generated)
+
+export function modelEntry(id: ModelId): ModelEntry | undefined {
+  return MODEL_MANIFEST.find((entry) => entry.id === id)
+}
+
+export function modelUrl(entry: ModelEntry): string {
+  return `${import.meta.env.BASE_URL}${entry.file}`
+}
