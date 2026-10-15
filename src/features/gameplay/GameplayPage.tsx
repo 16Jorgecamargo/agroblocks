@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'
-import { AnimatePresence, motion } from 'motion/react'
+import { animate, AnimatePresence, motion, useMotionValue, useTransform } from 'motion/react'
 import { BlocklyEditor } from '@/blocks/editor/BlocklyEditor'
 import { Confetti } from '@/components/game/Confetti'
 import { PillTabs, panelId, tabId, type TabItem } from '@/components/game/PillTabs'
@@ -12,7 +12,7 @@ import { GameHud } from '@/features/gameplay/components/GameHud'
 import { HarvestFlights } from '@/features/gameplay/components/HarvestFlights'
 import { HintsPanel } from '@/features/gameplay/components/HintsPanel'
 import { PseudocodePanel } from '@/features/gameplay/components/PseudocodePanel'
-import { IDLE_COLUMNS, RUNNING_COLUMNS } from '@/features/gameplay/gameplayLayout'
+import { columnsAt } from '@/features/gameplay/gameplayLayout'
 import { objectiveCells } from '@/features/gameplay/gameplayLogic'
 import { useGameplaySession } from '@/features/gameplay/useGameplaySession'
 import { useGameplayShortcuts } from '@/features/gameplay/useGameplayShortcuts'
@@ -93,7 +93,18 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
   })
 
   const locked = snapshot.status === 'running' || snapshot.status === 'paused'
-  const columns = locked ? RUNNING_COLUMNS : IDLE_COLUMNS
+  const layoutProgress = useMotionValue(locked ? 1 : 0)
+  const layoutColumns = useTransform(layoutProgress, columnsAt)
+
+  useEffect(() => {
+    const target = locked ? 1 : 0
+    if (reduced) {
+      layoutProgress.set(target)
+      return
+    }
+    const controls = animate(layoutProgress, target, { duration: DURATIONS.layoutShift, ease: EASINGS.easeInOutSine })
+    return () => controls.stop()
+  }, [locked, reduced, layoutProgress])
 
   return (
     <div className="gameplay" data-pane={pane}>
@@ -113,10 +124,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
       <motion.main
         className="gameplay__body"
         data-running={locked}
-        initial={false}
-        style={reduced ? { gridTemplateColumns: columns } : undefined}
-        animate={reduced ? undefined : { gridTemplateColumns: columns }}
-        transition={{ duration: DURATIONS.layoutShift, ease: EASINGS.easeInOutCubic }}
+        style={{ gridTemplateColumns: layoutColumns }}
       >
         <section className="gameplay__editor" aria-label="Programa" id={panelId('pane', 'program')} aria-labelledby={tabId('pane', 'program')}>
           <BlocklyEditor

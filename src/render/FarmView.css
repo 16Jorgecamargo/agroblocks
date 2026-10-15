@@ -50,10 +50,24 @@
 }
 
 .farm-view__stage {
+  position: relative;
+  overflow: hidden;
   flex: 1;
   min-height: 0;
+  min-width: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   place-items: stretch;
+}
+
+.farm-view__stage > .scene-stage {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: max(100%, calc(100vw - 360px));
+  transform: translateX(-50%);
 }
 
 .farm-view__stage > .grid2d {

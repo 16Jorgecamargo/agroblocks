@@ -176,3 +176,50 @@ test('the program view follows the block being executed', async ({ page }) => {
     await expect.poll(insideView, { timeout: 2000 }).toBe(true)
   }
 })
+
+test('the farm panel opens and closes over a fixed, centered 3D view', async ({ page }) => {
+  const short = program([act('moveForward'), act('moveForward')])
+  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full', defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', short) })
+  await openMission(page, 'm1-first-harvest')
+  await expect(page.locator('.farm-view canvas')).toBeVisible()
+  const measure = () =>
+    page.evaluate(() => {
+      const panel = document.querySelector('.farm-view')?.getBoundingClientRect()
+      const canvas = document.querySelector('.farm-view canvas')?.getBoundingClientRect()
+      return {
+        panelWidth: Math.round(panel?.width ?? 0),
+        canvasWidth: Math.round(canvas?.width ?? 0),
+        centerOffset: Math.round(((canvas?.left ?? 0) + (canvas?.width ?? 0) / 2) - ((panel?.left ?? 0) + (panel?.width ?? 0) / 2)),
+      }
+    })
+  await page.waitForTimeout(1500)
+  const before = await measure()
+  await page.getByRole('button', { name: 'Executar' }).click()
+  await page.waitForTimeout(1200)
+  const during = await measure()
+  await expect(page.getByRole('log')).toContainText('O programa terminou', { timeout: 20_000 })
+  await page.waitForTimeout(2000)
+  const after = await measure()
+  expect(during.panelWidth).toBeGreaterThan(before.panelWidth)
+  expect(during.canvasWidth).toBe(before.canvasWidth)
+  expect(after.canvasWidth).toBe(before.canvasWidth)
+  expect(Math.abs(after.panelWidth - before.panelWidth)).toBeLessThan(3)
+  for (const state of [before, during, after]) expect(Math.abs(state.centerOffset)).toBeLessThan(2)
+})
+
+test('the program view returns to where it was when the run stops', async ({ page }) => {
+  const mission = getMission('m6-efficient-farm')
+  if (!mission) throw new Error('mission missing')
+  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 1 }, save: saveWithProgram(mission.id, mission.referenceSolution, ['m0-training', 'm1-first-harvest', 'm2-row-planting', 'm3-smart-irrigation', 'm4-auto-harvest', 'm5-limited-resources']) })
+  await openMission(page, mission.id)
+  const firstBlock = page.locator('.injectionDiv > .blocklySvg .blocklyBlockCanvas .blocklyDraggable').first()
+  await page.waitForTimeout(800)
+  const before = await firstBlock.boundingBox()
+  await page.getByRole('button', { name: 'Executar' }).click()
+  await page.waitForTimeout(4000)
+  await page.getByRole('button', { name: 'Parar' }).click()
+  await page.waitForTimeout(1500)
+  const after = await firstBlock.boundingBox()
+  expect(Math.abs((after?.x ?? 0) - (before?.x ?? 0))).toBeLessThan(3)
+  expect(Math.abs((after?.y ?? 0) - (before?.y ?? 0))).toBeLessThan(3)
+})

@@ -1,7 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { GameplayPage } from '@/features/gameplay/GameplayPage'
-import { IDLE_COLUMNS, RUNNING_COLUMNS } from '@/features/gameplay/gameplayLayout'
 import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { DEFAULT_SETTINGS } from '@/services/storage/settingsStorage'
@@ -64,16 +63,8 @@ describe('GameplayPage', () => {
     expect(body).toHaveAttribute('data-running', 'false')
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
     expect(body).toHaveAttribute('data-running', 'true')
-    act(() => {
-      vi.advanceTimersByTime(50)
-    })
-    expect(body.style.gridTemplateColumns).toBe(RUNNING_COLUMNS)
     fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
     expect(body).toHaveAttribute('data-running', 'false')
-    act(() => {
-      vi.advanceTimersByTime(50)
-    })
-    expect(body.style.gridTemplateColumns).toBe(IDLE_COLUMNS)
   })
 
   it('redirects locked missions to the mission map', () => {

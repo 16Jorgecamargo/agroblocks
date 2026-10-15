@@ -51,6 +51,7 @@ export function BlocklyEditor({
   const hostRef = useRef<HTMLDivElement>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
   const haloRef = useRef<AnimationPlaybackControls | null>(null)
+  const homeScrollRef = useRef<{ x: number; y: number } | null>(null)
   const { reduced } = useMotionPrefs()
   const callbacksRef = useRef({ onChange, onBlockEvent, onLoadFailed })
 
@@ -115,7 +116,23 @@ export function BlocklyEditor({
     root?.classList.add('agro-running-block')
     const controls: AnimationPlaybackControls[] = []
     let active = true
+    if (!highlightBlockId && homeScrollRef.current) {
+      const home = homeScrollRef.current
+      homeScrollRef.current = null
+      const fromX = workspace.scrollX
+      const fromY = workspace.scrollY
+      if (reduced) workspace.scroll(home.x, home.y)
+      else
+        controls.push(
+          animate(0, 1, {
+            duration: DURATIONS.blockFollow,
+            ease: EASINGS.easeInOutCubic,
+            onUpdate: (progress) => workspace.scroll(fromX + (home.x - fromX) * progress, fromY + (home.y - fromY) * progress),
+          }),
+        )
+    }
     if (highlightBlockId && root) {
+      if (!homeScrollRef.current) homeScrollRef.current = { x: workspace.scrollX, y: workspace.scrollY }
       const startX = workspace.scrollX
       const startY = workspace.scrollY
       workspace.centerOnBlock(highlightBlockId, true)

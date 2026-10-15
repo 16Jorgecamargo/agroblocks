@@ -1,3 +1,14 @@
-export const IDLE_COLUMNS = 'minmax(420px, 1.15fr) minmax(360px, 1.25fr) 320px'
+const PROGRAM_SHARE = { idle: 1.15, running: 0.7 }
+const FARM_SHARE = { idle: 1.25, running: 1.9 }
 
-export const RUNNING_COLUMNS = 'minmax(300px, 0.75fr) minmax(360px, 1.95fr) 320px'
+function share(range: { idle: number; running: number }, progress: number): number {
+  return Number((range.idle + (range.running - range.idle) * progress).toFixed(4))
+}
+
+export function columnsAt(progress: number): string {
+  return `minmax(0px, ${share(PROGRAM_SHARE, progress)}fr) minmax(0px, ${share(FARM_SHARE, progress)}fr) 320px`
+}
+
+export const IDLE_COLUMNS = columnsAt(0)
+
+export const RUNNING_COLUMNS = columnsAt(1)
