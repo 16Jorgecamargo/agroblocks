@@ -1,0 +1,164 @@
+# AgroBlocks — Robô da referência, tomateiro legível, cercas e tela de sucesso
+
+**Data:** 2026-10-15 · **Branch:** `feat/agroblocks-motion` · **Referência:** `reference/AgroBlocks_ Fazenda Inteligente em Ação.png`
+
+## 1. Contexto e objetivo
+
+Feedback do usuário após o mundo 3D (spec `2026-10-15-agroblocks-world-environment-design.md`):
+
+- Plantas do canteiro finas (tomate Quaternius), não condizem com o cenário; não dá para saber se estão prontas para colher.
+- Cercas parecem erradas (`fence_simple` Kenney esticado ×1,9).
+- Voltar ao robô antigo, igual ao da referência, com todas as animações: parado, andando, virando, preparando solo, plantando, regando, colhendo, coletando, erro, comemorando.
+- Tela de sucesso fraca, não acompanha o resto; o cenário dela está praticamente vazio.
+
+Decisões tomadas com o usuário: tomateiro procedural cheio com estágio maduro inconfundível; robô com braço que troca de ferramenta e olhos expressivos; tela de sucesso igual à referência, com cena da fazenda bem preenchida.
+
+**Critérios de sucesso**
+
+1. Um aluno distingue, à primeira vista e na distância padrão da câmera, um canteiro maduro (pronto para colher) de um em crescimento.
+2. O robô em jogo, na tela inicial, no tutorial e na tela de sucesso é o mesmo, no estilo da referência (corpo branco arredondado, visor escuro, olhos ciano, antena, rodas grandes).
+3. Cada ação do jogo tem uma animação própria e reconhecível do robô, sincronizada com a velocidade de execução.
+4. Cercas com postes e trilhos grossos de madeira, proporcionais a canteiros, animais e construções.
+5. Tela de sucesso com layout da referência e cena cheia (sem plano verde vazio).
+
+## 2. Abordagem
+
+Tudo procedural em código (geometria simples + materiais foscos compartilhados), como o robô antigo. Animações do robô são poses calculadas por funções puras e aplicadas por frame. Sem novos assets binários; os GLB de robô, tomate, palha e cerca saem do pipeline.
+
+Alternativas descartadas: gerar GLB com clips por script (sem Blender, frágil) e novos pacotes CC0 (nenhum dos baixados tem o estilo da referência).
+
+## 3. Robô (`src/render/robot/`)
+
+### 3.1 Visual — `RobotRig.tsx`
+
+Proporções em unidades de mundo (canteiro = 1):
+
+- Corpo: caixa arredondada branca (`PALETTE.robotBody`) ~0,56 × 0,42 × 0,46, faixa cinza na base.
+- Cabeça: caixa arredondada branca ~0,52 × 0,4 × 0,44 sobre pescoço curto; visor escuro (`robotVisor`) na frente.
+- Olhos: dois discos ciano (`robotEye`) no visor. Expressões: `normal` (círculos), `happy` (arcos `^ ^`), `focus` (círculos achatados), `error` (X vermelho `PALETTE.error`), `blink` (traço).
+- Antena com esfera luminosa (emissiva, intensidade animável).
+- Rodas: duas grandes laterais (raio ~0,2, pneu escuro, cubo cinza) e uma roda de apoio atrás.
+- Braço direito: ombro (pivô) → braço → cotovelo (pivô) → antebraço → encaixe de ferramenta. Braço esquerdo curto fixo (simetria visual).
+- Ferramentas (só uma visível por vez): `hoe` (enxada), `seedBag` (saco), `wateringCan` (regador), `claw` (garra), `crate` (caixa com tomates, segurada pelos dois braços na comemoração da tela de sucesso).
+- Altura total ~0,95 (≈ robô antigo × 1,3). Sombras ligadas.
+
+O componente recebe uma `RobotPose` e só aplica valores aos `ref`s; não decide nada.
+
+### 3.2 Poses — `robotPoses.ts` (puro)
+
+```ts
+type RobotClip = 'idle' | 'move' | 'turn' | 'till' | 'plant' | 'water' | 'harvest' | 'collect' | 'error' | 'success'
+type RobotTool = 'none' | 'hoe' | 'seedBag' | 'wateringCan' | 'claw' | 'crate'
+type EyeShape = 'normal' | 'happy' | 'focus' | 'error' | 'blink'
+interface RobotPose {
+  bodyY: number; bodyPitch: number; bodyRoll: number
+  headYaw: number; headPitch: number
+  shoulder: number; elbow: number; toolTilt: number
+  wheelSpin: number
+  eyes: EyeShape; antennaGlow: number
+  tool: RobotTool
+}
+const CLIP_SPEC: Record<RobotClip, { loop: boolean; seconds: number; tool: RobotTool }>
+function poseAt(clip: RobotClip, t: number): RobotPose
+const REST_POSE: RobotPose
+```
+
+- `t` em segundos de clip. Loops (`idle`, `move`, `success`) são periódicos: `poseAt(c, t) == poseAt(c, t + seconds)`.
+- Clips de uma vez (`turn`, `till`, `plant`, `water`, `harvest`, `collect`, `error`) começam e terminam em `REST_POSE` (com a ferramenta do clip visível só no meio).
+- Movimentos:
+  - `idle`: leve sobe-e-desce do corpo, cabeça olhando de lado, piscada periódica.
+  - `move`: rodas girando, corpo inclinado para frente, balanço curto.
+  - `turn`: rodas em sentidos opostos, cabeça antecipa o giro.
+  - `till`: enxada sobe e golpeia o chão duas vezes; olhos `focus`.
+  - `plant`: braço desce com saco, inclina e solta; olhos `focus`.
+  - `water`: braço estende o regador e inclina; olhos `happy`.
+  - `harvest`: garra desce, fecha e sobe; olhos `happy`.
+  - `collect`: braço recolhe ao corpo, antena pisca forte.
+  - `error`: tremor lateral, olhos `error`, antena vermelha piscando.
+  - `success`: pulinhos, giro de cabeça, olhos `happy`, braços erguidos.
+
+### 3.3 Qual clip tocar — `clipForStep` (puro)
+
+```ts
+function clipForStep(input: { events: GameEvent[]; failed: boolean; celebrating: boolean; moving: boolean }): RobotClip
+```
+
+Prioridade: `failed` → `error`; `celebrating` → `success`; eventos do último passo: `plotChanged` para `prepared` → `till`; para `seeded` → `plant`; `moistureChanged` → `water`; `plotChanged` para `harvested` → `harvest`; `resourcesCollected` → `collect`; `robotTurned` → `turn`; `robotMoved` ou `moving` → `move`; senão `idle`.
+
+### 3.4 Execução — `RobotActor.tsx`
+
+- Substitui `RobotModel`/`RobotShowcase`/`RobotBody` (arquivo `farm3d/RobotModel.tsx` vira wrapper de deslocamento que usa o novo rig, mantendo a lógica atual de posição/rotação com Motion e o shake de erro).
+- Um `useFrame` avança o tempo do clip; clips de uma vez duram `min(CLIP_SPEC.seconds, durationMs do passo)` escalados pela velocidade do jogo; ao terminar, volta a `idle`. Troca de clip faz blend de 0,15 s entre poses (`blendPose`, puro).
+- `eventKey` do passo reinicia o clip mesmo quando a mesma ação se repete.
+- Reduzir animações: sem `useFrame`; aplica `REST_POSE` com os olhos do clip (`error` em falha, `happy` em sucesso).
+- `RobotShowcase({ clip, tool? })` para tela inicial, tutorial e sucesso.
+
+### 3.5 Efeitos novos em `Effects.tsx`
+
+- `SoilBurst`: torrões marrons saltando ao preparar solo.
+- `SeedDrop`: semente caindo do braço ao plantar.
+- Mantêm `WaterSplash` e `HarvestPop`. Mapeamento evento→efeito permanece em `Effects`.
+
+## 4. Tomateiro — `src/render/crops/CropPlant.tsx`
+
+- Descrição pura `cropShape(stage: CropStage): CropShape` (`crops/cropShape.ts`) com listas de folhas (posição, raio), caule e frutos (posição, raio, cor `green` | `red`), mais `width`, `height` e `glow: boolean`.
+- Estágios:
+  1. Montinho de terra com ponto verde (altura ~0,08).
+  2. Broto: caule curto e duas folhas (altura ~0,22).
+  3. Moita pequena: 4–5 folhas (icosaedros achatados) largura ~0,4.
+  4. Moita cheia largura ~0,7, altura ~0,5, com 3–4 tomates verdes.
+  5. Maduro: moita cheia largura ~0,72 com 5–6 tomates vermelhos grandes (raio ≥ 0,08) bem visíveis no topo e laterais, `glow` ligado.
+- Maduro também ganha: anel brilhante pulsando no chão do canteiro e uma estrelinha/brilho flutuando acima (desligados em "Reduzir animações", fica só o anel estático) e balanço suave da moita.
+- Colhido: três caules cortados e palha (substitui modelo `straw`).
+- Geometrias e materiais compartilhados em módulo (criados uma vez). Variação por canteiro: rotação Y por semente (`x`,`y`) para não parecer clonado.
+- `PlotTile` passa a usar `CropPlant`; `PlantModel.tsx`, `cropModelId` e modelos `crop-1..5`/`straw` são removidos. `cropStageFor` continua.
+
+## 5. Cercas — `src/render/world/Fences.tsx`
+
+- Segmento padrão de 1 unidade: dois postes quadrados (0,1 × 0,55, topo chanfrado) nas pontas e dois trilhos (0,06 × 0,08) a 0,2 e 0,42 de altura; marrom quente (`PALETTE.fenceWood`, `fenceWoodDark` nos postes) como na referência.
+- Porteira: postes mais altos e tábuas em X.
+- `buildWorld` continua posicionando `fence` e `fence-gate` como hoje (`fenceLine`, `farmLayout`), mas esses ids passam a ser `ProceduralPropId` (`'fence' | 'fence-gate'`), fora do manifesto de GLB. `PropItem.model` vira `ModelId | ProceduralPropId`.
+- Renderização com `InstancedMesh` por peça (poste, trilho, tábua) a partir dos `PropItem` de cerca, respeitando `rotation` e `scale` (comprimento). Postes adjacentes coincidentes são deduplicados (`fencePieces`, puro).
+- O cercado do grid continua 1 segmento por canteiro.
+
+## 6. Tela de sucesso
+
+### 6.1 Cena — `CelebrationScene.tsx`
+
+- Novo layout `celebration` em `buildWorld` (`celebrationLayout.ts`): chão completo sem bordas visíveis no enquadramento, celeiro, moinho girando, silo, cercado com animais, canteiros com tomateiros maduros, caminho de terra, árvores, flores, arbustos e borboletas. Densidade `full` igual à fazenda; `light` com gráficos leves.
+- Espaço livre reservado para o robô e a caixa à esquerda do centro; nada alto entre a câmera e o robô.
+- Robô `RobotShowcase` em `success` com ferramenta `crate` (caixa de tomates).
+- Câmera ortográfica isométrica enquadrando o robô no terço esquerdo; mundo ocupa a tela inteira (sem céu/plano visível nas bordas em 1440×900 e 390×844).
+- Coberta por `SceneWithSplash`. Fallback 2D sem WebGL como hoje.
+
+### 6.2 Interface — `ResultsPage.tsx` / `.css`
+
+- Layout da referência: cena em tela cheia ao fundo, cartão branco arredondado à direita (centralizado verticalmente; no celular embaixo, cena acima) e fileira de botões abaixo do cartão.
+- Cartão: estrela grande + "Missão concluída!" + objetivo; duas caixas lado a lado — (a) Comandos executados + Recursos consumidos com ícones, (b) Tentativas + selo verde "Conceito aprendido"; linha de eficiência (estrelas), blocos e dicas; selo "Solução correta".
+- Botões: "Ver solução" e "Tentar novamente" escuros (estilo HUD), "Próxima fase" verde largo — mesmo `GameButton` do jogo.
+- Tokens visuais iguais ao HUD (cores, raios, sombras, fonte). Confete mantido. Animações de entrada atuais mantidas.
+- Conteúdo, textos e a seção "Como funciona?" (`HowItWorks`) inalterados.
+
+## 7. Pipeline de assets
+
+- Remover de `assets.config.json`: `robot`, `crop-1..5`, `straw`, `fence`, `fence-gate`. Rodar `npm run assets:build`; manifesto regenerado.
+- `robotClipFor` antigo e `entry.clips` do robô saem de `modelChoice.ts`.
+
+## 8. Testes
+
+Unitários (Vitest):
+- `poseAt`: cada clip difere de `idle` em ao menos um campo no meio do clip; loops periódicos; clips de uma vez começam/terminam em `REST_POSE`; ferramenta correta no meio de cada clip.
+- `blendPose`: extremos iguais às poses de origem/destino.
+- `clipForStep`: cada evento e prioridade.
+- `cropShape`: maduro tem ≥ 5 frutos vermelhos e `glow`; largura do 5 ≥ 1,6 × a do 3; estágio 4 só frutos verdes.
+- `fencePieces`: n segmentos em linha → n+1 postes, 2n trilhos; porteira gera tábuas em X.
+- `buildWorld` `celebration`: determinístico, área do robô livre, ≥ N props, nada alto na frente da câmera.
+- `ResultsPage`: renderiza cartão, estatísticas e botões (teste atual adaptado).
+
+E2E (Playwright): tela de resultado com 3D renderiza canvas e splash some sem erros de página; os 14 existentes continuam verdes.
+
+Verificação visual (Playwright MCP 1440×900 e 390×844) contra a referência: fazenda fase 2 executando (cada animação), fase 4 com maduros, tela inicial, tutorial, resultado. Desempenho: custo de quadro da fazenda fase 4 sem regressão perceptível.
+
+## 9. Fora do escopo
+
+Novas culturas por fase, sons novos, mudanças de regras do jogo, mapa de missões (exceto cercas).
