@@ -4,7 +4,7 @@ import { motion, type HTMLMotionProps } from 'motion/react'
 import { Icon, type IconName } from '@/components/icons/Icon'
 import { PRESSABLE } from '@/motion/presets'
 
-export type ButtonTone = 'primary' | 'secondary' | 'danger' | 'accent' | 'ghost'
+export type ButtonTone = 'primary' | 'secondary' | 'danger' | 'accent' | 'ghost' | 'dark'
 
 type GameButtonProps = Omit<HTMLMotionProps<'button'>, 'children'> & {
   tone?: ButtonTone

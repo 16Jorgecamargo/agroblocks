@@ -1,10 +1,18 @@
-import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
-import { Link, Navigate, useParams } from 'react-router'
+import { lazy, Suspense, useMemo, useState } from 'react'
+import { Navigate, useParams } from 'react-router'
+import { AnimatePresence, motion } from 'motion/react'
+import { Confetti } from '@/components/game/Confetti'
+import { CountUp } from '@/components/game/CountUp'
+import { GameButton, GameLink } from '@/components/game/GameButton'
+import { StarRow } from '@/components/game/StarRow'
 import { Icon } from '@/components/icons/Icon'
 import { getMission } from '@/data/missions'
-import { CONCEPT_TIPS, latestSuccess, nextStep, previousBestBefore, referenceStats } from '@/features/results/resultsLogic'
+import { HowItWorks } from '@/features/results/HowItWorks'
+import { latestSuccess, nextStep, previousBestBefore, referenceStats } from '@/features/results/resultsLogic'
 import { CONCEPT_LABELS } from '@/game/missions/missionTypes'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { SPRINGS } from '@/motion/springs'
+import { overshoot, softRise, staggerContainer, staggerItem } from '@/motion/presets'
+import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { hasWebGL } from '@/render/hasWebGL'
 import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -12,35 +20,12 @@ import './ResultsPage.css'
 
 const CelebrationScene = lazy(() => import('@/features/results/CelebrationScene'))
 
-function Stars({ value }: { value: number }) {
-  return (
-    <span className="stars" role="img" aria-label={`Eficiência ${value} de 3`}>
-      {[1, 2, 3].map((position) => (
-        <span key={position} className={position <= value ? 'stars__on' : 'stars__off'} aria-hidden="true">
-          <Icon name="star" size={20} />
-        </span>
-      ))}
-    </span>
-  )
-}
-
-function Stat({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="result-stat" role="group" aria-label={label}>
-      <span className="result-stat__label" aria-hidden="true">
-        {label}
-      </span>
-      <span className="result-stat__value">{children}</span>
-    </div>
-  )
-}
-
 export function ResultsPage() {
   const { missionId = '' } = useParams()
   const mission = getMission(missionId)
   const save = useProgressStore((store) => store.save)
   const renderMode = useSettingsStore((store) => store.settings.renderMode)
-  const reducedMotion = useReducedMotion()
+  const { reduced } = useMotionPrefs()
   const webgl = useMemo(() => hasWebGL(), [])
   const [showSolution, setShowSolution] = useState(false)
   const attempt = mission ? latestSuccess(save, mission.id) : null
@@ -59,20 +44,26 @@ export function ResultsPage() {
       <div className="results__scene" aria-hidden="true">
         {show3d ? (
           <Suspense fallback={null}>
-            <CelebrationScene reducedMotion={reducedMotion} />
+            <CelebrationScene reducedMotion={reduced} />
           </Suspense>
         ) : (
           <div className="home-scene--fallback" />
         )}
-        {!reducedMotion && <div className="results__confetti" />}
       </div>
+      {!reduced && <Confetti seed={mission.id} />}
 
       <main className="results__content">
-        <section className="results__card card" aria-labelledby="results-title">
+        <motion.section className="results__card" aria-labelledby="results-title" variants={overshoot} initial="hidden" animate="visible">
           <div className="results__head">
-            <span className="results__star" aria-hidden="true">
-              <Icon name="star" size={48} />
-            </span>
+            <motion.span
+              className="results__star"
+              aria-hidden="true"
+              initial={{ scale: 0, rotate: -40 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ ...SPRINGS.star, delay: 0.15 }}
+            >
+              <Icon name="star" size={56} />
+            </motion.span>
             <div>
               <h1 id="results-title" className="results__title">
                 Missão concluída!
@@ -81,105 +72,102 @@ export function ResultsPage() {
             </div>
           </div>
 
-          <div className="results__verdict">
-            <span className="results__correct">
-              <Icon name="check" /> Solução correta
+          <motion.div className="results__boxes" variants={staggerContainer(0.1, 0.25)} initial="hidden" animate="visible">
+            <motion.div className="results__box" variants={staggerItem}>
+              <div className="result-stat" role="group" aria-label="Comandos executados">
+                <span className="result-stat__label" aria-hidden="true">
+                  Comandos executados
+                </span>
+                <span className="result-stat__value">
+                  <CountUp value={attempt.actions} />
+                </span>
+              </div>
+              <div className="result-stat" role="group" aria-label="Recursos consumidos">
+                <span className="result-stat__label" aria-hidden="true">
+                  Recursos consumidos
+                </span>
+                <span className="results__resources">
+                  <span>
+                    <Icon name="seed" size={18} /> {attempt.usage.seeds}
+                  </span>
+                  <span>
+                    <Icon name="drop" size={18} /> {attempt.usage.water}
+                  </span>
+                  <span>
+                    <Icon name="bolt" size={18} /> {attempt.usage.energy}
+                  </span>
+                </span>
+              </div>
+            </motion.div>
+            <motion.div className="results__box" variants={staggerItem}>
+              <div className="result-stat" role="group" aria-label="Tentativas">
+                <span className="result-stat__label" aria-hidden="true">
+                  Tentativas
+                </span>
+                <span className="result-stat__value">
+                  <CountUp value={progress?.attempts ?? attempt.attemptNumber} />
+                </span>
+              </div>
+              <div className="results__concept">
+                <span className="results__concept-badge" aria-hidden="true">
+                  <Icon name="check" size={18} />
+                </span>
+                <span>
+                  Conceito aprendido
+                  <strong>{CONCEPT_LABELS[mission.concept]}</strong>
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          <motion.div className="results__meta" variants={softRise} initial="hidden" animate="visible" transition={{ delay: 0.5 }}>
+            <span className="results__efficiency">
+              Eficiência <StarRow value={attempt.efficiencyStars ?? 1} label={`Eficiência ${attempt.efficiencyStars ?? 1} de 3`} delay={0.6} />
             </span>
-            <Stars value={attempt.efficiencyStars ?? 1} />
-          </div>
+            <span>Blocos usados: {attempt.blocks}</span>
+            <span>Dicas usadas: {attempt.hintsUsed}</span>
+            <span className="results__correct">
+              <Icon name="check" size={16} /> Solução correta
+            </span>
+          </motion.div>
           <p className="results__note">A eficiência é avaliada à parte: uma solução correta nunca é reprovada por usar mais comandos.</p>
-
-          <div className="results__stats">
-            <Stat label="Comandos executados">{attempt.actions}</Stat>
-            <Stat label="Tentativas">{progress?.attempts ?? attempt.attemptNumber}</Stat>
-            <Stat label="Blocos usados">{attempt.blocks}</Stat>
-            <Stat label="Dicas usadas">{attempt.hintsUsed}</Stat>
-            <Stat label="Recursos consumidos">
-              <span className="results__resources">
-                <span>
-                  <Icon name="seed" size={16} /> {attempt.usage.seeds}
-                </span>
-                <span>
-                  <Icon name="drop" size={16} /> {attempt.usage.water}
-                </span>
-                <span>
-                  <Icon name="bolt" size={16} /> {attempt.usage.energy}
-                </span>
-              </span>
-            </Stat>
-            <div className="results__concept">
-              <Icon name="check" />
-              <span>
-                Conceito aprendido
-                <strong>{CONCEPT_LABELS[mission.concept]}</strong>
-              </span>
-            </div>
-          </div>
-
           {previous && (
             <p className="results__compare">
               Comparado com sua melhor solução anterior: {previous.actions} → {attempt.actions} comandos, {previous.blocks} → {attempt.blocks} blocos.
             </p>
           )}
+        </motion.section>
 
-          <div className="results__actions">
-            <button type="button" className="button" aria-expanded={showSolution} onClick={() => setShowSolution((value) => !value)}>
-              <Icon name="book" /> {showSolution ? 'Ocultar explicação' : 'Ver solução'}
-            </button>
-            <Link to={`/jogar/${mission.id}`} className="button">
-              <Icon name="reset" /> Tentar melhorar
-            </Link>
-            <Link to={next.to} className="button button--primary">
+        <motion.div className="results__actions" variants={staggerContainer(0.08, 0.6)} initial="hidden" animate="visible">
+          <motion.div variants={staggerItem}>
+            <GameButton tone="dark" size="lg" icon="book" aria-expanded={showSolution} onClick={() => setShowSolution((value) => !value)}>
+              {showSolution ? 'Ocultar solução' : 'Ver solução'}
+            </GameButton>
+          </motion.div>
+          <motion.div variants={staggerItem}>
+            <GameLink to={`/jogar/${mission.id}`} tone="dark" size="lg" icon="reset">
+              Tentar novamente
+            </GameLink>
+          </motion.div>
+          <motion.div variants={staggerItem} className="results__next">
+            <GameLink to={next.to} tone="primary" size="lg">
               {next.label}
-            </Link>
-          </div>
-        </section>
+            </GameLink>
+          </motion.div>
+        </motion.div>
 
-        {showSolution && (
-          <section className="results__explain card" aria-labelledby="explain-title">
-            <h2 id="explain-title">Como funciona?</h2>
-            <p>{mission.solutionExplanation}</p>
-            <div className="results__columns">
-              <figure>
-                <figcaption>O seu algoritmo</figcaption>
-                <pre>{attempt.pseudocode}</pre>
-              </figure>
-              <figure>
-                <figcaption>Uma solução de referência (existem outras corretas)</figcaption>
-                <pre>{reference.pseudocode}</pre>
-              </figure>
-            </div>
-            <table className="results__table">
-              <caption>Comparação entre soluções corretas</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Medida</th>
-                  <th scope="col">Sua solução</th>
-                  <th scope="col">Referência</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">Comandos executados</th>
-                  <td>{attempt.actions}</td>
-                  <td>{reference.actions}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Blocos usados</th>
-                  <td>{attempt.blocks}</td>
-                  <td>{reference.blocks}</td>
-                </tr>
-              </tbody>
-            </table>
-            <aside className="results__tip">
-              <Icon name="bulb" />
-              <div>
-                <strong>Dica</strong>
-                <p>{CONCEPT_TIPS[mission.concept]}</p>
-              </div>
-            </aside>
-          </section>
-        )}
+        <AnimatePresence>
+          {showSolution && (
+            <HowItWorks
+              key="how"
+              mission={mission}
+              savedProgram={progress?.savedProgram ?? null}
+              pseudocode={attempt.pseudocode}
+              reference={reference}
+              attempt={{ actions: attempt.actions, blocks: attempt.blocks }}
+            />
+          )}
+        </AnimatePresence>
       </main>
     </div>
   )

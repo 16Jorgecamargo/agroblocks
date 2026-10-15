@@ -1,0 +1,12 @@
+.block-preview {
+  position: relative;
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.block-preview .blocklyMainBackground {
+  fill: transparent;
+  stroke: none;
+}

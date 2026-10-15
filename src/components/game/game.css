@@ -44,6 +44,12 @@
   --btn-text: #2a1f05;
 }
 
+.game-button--dark {
+  --btn: #1e2a33;
+  --btn-dark: #0e161c;
+  --btn-text: #ffffff;
+}
+
 .game-button--ghost {
   --btn: transparent;
   --btn-dark: rgb(255 255 255 / 0.18);

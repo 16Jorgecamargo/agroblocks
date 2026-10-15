@@ -15,10 +15,12 @@ function renderAt(path: string) {
   )
 }
 
-function answerAll(form: 'pre' | 'post', correct: boolean) {
-  for (const item of itemsForForm(form)) {
+async function answerAll(form: 'pre' | 'post', correct: boolean) {
+  const items = itemsForForm(form)
+  for (const [position, item] of items.entries()) {
+    await screen.findByText(`Questão ${position + 1} de ${items.length}`)
     const index = correct ? item.correctIndex : (item.correctIndex + 1) % item.options.length
-    fireEvent.click(screen.getByRole('radio', { name: item.options[index] }))
+    fireEvent.click(await screen.findByRole('radio', { name: item.options[index] }))
     fireEvent.click(screen.getByRole('button', { name: /Próxima|Concluir/ }))
   }
 }
@@ -26,14 +28,14 @@ function answerAll(form: 'pre' | 'post', correct: boolean) {
 describe('AssessmentPage', () => {
   beforeEach(() => useProgressStore.getState().resetProgress())
 
-  it('runs the pre-test one question at a time without feedback and stores answers', () => {
+  it('runs the pre-test one question at a time without feedback and stores answers', async () => {
     renderAt('/avaliacao/pre')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     expect(screen.getByText('Questão 1 de 10')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Próxima' })).toBeDisabled()
-    answerAll('pre', true)
+    await answerAll('pre', true)
+    expect(await screen.findByRole('heading', { name: 'Obrigado!' })).toBeInTheDocument()
     expect(screen.queryByText(/correta|errada/i)).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Obrigado!' })).toBeInTheDocument()
     const stored = useProgressStore.getState().save.assessments.pre
     expect(stored?.skipped).toBe(false)
     expect(Object.keys(stored?.answers ?? {})).toHaveLength(10)
@@ -51,7 +53,7 @@ describe('AssessmentPage', () => {
     expect(screen.queryByRole('button', { name: 'Começar' })).not.toBeInTheDocument()
   })
 
-  it('compares pre and post by concept after the post-test', () => {
+  it('compares pre and post by concept after the post-test', async () => {
     useProgressStore.getState().storeAssessment({ form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
     useProgressStore.getState().recordAttempt({
       missionId: 'm6-efficient-farm',
@@ -66,8 +68,8 @@ describe('AssessmentPage', () => {
     })
     renderAt('/avaliacao/pos')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
-    answerAll('post', true)
-    const row = screen.getByRole('row', { name: /Sequenciamento/ })
+    await answerAll('post', true)
+    const row = await screen.findByRole('row', { name: /Sequenciamento/ })
     expect(row).toHaveTextContent('0%')
     expect(row).toHaveTextContent('100%')
   })

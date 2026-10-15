@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { ResultsPage } from '@/features/results/ResultsPage'
 import { useProgressStore } from '@/stores/progressStore'
@@ -53,6 +53,26 @@ describe('ResultsPage', () => {
     expect(screen.getByRole('img', { name: 'Eficiência 1 de 3' })).toBeInTheDocument()
     expect(screen.getByText('Sequenciamento')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Próxima fase' })).toHaveAttribute('href', '/jogar/m2-row-planting')
-    expect(screen.getByRole('link', { name: 'Tentar melhorar' })).toHaveAttribute('href', '/jogar/m1-first-harvest')
+    expect(screen.getByRole('link', { name: 'Tentar novamente' })).toHaveAttribute('href', '/jogar/m1-first-harvest')
+  })
+
+  it('reveals how it works with the robot steps when asking to see the solution', async () => {
+    useProgressStore.getState().recordAttempt({
+      missionId: 'm1-first-harvest',
+      timestamp: '2026-10-14T12:01:00.000Z',
+      outcome: 'success',
+      errorCode: null,
+      actions: 12,
+      blocks: 10,
+      usage: { seeds: 0, water: 0, energy: 11 },
+      efficiencyStars: 1,
+      pseudocode: 'quando executar:\n    mover para frente',
+    })
+    renderAt('/resultado/m1-first-harvest')
+    expect(screen.queryByRole('heading', { name: 'Como funciona?' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Ver solução' }))
+    expect(await screen.findByRole('heading', { name: 'Como funciona?' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'O que o robô fez?' })).toBeInTheDocument()
+    expect(screen.getByText('Dica')).toBeInTheDocument()
   })
 })
