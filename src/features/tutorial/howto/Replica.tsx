@@ -83,7 +83,7 @@ export function Replica({ parts, state }: { parts: ReplicaPart[]; state: Replica
       {show.has('run') && (
         <>
           <span className={`replica__run replica__run--${state.run === 'running' ? 'stop' : 'go'}`} style={at(RUN_POINT)}>
-            {state.run === 'running' ? 'Parar' : state.stepMode ? 'Próximo' : 'Executar'}
+            {state.run === 'running' ? 'Parar' : state.run === 'stepping' ? 'Próximo' : 'Executar'}
           </span>
           <span className={`replica__toggle${state.stepMode ? ' is-on' : ''}`} style={at(STEP_TOGGLE_POINT)}>
             <span className="replica__toggle-label">Passo a passo</span>

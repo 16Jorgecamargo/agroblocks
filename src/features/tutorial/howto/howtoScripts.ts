@@ -169,7 +169,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
     segments: [
       {
         label: 'Passo a passo',
-        caption: 'Ligue Passo a passo e clique em Próximo: o robô faz um bloco por clique.',
+        caption: 'Ligue Passo a passo e clique em Executar: o robô faz o primeiro bloco. Depois, cada Próximo faz mais um.',
         lengthMs: 5600,
         initial: { stack: [MOVE, MOVE] },
         beats: [
@@ -212,7 +212,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
   },
   'error-experiment': {
     id: 'error-experiment',
-    title: 'Experimento: andar demais',
+    title: 'Como fazer o experimento',
     parts: ['workspace', 'run', 'farm', 'side'],
     segments: [
       {

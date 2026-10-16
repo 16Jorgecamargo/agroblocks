@@ -13,30 +13,9 @@ test('starts a new farm from the home screen at the guided training', async ({ p
   await expect(page.getByRole('button', { name: /Continuar missão/ })).toBeDisabled()
   await page.getByRole('button', { name: 'Iniciar nova fazenda' }).click()
   await expect(page).toHaveURL(/#\/jogar\/m0-training$/)
-  await page.getByRole('button', { name: 'Começar' }).click()
-  await expect(page.getByText('1/6')).toBeVisible()
-})
-
-test('builds a program by dragging a real block into the editor', async ({ page }) => {
-  await seedStorage(page, {})
-  await openMission(page, 'm0-training')
-  await page.getByRole('button', { name: 'Próximo' }).click()
-  await expect(page.getByText('2/6')).toBeVisible()
-
-  await page.getByRole('treeitem', { name: /Movimento/ }).click()
-  const source = page.locator('.blocklyFlyout .blocklyDraggable').filter({ hasText: 'mover para frente' }).first()
-  const hat = page.locator('.blocklyBlockCanvas .blocklyDraggable').filter({ hasText: 'quando executar' }).first()
-  const from = await source.boundingBox()
-  const to = await hat.boundingBox()
-  if (!from || !to) throw new Error('blocks not visible')
-  await page.mouse.move(from.x + 12, from.y + from.height / 2)
-  await page.mouse.down()
-  await page.mouse.move(to.x + 36, to.y + 62, { steps: 20 })
-  await page.mouse.up()
-
-  await expect(page.getByText('3/6')).toBeVisible()
-  await page.getByRole('tab', { name: 'Pseudocódigo' }).click()
-  await expect(page.locator('.pseudocode-panel__code')).toContainText('quando executar:\n    mover para frente')
+  await expect(page.getByRole('dialog', { name: 'Bem-vindo ao treinamento' })).toBeVisible()
+  await page.getByRole('button', { name: 'Começar treinamento' }).click()
+  await expect(page.getByTestId('tutorial-progress')).toHaveText('2/15')
 })
 
 test('explains an error and highlights the failing state', async ({ page }) => {

@@ -79,7 +79,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Passo a passo',
     text: 'Ligue Passo a passo.',
     done: [{ type: 'stepModeOn' }, { type: 'stepped' }],
-    followUps: ['Agora clique em Próximo: o robô faz um bloco por vez e o bloco atual fica destacado.'],
+    followUps: ['Agora clique em Executar: o robô faz só o primeiro bloco. Depois, cada clique em Próximo faz mais um, e o bloco atual fica destacado.'],
   },
   {
     id: 'hints',
