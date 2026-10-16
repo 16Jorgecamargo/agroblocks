@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { act, program } from '@/blocks/interpreter/programBuilder'
 import { getMission } from '@/data/missions'
-import { openMission, saveWithProgram, seedStorage } from './helpers'
+import { openMission, registerStudent, saveWithProgram, seedStorage } from './helpers'
 
 const firstHarvest = getMission('m1-first-harvest')
 if (!firstHarvest) throw new Error('mission missing')
@@ -12,6 +12,7 @@ test('starts a new farm from the home screen at the guided training', async ({ p
   await expect(page.getByRole('heading', { level: 1, name: 'AgroBlocks' })).toBeVisible()
   await expect(page.getByRole('button', { name: /Continuar missão/ })).toBeDisabled()
   await page.getByRole('button', { name: 'Iniciar nova fazenda' }).click()
+  await registerStudent(page)
   await expect(page).toHaveURL(/#\/jogar\/m0-training$/)
   await expect(page.getByRole('dialog', { name: 'Bem-vindo ao treinamento' })).toBeVisible()
   await page.getByRole('button', { name: 'Começar treinamento' }).click()

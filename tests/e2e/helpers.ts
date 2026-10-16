@@ -88,3 +88,10 @@ export async function dragFromToolbox(page: Page, category: string, label: strin
   await page.mouse.move(target.x, target.y, { steps: 20 })
   await page.mouse.up()
 }
+
+export async function registerStudent(page: Page, name = 'Ana Souza', school = 'Escola Azul'): Promise<void> {
+  const dialog = page.getByRole('dialog', { name: 'Quem está jogando?' })
+  await dialog.getByLabel('Nome completo').fill(name)
+  await dialog.getByLabel('Escola').fill(school)
+  await dialog.getByRole('button', { name: 'Começar' }).click()
+}

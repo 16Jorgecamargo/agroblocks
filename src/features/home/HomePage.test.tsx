@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { HomePage } from '@/features/home/HomePage'
 import { useProgressStore } from '@/stores/progressStore'
@@ -26,6 +26,12 @@ const success = (missionId: string) => ({
   pseudocode: '',
 })
 
+function register(name = 'Ana Souza', school = 'Escola Azul') {
+  fireEvent.change(screen.getByLabelText('Nome completo'), { target: { value: name } })
+  fireEvent.change(screen.getByLabelText('Escola'), { target: { value: school } })
+  fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
+}
+
 describe('HomePage', () => {
   beforeEach(() => useProgressStore.getState().resetProgress())
 
@@ -35,12 +41,6 @@ describe('HomePage', () => {
     expect(screen.getByText('Automatize. Programe. Cultive.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Continuar missão/ })).toBeDisabled()
     expect(screen.getByText('0 de 6 fases concluídas')).toBeInTheDocument()
-  })
-
-  it('starts a new farm at the training when there is no progress', () => {
-    renderHome()
-    fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova fazenda' }))
-    expect(screen.getByText('jogando')).toBeInTheDocument()
   })
 
   it('continues at the next mission and shows its name', () => {
@@ -53,13 +53,53 @@ describe('HomePage', () => {
     expect(screen.getByText('1 de 6 fases concluídas')).toBeInTheDocument()
   })
 
-  it('asks before wiping progress when starting a new farm', () => {
+  it('asks who is playing before starting a new farm', () => {
+    renderHome()
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova fazenda' }))
+    expect(screen.getByRole('dialog', { name: 'Quem está jogando?' })).toBeInTheDocument()
+    register()
+    expect(screen.getByText('jogando')).toBeInTheDocument()
+    expect(useProgressStore.getState().save.student).toEqual({ name: 'Ana Souza', school: 'Escola Azul' })
+    expect(useProgressStore.getState().save.runId).not.toBeNull()
+  })
+
+  it('asks before wiping progress, then asks who is playing', () => {
     useProgressStore.getState().recordAttempt(success('m1-first-harvest'))
     renderHome()
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova fazenda' }))
-    expect(screen.getByRole('dialog', { name: 'Começar uma nova fazenda?' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Apagar e começar' }))
+    expect(useProgressStore.getState().save.attempts).toHaveLength(1)
+    expect(screen.getByRole('dialog', { name: 'Quem está jogando?' })).toBeInTheDocument()
+    register()
     expect(useProgressStore.getState().save.attempts).toHaveLength(0)
+    expect(screen.getByText('jogando')).toBeInTheDocument()
+  })
+
+  it('keeps everything when the student cancels the registration', () => {
+    useProgressStore.getState().recordAttempt(success('m1-first-harvest'))
+    renderHome()
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova fazenda' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar e começar' }))
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Quem está jogando?' })).getByRole('button', { name: 'Cancelar' }))
+    expect(useProgressStore.getState().save.attempts).toHaveLength(1)
+    expect(screen.queryByText('jogando')).not.toBeInTheDocument()
+  })
+
+  it('registers an old save before continuing without losing progress', () => {
+    useProgressStore.getState().recordAttempt(success('m0-training'))
+    renderHome()
+    fireEvent.click(screen.getByRole('button', { name: /Continuar missão/ }))
+    register()
+    expect(screen.getByText('jogando')).toBeInTheDocument()
+    expect(useProgressStore.getState().save.attempts).toHaveLength(1)
+    expect(useProgressStore.getState().save.student?.name).toBe('Ana Souza')
+  })
+
+  it('continues directly when the student is known', () => {
+    useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
+    useProgressStore.getState().recordAttempt(success('m0-training'))
+    renderHome()
+    fireEvent.click(screen.getByRole('button', { name: /Continuar missão/ }))
     expect(screen.getByText('jogando')).toBeInTheDocument()
   })
 })

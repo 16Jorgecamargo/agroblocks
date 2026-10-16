@@ -27,6 +27,8 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
   const settings = useSettingsStore((store) => store.settings)
   const update = useSettingsStore((store) => store.update)
   const resetProgress = useProgressStore((store) => store.resetProgress)
+  const student = useProgressStore((store) => store.save.student)
+  const startRun = useProgressStore((store) => store.startRun)
   const [warningScope, animateWarning] = useAnimate()
 
   const askReset = () => {
@@ -46,7 +48,8 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
                       <GameButton
                         tone="danger"
                         onClick={() => {
-                          resetProgress()
+                          if (student) startRun(student)
+                          else resetProgress()
                           setConfirmReset(false)
                         }}
                       >

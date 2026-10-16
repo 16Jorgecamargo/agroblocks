@@ -8,9 +8,11 @@ import { Logo } from '@/components/brand/Logo'
 import { getMission, MISSIONS } from '@/data/missions'
 import { HomeScene } from '@/features/home/HomeScene'
 import { SettingsDialog } from '@/features/settings/SettingsDialog'
+import { StudentDialog } from '@/features/student/StudentDialog'
 import { continueMissionId, hasProgress } from '@/game/progress/progression'
 import { PRESSABLE, softRise, staggerContainer, staggerItem } from '@/motion/presets'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
+import type { StudentInfo } from '@/shared/student'
 import { useProgressStore } from '@/stores/progressStore'
 import './HomePage.css'
 
@@ -20,9 +22,11 @@ export function HomePage() {
   const navigate = useNavigate()
   const { ambient } = useMotionPrefs()
   const save = useProgressStore((store) => store.save)
-  const resetProgress = useProgressStore((store) => store.resetProgress)
+  const startRun = useProgressStore((store) => store.startRun)
+  const registerStudent = useProgressStore((store) => store.registerStudent)
   const [showSettings, setShowSettings] = useState(false)
   const [confirmNew, setConfirmNew] = useState(false)
+  const [registerFor, setRegisterFor] = useState<'new' | 'continue' | null>(null)
   const continueId = continueMissionId(save, MISSIONS)
   const continueMission = continueId ? getMission(continueId) : undefined
   const phases = MISSIONS.filter((mission) => !mission.tutorial)
@@ -33,7 +37,7 @@ export function HomePage() {
       setConfirmNew(true)
       return
     }
-    navigate(`/jogar/${TRAINING_ID}`)
+    setRegisterFor('new')
   }
 
   return (
@@ -66,7 +70,11 @@ export function HomePage() {
           type="button"
           className="home__cta home__cta--dark"
           disabled={!continueMission}
-          onClick={() => continueMission && navigate(`/jogar/${continueMission.id}`)}
+          onClick={() => {
+            if (!continueMission) return
+            if (save.student) navigate(`/jogar/${continueMission.id}`)
+            else setRegisterFor('continue')
+          }}
           variants={staggerItem}
           {...(continueMission ? PRESSABLE : {})}
         >
@@ -101,14 +109,29 @@ export function HomePage() {
           <GameButton
             tone="danger"
             onClick={() => {
-              resetProgress()
-              navigate(`/jogar/${TRAINING_ID}`)
+              setConfirmNew(false)
+              setRegisterFor('new')
             }}
           >
             Apagar e começar
           </GameButton>
         </DialogSection>
       </GameDialog>
+      <StudentDialog
+        open={registerFor !== null}
+        onCancel={() => setRegisterFor(null)}
+        onConfirm={(student: StudentInfo) => {
+          const target = registerFor
+          setRegisterFor(null)
+          if (target === 'new') {
+            startRun(student)
+            navigate(`/jogar/${TRAINING_ID}`)
+            return
+          }
+          registerStudent(student)
+          if (continueMission) navigate(`/jogar/${continueMission.id}`)
+        }}
+      />
     </div>
   )
 }
