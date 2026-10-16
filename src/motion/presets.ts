@@ -40,7 +40,6 @@ export const DURATIONS = {
   soilCrossfade: 0.7,
   spotlightPulse: 1.6,
   calloutSwap: 0.2,
-  howtoLoopPause: 1.2,
   heartbeatRepeatDelay: 0.8,
   burst: 0.9,
   heartbeat: 1.2,

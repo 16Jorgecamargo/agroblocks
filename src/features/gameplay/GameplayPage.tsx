@@ -246,7 +246,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
         </aside>
       </motion.main>
       <HarvestFlights />
-      {mission.tutorial && (
+      {mission.tutorial && import.meta.env.MODE !== 'howto' && (
         <TutorialOverlay
           snapshot={snapshot}
           bus={tutorialBus}

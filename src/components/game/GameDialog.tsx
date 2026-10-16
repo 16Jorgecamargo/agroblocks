@@ -14,7 +14,7 @@ interface DialogFrameProps {
   title: string
   icon: IconName
   tone: DialogTone
-  size: 'md' | 'lg' | 'fixed'
+  size: 'md' | 'lg' | 'xl' | 'fixed'
   onClose?: () => void
   children: ReactNode
 }
@@ -102,7 +102,7 @@ interface GameDialogProps {
   title: string
   icon: IconName
   tone?: DialogTone
-  size?: 'md' | 'lg' | 'fixed'
+  size?: 'md' | 'lg' | 'xl' | 'fixed'
   onClose?: () => void
   children: ReactNode
 }

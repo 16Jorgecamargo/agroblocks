@@ -8,7 +8,7 @@ async function progress(page: Page, value: string) {
 async function practise(page: Page, title: string) {
   const dialog = page.getByRole('dialog', { name: title })
   await expect(dialog).toBeVisible()
-  await expect(dialog.locator('.howto-hand')).toBeVisible()
+  await expect.poll(() => dialog.locator('.howto-video video').evaluate((video: HTMLVideoElement) => video.videoWidth)).toBe(1280)
   await dialog.getByRole('button', { name: 'Praticar' }).click()
   await expect(dialog).toBeHidden()
 }

@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "assets:inspect": "node scripts/assets/inspect.mjs",
-    "assets:build": "node --disable-warning=ExperimentalWarning scripts/assets/build.mjs"
+    "assets:build": "node --disable-warning=ExperimentalWarning scripts/assets/build.mjs",
+    "howto:record": "playwright test -c playwright.howto.config.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

@@ -9,7 +9,7 @@ Jogo educativo de automação agrícola e programação visual para o Ensino Mé
 - Editor de blocos em português com liberação gradual por fase.
 - Motor de execução próprio: interpreta o programa do aluno sem `eval`, com pausa, continuação, passo a passo, parada, reinício, velocidade e limite de passos.
 - Simulação agrícola determinística (preparo, plantio, irrigação, crescimento, colheita, recursos e energia).
-- Treinamento guiado em 15 etapas: holofote na área real da tela com balão apontando, e antes de cada ação uma animação mostra como fazer (adicionar, encaixar e apagar blocos, executar e parar, passo a passo, dicas, console, pseudocódigo e corrigir erro) + 6 fases (sequência, repetição, condicionais, sensores, variáveis, depuração e eficiência).
+- Treinamento guiado em 15 etapas: holofote na área real da tela com balão apontando, e antes de cada ação um vídeo gravado do próprio jogo, com uma mão fantasma, mostra como fazer (adicionar, encaixar e apagar blocos, executar e parar, passo a passo, dicas, console, pseudocódigo e corrigir erro) + 6 fases (sequência, repetição, condicionais, sensores, variáveis, depuração e eficiência).
 - Feedback educativo com mensagens de erro explicativas, dicas graduais e pseudocódigo gerado dos blocos.
 - Tela de resultado que separa correção de eficiência e compara soluções corretas.
 - Pré-teste e pós-teste equivalentes, painel do professor e exportação CSV anônima.
@@ -36,6 +36,7 @@ Abra `http://localhost:5173`.
 | `npm test` | testes unitários e de componentes (Vitest) |
 | `npx playwright install chromium` | instala o navegador dos testes E2E (uma vez) |
 | `npm run test:e2e` | testes de interface (Playwright, contra o build de produção) |
+| `npm run howto:record` | regrava os vídeos de demonstração do treinamento em `public/howto/` (Chrome com janela, usa a GPU) |
 | `npm run build` | typecheck + build de produção em `dist/` |
 | `npm run preview` | serve o build localmente |
 
