@@ -59,10 +59,13 @@ Entrar direto por rota (`/#/missoes`, `/#/jogar/...`) sem cadastro não bloqueia
 ```ts
 interface StudentInfo { name: string; school: string }
 
+interface TutorialRecord { status: 'completed' | 'skipped'; step: number; at: string }
+
 interface SaveData {
   version: 1
   runId: string | null
   student: StudentInfo | null
+  tutorial: TutorialRecord | null
   createdAt: string
   missions: Record<string, MissionProgress>
   attempts: AttemptRecord[]
@@ -76,6 +79,12 @@ interface SaveData {
   - `startRun(student)`: zera o save, gera `runId` novo com `crypto.randomUUID()` e grava o aluno;
   - `registerStudent(student)`: mantém o progresso, grava o aluno e gera `runId` se faltar.
 - `resetProgress` deixa de ser usado pela Home.
+- Tutorial: `progressStore.recordTutorial(status, step)` grava o desfecho do treinamento.
+  - **Concluído:** botão "Ir para as missões" do passo final.
+  - **Pulado:** confirmar "Sair do treinamento" a partir de "Pular tutorial".
+  - Em ambos, `step` é a etapa em que o aluno estava (1 a 15).
+  - Um desfecho só é sobrescrito por outro desfecho da mesma jogada. Se o aluno pulou e depois concluiu, fica "completed".
+  - `null` = tutorial ainda não terminado nesta jogada.
 
 ## 2. Envio ao servidor
 
@@ -91,6 +100,7 @@ interface RunSnapshot {
   missions: Record<string, MissionProgress>
   attempts: AttemptRecord[]
   assessments: SaveData['assessments']
+  tutorial: TutorialRecord | null
 }
 ```
 
@@ -179,12 +189,14 @@ Fonte: `GET /api/teacher/runs`, mais o botão **Atualizar**. O modo demonstraç�
   - jogadas;
   - fases concluídas, pelo máximo entre as jogadas;
   - tentativas, dicas e erros, somados em todas as jogadas;
+  - tutorial: o desfecho da jogada mais recente, exibido como "Concluído", "Pulado na etapa N de 15" ou "Não terminado";
   - nota pré e nota pós em acertos de 0 a 10, usando a resposta mais recente entre as jogadas e `correctIndex` dos itens;
   - ganho = pós − pré, só quando houver as duas;
   - último acesso.
 - Resumo:
   - número de alunos, escolas e jogadas;
   - média de fases concluídas por aluno;
+  - tutorial: quantos concluíram, pularam e não terminaram;
   - total de tentativas e de dicas;
   - média pré, média pós e ganho médio (só alunos com as duas).
 - Por fase: alunos que concluíram, tentativas médias, dicas médias e distribuição de estrelas (1, 2, 3).
@@ -202,8 +214,9 @@ Fonte: `GET /api/teacher/runs`, mais o botão **Atualizar**. O modo demonstraç�
    - erros mais comuns;
    - pré × pós por escola;
    - estrelas por fase.
-5. Tabela de alunos, ordenável por qualquer coluna (clique no cabeçalho alterna asc/desc). Colunas: nome, escola, jogadas, fases, tentativas, dicas, erros, pré, pós, ganho, último acesso.
+5. Tabela de alunos, ordenável por qualquer coluna (clique no cabeçalho alterna asc/desc). Colunas: nome, escola, jogadas, tutorial, fases, tentativas, dicas, erros, pré, pós, ganho, último acesso.
 6. Detalhe do aluno: painel lateral ao clicar numa linha, com uma seção por jogada:
+   - desfecho do tutorial (concluído, pulado na etapa N ou não terminado, com data);
    - situação de cada fase (status, tentativas, melhor resultado, estrelas);
    - linha do tempo das tentativas (data, fase, resultado, erro e pseudocódigo recolhível);
    - avaliação pré e pós, questão por questão, com a resposta marcada e ✓/✗;
@@ -239,6 +252,7 @@ Unitários (Vitest):
 - validação do StudentDialog;
 - schema do save com migração do legado;
 - `startRun` / `registerStudent`;
+- `recordTutorial` (pulado → concluído vira concluído; concluído não volta a pulado) e o TutorialOverlay chamando-o nos dois caminhos;
 - `toSnapshot` (sem `savedProgram`);
 - fila de envio: debounce, pendência, retry e um envio por vez, com `fetch` e timers falsos;
 - handlers com o store em memória: 204, 400, 413, login certo/errado, token expirado/adulterado, 503 sem configuração, lista e remoção;
@@ -249,6 +263,8 @@ Unitários (Vitest):
 - Home: os três fluxos da tabela da seção 1.
 
 E2E (Playwright, contra `vite preview` com o plugin `devApi`):
+- cadastro → jogar o treinamento até concluir → `/painel`, coluna Tutorial "Concluído";
+- cadastro → pular o tutorial na etapa 3 → painel mostra "Pulado na etapa 3 de 15";
 - cadastro → jogar o treinamento até concluir → `/painel` → senha errada recusada → senha `dashboard` → o aluno aparece na tabela com a escola e 1 fase concluída;
 - "Apagar e começar" pede o cadastro de novo e o painel mostra 2 jogadas do mesmo aluno.
 
