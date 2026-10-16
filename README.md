@@ -146,7 +146,7 @@ Os dados ficam apenas no navegador do aluno. O código de participante é opcion
 
 ## Áudio
 
-Efeitos sonoros são sintetizados em tempo real. A música é opcional (`public/audio/theme.ogg`); veja `docs/audio.md` para gerar uma trilha offline com ACE-Step 1.5.
+Efeitos sonoros são sintetizados em tempo real, incluindo um acorde curto quando a tela de carregamento some e a cena aparece. A música são duas faixas em `public/audio/` que tocam em sequência quando "Música" está ligada.
 
 ## Licença e créditos
 

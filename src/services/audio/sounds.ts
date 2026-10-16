@@ -1,6 +1,6 @@
 import type { GameEvent } from '@/game/world/types'
 
-export type SoundName = 'move' | 'turn' | 'plant' | 'water' | 'harvest' | 'collect' | 'error' | 'success'
+export type SoundName = 'move' | 'turn' | 'plant' | 'water' | 'harvest' | 'collect' | 'error' | 'success' | 'reveal'
 
 function soundFor(event: GameEvent): SoundName | null {
   switch (event.type) {

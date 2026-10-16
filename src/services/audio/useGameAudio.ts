@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import type { ExecutionSnapshot } from '@/game/execution/types'
-import { createSfxPlayer } from '@/services/audio/sfxPlayer'
+import { sharedSfx } from '@/services/audio/sfxPlayer'
 import { soundsForEvents } from '@/services/audio/sounds'
 import { useSettingsStore } from '@/stores/settingsStore'
 
 export function useGameAudio(snapshot: ExecutionSnapshot): void {
   const enabled = useSettingsStore((store) => store.settings.soundEnabled)
-  const player = useMemo(() => createSfxPlayer(), [])
+  const player = sharedSfx
   const lastStep = useRef(snapshot.stepCount)
   const lastStatus = useRef(snapshot.status)
 

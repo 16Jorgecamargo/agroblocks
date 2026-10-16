@@ -24,6 +24,14 @@ const TONES: Record<SoundName, Tone[]> = {
     { frequency: 659, slideTo: 659, duration: 0.12, type: 'triangle', gain: 0.08 },
     { frequency: 784, slideTo: 784, duration: 0.25, type: 'triangle', gain: 0.08 },
   ],
+  reveal: [
+    { frequency: 392, slideTo: 392, duration: 0.07, type: 'triangle', gain: 0.06 },
+    { frequency: 523, slideTo: 523, duration: 0.07, type: 'triangle', gain: 0.06 },
+    { frequency: 659, slideTo: 659, duration: 0.07, type: 'triangle', gain: 0.06 },
+    { frequency: 784, slideTo: 784, duration: 0.09, type: 'triangle', gain: 0.07 },
+    { frequency: 1047, slideTo: 1047, duration: 0.32, type: 'sine', gain: 0.07 },
+    { frequency: 1568, slideTo: 2093, duration: 0.18, type: 'sine', gain: 0.03 },
+  ],
 }
 
 export function createSfxPlayer(): { play(name: SoundName): void } {
@@ -32,6 +40,7 @@ export function createSfxPlayer(): { play(name: SoundName): void } {
     play(name) {
       try {
         context ??= new AudioContext()
+        if (context.state === 'suspended') void context.resume().catch(() => undefined)
         let start = context.currentTime
         for (const tone of TONES[name]) {
           const oscillator = context.createOscillator()
@@ -52,3 +61,5 @@ export function createSfxPlayer(): { play(name: SoundName): void } {
     },
   }
 }
+
+export const sharedSfx = createSfxPlayer()

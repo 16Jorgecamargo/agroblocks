@@ -1,10 +1,12 @@
-import { Suspense, useEffect, useState, type ReactNode } from 'react'
+import { Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useProgress } from '@react-three/drei'
 import { animate } from 'motion'
 import { AnimatePresence, motion } from 'motion/react'
 import { Logo } from '@/components/brand/Logo'
 import { EASINGS } from '@/motion/easings'
 import { DURATIONS } from '@/motion/presets'
+import { sharedSfx } from '@/services/audio/sfxPlayer'
+import { useSettingsStore } from '@/stores/settingsStore'
 import './SceneSplash.css'
 
 export function SceneSplash({ progress, label }: { progress: number; label: string }) {
@@ -29,6 +31,14 @@ export function SceneWithSplash({ children, label = 'Carregando fazenda…' }: {
   const { active, progress } = useProgress()
   const [ready, setReady] = useState(false)
   const [hidden, setHidden] = useState(false)
+  const soundEnabled = useSettingsStore((store) => store.settings.soundEnabled)
+  const revealed = useRef(false)
+
+  useEffect(() => {
+    if (!hidden || revealed.current) return
+    revealed.current = true
+    if (soundEnabled) sharedSfx.play('reveal')
+  }, [hidden, soundEnabled])
 
   useEffect(() => {
     const ceiling = window.setTimeout(() => setHidden(true), DURATIONS.splashMax * 1000)

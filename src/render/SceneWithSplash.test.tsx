@@ -1,5 +1,10 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { SceneWithSplash } from '@/render/SceneWithSplash'
+import { useSettingsStore } from '@/stores/settingsStore'
+
+const sfx = vi.hoisted(() => ({ play: vi.fn() }))
+
+vi.mock('@/services/audio/sfxPlayer', () => ({ sharedSfx: sfx }))
 
 const loader = { active: false, progress: 0 }
 
@@ -19,6 +24,8 @@ describe('SceneWithSplash', () => {
   beforeEach(() => {
     loader.active = false
     loader.progress = 0
+    sfx.play.mockClear()
+    useSettingsStore.getState().update({ soundEnabled: true })
   })
 
   it('covers the scene with a loading status and real progress', () => {
@@ -54,5 +61,22 @@ describe('SceneWithSplash', () => {
     })
     vi.useRealTimers()
     await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), { timeout: 3000 })
+  })
+
+  it('plays the reveal sound once when the farm appears', async () => {
+    render(<SceneWithSplash>{(onReady) => <Ready onReady={onReady} />}</SceneWithSplash>)
+    expect(sfx.play).not.toHaveBeenCalled()
+    act(() => screen.getByRole('button', { name: 'canvas' }).click())
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), { timeout: 3000 })
+    expect(sfx.play).toHaveBeenCalledTimes(1)
+    expect(sfx.play).toHaveBeenCalledWith('reveal')
+  })
+
+  it('stays quiet when sound effects are off', async () => {
+    useSettingsStore.getState().update({ soundEnabled: false })
+    render(<SceneWithSplash>{(onReady) => <Ready onReady={onReady} />}</SceneWithSplash>)
+    act(() => screen.getByRole('button', { name: 'canvas' }).click())
+    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument(), { timeout: 3000 })
+    expect(sfx.play).not.toHaveBeenCalled()
   })
 })

@@ -1,5 +1,3 @@
 # Trilhas sonoras
 
-Coloque aqui `theme.ogg` (trilha ambiente em loop, 60–120 s). O jogo funciona sem o arquivo.
-
-Geração sugerida (offline, fora do app) com ACE-Step 1.5 — veja `docs/audio.md`.
+`seeds-and-sprockets.mp3` e `sunlight-on-painted-wood.mp3` tocam em sequência, em loop, quando "Música" está ligada em Configurações › Som. Os originais ficam em `assets-src/`.
