@@ -86,4 +86,15 @@ describe('DashboardPage', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Tentar de novo' }))
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
+
+  it('opens a student and deletes one of their runs on the server', async () => {
+    const runs = createDemoRuns(MISSIONS)
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => (init?.method === 'DELETE' ? new Response(null, { status: 204 }) : json(200, { runs })))
+    vi.stubGlobal('fetch', fetchMock)
+    renderPage()
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver detalhes de Felipe Costa' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar jogada' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Apagar' }))
+    await vi.waitFor(() => expect(fetchMock.mock.calls.some(([url, init]) => init?.method === 'DELETE' && String(url).includes('demo-run-5-0'))).toBe(true))
+  })
 })
