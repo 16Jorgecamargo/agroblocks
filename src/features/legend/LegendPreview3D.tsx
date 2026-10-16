@@ -5,6 +5,7 @@ import { legendCell, type LegendPreview } from '@/features/legend/legendPages'
 import { Flat } from '@/render/farm3d/materials'
 import { PlotTile } from '@/render/farm3d/PlotTile'
 import { PALETTE } from '@/render/palette'
+import { CANVAS_RESIZE } from '@/render/canvasResize'
 
 function Aim() {
   const camera = useThree((three) => three.camera)
@@ -29,7 +30,7 @@ function Turntable({ active, children }: { active: boolean; children: ReactNode 
 export default function LegendPreview3D({ preview, reducedMotion }: { preview: LegendPreview; reducedMotion: boolean }) {
   const key = `${preview.terrain}-${preview.plot}-${preview.moisture}-${preview.goal}`
   return (
-    <Canvas orthographic dpr={[1, 2]} camera={{ position: [4, 3.6, 4], zoom: 120, near: -50, far: 50 }} aria-hidden="true">
+    <Canvas resize={CANVAS_RESIZE} orthographic dpr={[1, 2]} camera={{ position: [4, 3.6, 4], zoom: 120, near: -50, far: 50 }} aria-hidden="true">
       <color attach="background" args={[PALETTE.sky]} />
       <Aim />
       <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 1]} />

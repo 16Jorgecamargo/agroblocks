@@ -15,6 +15,7 @@ import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import type { Cell } from '@/game/world/types'
 import { DURATIONS } from '@/motion/presets'
+import { CANVAS_RESIZE } from '@/render/canvasResize'
 
 
 const BED_CELLS: Cell['plot'][] = ['mature', 'growing', 'mature', 'seeded', 'mature', 'growing', 'mature', 'mature', 'growing', 'seeded', 'mature', 'growing']
@@ -51,7 +52,7 @@ export default function HomeLandscape({ ambient, lowGraphics, onReady }: { ambie
   const alive = ambient && !lowGraphics
 
   return (
-    <Canvas shadows={!lowGraphics} dpr={lowGraphics ? 1 : [1, 2]} camera={{ fov: 42, position: [0, 2.6, 10.5], near: 0.1, far: 200 }} gl={{ alpha: true }} onCreated={() => onReady?.()} aria-hidden="true">
+    <Canvas resize={CANVAS_RESIZE} shadows={!lowGraphics} dpr={lowGraphics ? 1 : [1, 2]} camera={{ fov: 42, position: [0, 2.6, 10.5], near: 0.1, far: 200 }} gl={{ alpha: true }} onCreated={() => onReady?.()} aria-hidden="true">
       <fog attach="fog" args={['#e9d8e6', 22, 60]} />
       <CameraDrift ambient={ambient} />
       <hemisphereLight args={['#fff4e6', '#5c8f3e', 1]} />

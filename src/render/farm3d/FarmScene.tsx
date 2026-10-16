@@ -14,6 +14,7 @@ import { Butterflies } from '@/render/world/Butterflies'
 import { Herd } from '@/render/world/Herd'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
+import { CANVAS_RESIZE } from '@/render/canvasResize'
 
 export default function FarmScene({
   state,
@@ -40,7 +41,7 @@ export default function FarmScene({
   const duration = reducedMotion ? 0 : stepDurationMs
 
   return (
-    <Canvas
+    <Canvas resize={CANVAS_RESIZE}
       orthographic
       shadows={!lowGraphics}
       dpr={lowGraphics ? 1 : [1, 2]}

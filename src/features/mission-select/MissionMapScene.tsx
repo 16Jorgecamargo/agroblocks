@@ -16,6 +16,7 @@ import { Herd } from '@/render/world/Herd'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import type { Vec2 } from '@/render/world/worldTypes'
+import { CANVAS_RESIZE } from '@/render/canvasResize'
 
 interface MissionMapSceneProps {
   missions: MissionDefinition[]
@@ -55,7 +56,7 @@ export default function MissionMapScene({ missions, statuses, selectedId, onSele
   const alive = ambient && !lowGraphics
   return (
     <div className="map-scene">
-      <Canvas
+      <Canvas resize={CANVAS_RESIZE}
         orthographic
         shadows={!lowGraphics}
         dpr={lowGraphics ? 1 : [1, 2]}

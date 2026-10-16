@@ -10,6 +10,7 @@ import { CELEBRATION_BED_CENTERS, CELEBRATION_ROBOT } from '@/render/world/celeb
 import { Herd } from '@/render/world/Herd'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
+import { CANVAS_RESIZE } from '@/render/canvasResize'
 
 interface CelebrationSceneProps {
   reducedMotion: boolean
@@ -22,7 +23,7 @@ export default function CelebrationScene({ reducedMotion, lowGraphics, onReady }
   const alive = !reducedMotion && !lowGraphics
 
   return (
-    <Canvas
+    <Canvas resize={CANVAS_RESIZE}
       orthographic
       shadows={!lowGraphics}
       dpr={lowGraphics ? 1 : [1, 2]}
