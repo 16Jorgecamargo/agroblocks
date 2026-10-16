@@ -53,9 +53,6 @@ export function HomePage() {
             Automatize. Programe. Cultive.
           </motion.p>
         </div>
-        <motion.p className="home__intro" variants={staggerItem}>
-          Construa algoritmos, controle robôs e transforme sua fazenda em um sistema inteligente.
-        </motion.p>
       </motion.header>
       <motion.main className="home__actions" variants={staggerContainer(0.09, 0.45)} initial="hidden" animate="visible">
         <motion.span className="home__progress" variants={staggerItem}>

@@ -1,83 +1,19 @@
 .logo {
   display: inline-flex;
-  font-family: var(--font-logo);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1;
+  line-height: 0;
 }
 
-.logo__word {
-  position: relative;
-  display: inline-flex;
-  align-items: baseline;
+.logo__image {
+  display: block;
+  height: auto;
+  user-select: none;
 }
 
-.logo__a {
-  flex: none;
-  align-self: flex-end;
-  width: 0.93em;
-  height: 1.245em;
-  margin-right: -0.04em;
-  margin-bottom: -0.3em;
-  overflow: visible;
+.logo--sm .logo__image {
+  width: 132px;
 }
 
-.logo__agro,
-.logo__blocks,
-.logo__k {
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.logo__blocks {
-  display: inline-flex;
-  align-items: baseline;
-}
-
-.logo__k {
-  position: relative;
-  background-image: inherit;
-}
-
-.logo__sprout {
-  position: absolute;
-  left: 0.02em;
-  bottom: 0.66em;
-  width: 0.74em;
-  height: 0.55em;
-  overflow: visible;
-}
-
-.logo--brand .logo__word {
-  filter: drop-shadow(0.016em 0 0 #fffaf0) drop-shadow(-0.016em 0 0 #fffaf0) drop-shadow(0 0.016em 0 #fffaf0)
-    drop-shadow(0 -0.016em 0 #fffaf0) drop-shadow(0 0.04em 0.04em rgb(40 30 10 / 0.4));
-}
-
-.logo--brand .logo__agro {
-  background-image: linear-gradient(180deg, #4fae42 0%, #2a8a39 50%, #1c6e30 100%);
-}
-
-.logo--brand .logo__blocks {
-  background-image: linear-gradient(180deg, #6f4426 0%, #573216 60%, #45260f 100%);
-}
-
-.logo--mono .logo__word {
-  filter: drop-shadow(0 0.05em 0 rgb(0 0 0 / 0.35));
-}
-
-.logo--mono .logo__agro {
-  background-image: linear-gradient(180deg, #8ad85f 0%, #4caf43 100%);
-}
-
-.logo--mono .logo__blocks {
-  background-image: linear-gradient(180deg, #ffffff 0%, #e6ebe8 100%);
-}
-
-.logo--sm {
-  font-size: 1.7rem;
-}
-
-.logo--lg {
-  font-size: clamp(3rem, 7.5vw, 5.4rem);
+.logo--lg .logo__image {
+  width: clamp(360px, 44vw, 620px);
+  filter: drop-shadow(0 10px 18px rgb(30 40 20 / 0.28));
 }

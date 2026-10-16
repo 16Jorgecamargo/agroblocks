@@ -61,26 +61,21 @@
 
 .home__lockup {
   display: grid;
-  justify-items: end;
+  justify-items: center;
 }
 
 .home__tagline {
-  margin: -0.15em 0.2em 0 0;
-  font-family: var(--font-logo);
-  font-size: clamp(1rem, 1.85vw, 1.4rem);
-  font-weight: 700;
-  color: #1f6a30;
-  text-shadow: 0 1px 0 rgb(255 255 255 / 0.8), 0 0 6px rgb(255 255 255 / 0.5);
+  margin: -0.35em 0 0;
+  padding: 0.15em 0.9em;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(180deg, #3f9a3a, #2a7a2e);
+  box-shadow: 0 3px 0 #1f5a24, 0 8px 18px rgb(20 40 20 / 0.25);
 }
 
-.home__intro {
-  margin: 0;
-  max-width: 34ch;
-  font-size: clamp(1rem, 1.6vw, 1.2rem);
-  font-weight: 500;
-  color: #24323d;
-  text-shadow: 0 1px 0 rgb(255 255 255 / 0.75);
-}
 
 .home__actions {
   position: absolute;
