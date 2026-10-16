@@ -6,7 +6,7 @@ import { MissionSelectPage } from '@/features/mission-select/MissionSelectPage'
 import { ResultsPage } from '@/features/results/ResultsPage'
 import { HowToPlayPage } from '@/features/how-to-play/HowToPlayPage'
 import { AssessmentPage } from '@/features/assessment/AssessmentPage'
-import { DashboardPage } from '@/features/dashboard/DashboardPage'
+import { TeacherGate } from '@/features/dashboard/TeacherGate'
 
 export const appRoutes: RouteObject[] = [
   { path: '/', element: <HomePage /> },
@@ -15,6 +15,6 @@ export const appRoutes: RouteObject[] = [
   { path: '/resultado/:missionId', element: <ResultsPage /> },
   { path: '/como-jogar', element: <HowToPlayPage /> },
   { path: '/avaliacao/:form', element: <AssessmentPage /> },
-  { path: '/painel', element: <DashboardPage /> },
+  { path: '/painel', element: <TeacherGate /> },
   { path: '*', element: <Navigate to="/" replace /> },
 ]

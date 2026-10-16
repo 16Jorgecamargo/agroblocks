@@ -6,7 +6,7 @@ import { useProgressStore } from '@/stores/progressStore'
 function renderPage() {
   return render(
     <MemoryRouter>
-      <DashboardPage />
+      <DashboardPage token="t" onUnauthorized={vi.fn()} onLogout={vi.fn()} />
     </MemoryRouter>,
   )
 }

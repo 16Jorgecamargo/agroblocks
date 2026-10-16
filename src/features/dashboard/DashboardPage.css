@@ -118,3 +118,14 @@
     overflow-x: auto;
   }
 }
+
+.teacher-gate {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.teacher-gate__error {
+  margin: 0;
+  color: #b3261e;
+  font-weight: 700;
+}

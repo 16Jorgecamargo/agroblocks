@@ -11,7 +11,14 @@ import './DashboardPage.css'
 
 const STATUS_TEXT = { completed: 'Concluída', available: 'Disponível', locked: 'Bloqueada' } as const
 
-export function DashboardPage() {
+interface DashboardPageProps {
+  token: string
+  onUnauthorized: () => void
+  onLogout: () => void
+}
+
+export function DashboardPage(props: DashboardPageProps) {
+  void props
   const realSave = useProgressStore((store) => store.save)
   const [demo, setDemo] = useState(false)
   const demoSave = useMemo(() => createDemoSave(MISSIONS), [])
@@ -24,7 +31,7 @@ export function DashboardPage() {
 
   return (
     <div className="chrome-page">
-      <PageHeader title="Painel educativo" subtitle="Acompanhamento das partidas registradas neste navegador." backTo="/" />
+      <PageHeader title="Painel do professor" subtitle="Acompanhamento das partidas registradas neste navegador." backTo="/" />
       <main className="dashboard">
         <p className="dashboard__banner" role="note">
           <Icon name="database" /> Dados registrados neste navegador. Não constituem resultados de pesquisa até serem coletados e analisados
