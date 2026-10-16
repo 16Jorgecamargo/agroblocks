@@ -148,15 +148,13 @@ describe('TutorialOverlay', () => {
 
   it('goes back with Anterior', () => {
     setup()
-    fireEventved' })
-    practise()
-    emit({ type: 'tabOpened', tab: 'pseudocode' })
-    practise()
-    rerender(snap('running'))
-    rerender(snap('failed'))
-    expect(progress()).toBe('8/15')
-    expect(screen.getByRole('dialog', { name: 'Executar e Parar' })).toHaveTextContent('terminou antes')
+    fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
+    expect(progress()).toBe('3/15')
+    fireEvent.click(screen.getByRole('button', { name: 'Passo anterior' }))
+    expect(progress()).toBe('2/15')
   })
+})
 ```
 
 - [ ] **Step 2: Run to verify it fails**
