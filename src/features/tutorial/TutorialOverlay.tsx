@@ -34,6 +34,7 @@ export function TutorialOverlay({ snapshot, bus, facts, onSideTab, onExit }: Tut
   const [howToOpen, setHowToOpen] = useState(false)
   const [confirmSkip, setConfirmSkip] = useState(false)
   const previousStatus = useRef(snapshot.status)
+  const furthest = useRef(0)
   const factsRef = useRef(facts)
   const sideTabRef = useRef(onSideTab)
   factsRef.current = facts
@@ -51,8 +52,11 @@ export function TutorialOverlay({ snapshot, bus, facts, onSideTab, onExit }: Tut
 
   useEffect(() => {
     const step = TUTORIAL_STEPS[progress.index]
+    const forward = progress.index > furthest.current
+    furthest.current = Math.max(furthest.current, progress.index)
     if (step.onEnterTab) sideTabRef.current(step.onEnterTab)
     setHowToOpen(step.kind === 'practice')
+    if (!forward) return
     apply({ type: 'stackSize', size: factsRef.current.stackSize })
     if (factsRef.current.stepMode) apply({ type: 'stepModeOn' })
   }, [progress.index, apply])

@@ -20,7 +20,7 @@ describe('tutorial machine', () => {
   })
 
   it('completes each practice step with its own signal', () => {
-    expect(advanceTutorial(at('add'), { type: 'blockAdded' }).index).toBe(indexOf('snap'))
+    expect(advanceTutorial(at('add'), { type: 'stackSize', size: 1 }).index).toBe(indexOf('snap'))
     expect(advanceTutorial(at('snap'), { type: 'stackSize', size: 1 })).toEqual(at('snap'))
     expect(advanceTutorial(at('snap'), { type: 'stackSize', size: 2 }).index).toBe(indexOf('delete'))
     expect(advanceTutorial(at('delete'), { type: 'blockRemoved' }).index).toBe(indexOf('pseudocode'))
@@ -35,7 +35,7 @@ describe('tutorial machine', () => {
     expect(halfway).toEqual(at('run-stop', 1))
     expect(advanceTutorial(at('run-stop'), { type: 'stop' })).toEqual(at('run-stop'))
     expect(advanceTutorial(halfway, { type: 'stop' }).index).toBe(indexOf('step-mode'))
-    expect(feed(at('step-mode'), [{ type: 'stepModeOn' }, { type: 'stepped' }]).index).toBe(indexOf('hints'))
+    expect(feed(at('step-mode'), [{ type: 'stepModeOn' }, { type: 'stepped' }, { type: 'stop' }]).index).toBe(indexOf('hints'))
     expect(feed(at('hints'), [{ type: 'tabOpened', tab: 'hints' }, { type: 'hintRevealed' }]).index).toBe(indexOf('experiment'))
   })
 
@@ -71,7 +71,39 @@ describe('statusSignal', () => {
     expect(statusSignal('paused', snap('idle'))).toEqual({ type: 'stop' })
     expect(statusSignal('running', snap('failed'))).toEqual({ type: 'error' })
     expect(statusSignal('running', snap('finished', true))).toEqual({ type: 'success' })
-    expect(statusSignal('running', snap('finished', false))).toEqual({ type: 'error' })
     expect(statusSignal('running', snap('running'))).toBeNull()
+  })
+})
+
+describe('review fixes', () => {
+  const snap = (status: ExecutionSnapshot['status'], success = false) =>
+    ({ status, validation: status === 'finished' ? { success, objectives: [], constraints: [] } : null }) as unknown as ExecutionSnapshot
+
+  it('tells a crash apart from a program that ends without harvesting', () => {
+    expect(statusSignal('running', snap('failed'))).toEqual({ type: 'error' })
+    expect(statusSignal('running', snap('finished', false))).toEqual({ type: 'incomplete' })
+    expect(statusSignal('idle', snap('paused'))).toEqual({ type: 'run' })
+  })
+
+  it('completes the experiment only when the robot really crashes', () => {
+    const early = advanceTutorial(at('experiment'), { type: 'incomplete' })
+    expect(early.index).toBe(indexOf('experiment'))
+    expect(early.notice).toContain('parou antes da pedra')
+    expect(advanceTutorial(at('experiment'), { type: 'error' }).index).toBe(indexOf('console'))
+  })
+
+  it('counts an incomplete run as finishing before Parar', () => {
+    expect(feed(at('run-stop'), [{ type: 'run' }, { type: 'incomplete' }]).notice).toContain('terminou antes')
+  })
+
+  it('finishes Passo a passo only after Parar, so the editor is unlocked for the next steps', () => {
+    const stepped = feed(at('step-mode'), [{ type: 'stepModeOn' }, { type: 'stepped' }])
+    expect(stepped).toEqual(at('step-mode', 2))
+    expect(advanceTutorial(stepped, { type: 'stop' }).index).toBe(indexOf('hints'))
+  })
+
+  it('adds a block only once it is snapped into the program', () => {
+    expect(advanceTutorial(at('add'), { type: 'blockAdded' })).toEqual(at('add'))
+    expect(advanceTutorial(at('add'), { type: 'stackSize', size: 1 }).index).toBe(indexOf('snap'))
   })
 })

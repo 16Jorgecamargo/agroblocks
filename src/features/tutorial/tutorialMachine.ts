@@ -47,8 +47,9 @@ export function statusSignal(previous: ExecutionStatus, snapshot: ExecutionSnaps
   const next = snapshot.status
   if (previous === next) return null
   if (next === 'running') return previous === 'paused' ? null : { type: 'run' }
+  if (next === 'paused' && previous === 'idle') return { type: 'run' }
   if (next === 'idle' && (previous === 'running' || previous === 'paused')) return { type: 'stop' }
   if (next === 'failed') return { type: 'error' }
-  if (next === 'finished') return snapshot.validation?.success ? { type: 'success' } : { type: 'error' }
+  if (next === 'finished') return snapshot.validation?.success ? { type: 'success' } : { type: 'incomplete' }
   return null
 }

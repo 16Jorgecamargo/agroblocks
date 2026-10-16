@@ -15,7 +15,7 @@ export type HowToId =
 
 export type CalloutSide = 'right' | 'left' | 'bottom' | 'top'
 
-type SimpleSignalType = 'blockAdded' | 'blockRemoved' | 'hintRevealed' | 'stepModeOn' | 'stepped' | 'run' | 'stop' | 'error' | 'success'
+type SimpleSignalType = 'blockAdded' | 'blockRemoved' | 'hintRevealed' | 'stepModeOn' | 'stepped' | 'run' | 'stop' | 'error' | 'incomplete' | 'success'
 
 export type TutorialSignal =
   | { type: SimpleSignalType }

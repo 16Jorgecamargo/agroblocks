@@ -166,13 +166,13 @@ describe('GameplayPage', () => {
     }
   })
 
-  it('counts opening Dicas as the reveal when no hint can be revealed', () => {
+  it('skips the block steps already done by the saved program when the training is repeated', () => {
     useProgressStore.setState((state) => ({
       save: { ...state.save, missions: { ...state.save.missions, 'm0-training': { ...state.save.missions['m0-training'], hintsUsed: 3 } } },
     }))
     renderAt('/jogar/m0-training')
     fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
     for (let index = 0; index < 2; index += 1) fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
-    expect(screen.getByTestId('tutorial-progress')).toHaveTextContent('4/15')
+    expect(screen.getByTestId('tutorial-progress')).toHaveTextContent('6/15')
   })
 })

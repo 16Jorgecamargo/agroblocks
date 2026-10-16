@@ -31,7 +31,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     howTo: 'add-block',
     title: 'Adicionar um bloco',
     text: 'Abra a categoria Movimento e arraste o bloco "mover para frente" para dentro de "quando executar".',
-    done: [{ type: 'blockAdded' }],
+    done: [{ type: 'stackSize', atLeast: 1 }],
   },
   {
     id: 'snap',
@@ -69,7 +69,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     text: 'Clique em Executar e observe o robô.',
     done: [{ type: 'run' }, { type: 'stop' }],
     followUps: ['Agora, enquanto o robô anda, clique em Parar: a fazenda volta ao início.'],
-    notices: { success: EARLY_FINISH, error: EARLY_FINISH },
+    notices: { success: EARLY_FINISH, error: EARLY_FINISH, incomplete: EARLY_FINISH },
   },
   {
     id: 'step-mode',
@@ -78,8 +78,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     howTo: 'step-mode',
     title: 'Passo a passo',
     text: 'Ligue Passo a passo.',
-    done: [{ type: 'stepModeOn' }, { type: 'stepped' }],
-    followUps: ['Agora clique em Executar: o robô faz só o primeiro bloco. Depois, cada clique em Próximo faz mais um, e o bloco atual fica destacado.'],
+    done: [{ type: 'stepModeOn' }, { type: 'stepped' }, { type: 'stop' }],
+    followUps: [
+      'Agora clique em Executar: o robô faz só o primeiro bloco. Depois, cada clique em Próximo faz mais um, e o bloco atual fica destacado.',
+      'Para terminar, clique em Parar: o passo a passo encerra e você pode editar o programa de novo.',
+    ],
   },
   {
     id: 'hints',
@@ -100,6 +103,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     text: 'E se o robô andar demais? Deixe três "mover para frente" e depois "colher planta" (categoria Agricultura). Desligue Passo a passo e clique em Executar.',
     done: [{ type: 'error' }],
     notices: {
+      incomplete: 'O robô parou antes da pedra. Deixe três "mover para frente" antes de "colher planta" e execute de novo.',
       success: 'Seu programa já colheu a planta! Para o experimento, deixe três "mover para frente" antes de "colher planta" e execute de novo.',
     },
   },

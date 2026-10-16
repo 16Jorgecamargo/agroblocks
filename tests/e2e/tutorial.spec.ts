@@ -65,6 +65,8 @@ test('the training teaches every part of the screen with real actions', async ({
   await practise(page, 'Como usar o passo a passo')
   await page.getByRole('switch', { name: 'Passo a passo' }).click()
   await page.locator('.execution-panel').getByRole('button', { name: 'Executar' }).click()
+  await progress(page, '9/15')
+  await page.locator('.execution-panel').getByRole('button', { name: 'Parar' }).click()
   await progress(page, '10/15')
 
   await practise(page, 'Como pedir uma dica')
@@ -73,7 +75,6 @@ test('the training teaches every part of the screen with real actions', async ({
   await progress(page, '11/15')
 
   await practise(page, 'Como fazer o experimento')
-  await page.locator('.execution-panel').getByRole('button', { name: 'Parar' }).click()
   await page.getByRole('switch', { name: 'Passo a passo' }).click()
   await settle(page)
   await dragFromToolbox(page, 'Movimento', 'mover para frente', 1)

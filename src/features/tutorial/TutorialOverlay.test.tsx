@@ -36,6 +36,8 @@ describe('TutorialOverlay', () => {
     expect(screen.queryByRole('button', { name: 'Próximo' })).not.toBeInTheDocument()
     practise()
     emit({ type: 'blockAdded' })
+    expect(progress()).toBe('4/15')
+    emit({ type: 'stackSize', size: 1 })
     expect(progress()).toBe('5/15')
     practise()
     emit({ type: 'stackSize', size: 2 })
@@ -53,6 +55,9 @@ describe('TutorialOverlay', () => {
     practise()
     emit({ type: 'stepModeOn' })
     emit({ type: 'stepped' })
+    expect(progress()).toBe('9/15')
+    rerender(snap('paused'))
+    rerender(snap('idle'))
     practise()
     emit({ type: 'tabOpened', tab: 'hints' })
     emit({ type: 'hintRevealed' })
@@ -74,13 +79,21 @@ describe('TutorialOverlay', () => {
   })
 
   it('completes a step at once when its condition is already true on entry', () => {
-    const { emit } = setup({ stackSize: 2, stepMode: false })
+    setup({ stackSize: 2, stepMode: false })
     fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
     fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
     fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
-    practise()
-    emit({ type: 'blockAdded' })
     expect(progress()).toBe('6/15')
+  })
+
+  it('lets Anterior stay on a step whose condition is already true', () => {
+    setup({ stackSize: 2, stepMode: false })
+    fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
+    expect(progress()).toBe('6/15')
+    fireEvent.click(screen.getByRole('button', { name: 'Passo anterior' }))
+    expect(progress()).toBe('5/15')
   })
 
   it('shows a notice when the run ends before Parar', () => {
@@ -88,7 +101,7 @@ describe('TutorialOverlay', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
     for (let index = 0; index < 2; index += 1) fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
     practise()
-    emit({ type: 'blockAdded' })
+    emit({ type: 'stackSize', size: 1 })
     practise()
     emit({ type: 'stackSize', size: 2 })
     practise()
