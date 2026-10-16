@@ -15,10 +15,14 @@ export function MusicPlayer() {
     }
     const audio = audioRef.current ?? new Audio()
     if (!audioRef.current) audio.src = MUSIC_TRACKS[trackRef.current]
-    audio.volume = 0.3
+    audio.volume = 0.18
     audioRef.current = audio
     const start = () => {
-      audio.play().catch(() => undefined)
+      try {
+        Promise.resolve(audio.play()).catch(() => undefined)
+      } catch {
+        return
+      }
     }
     const next = () => {
       trackRef.current = (trackRef.current + 1) % MUSIC_TRACKS.length

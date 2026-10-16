@@ -17,7 +17,7 @@ export const SETTINGS_KEY = 'agroblocks:settings:v1'
 
 export const DEFAULT_SETTINGS: Settings = {
   soundEnabled: true,
-  musicEnabled: false,
+  musicEnabled: true,
   motion: 'system',
   lowGraphics: false,
   renderMode: 'auto',
@@ -27,7 +27,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
 export function loadSettings(storage: Storage | null): Settings {
   const { value } = readJson(storage, SETTINGS_KEY, settingsSchema.partial())
-  return { ...DEFAULT_SETTINGS, ...(value ?? {}) }
+  return { ...DEFAULT_SETTINGS, ...(value ?? {}), musicEnabled: true, soundEnabled: true }
 }
 
 export function saveSettings(storage: Storage | null, settings: Settings): void {

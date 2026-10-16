@@ -8,6 +8,8 @@ interface Tone {
   gain: number
 }
 
+export const SFX_VOLUME = 2.5
+
 const TONES: Record<SoundName, Tone[]> = {
   move: [{ frequency: 220, slideTo: 260, duration: 0.08, type: 'triangle', gain: 0.08 }],
   turn: [{ frequency: 330, slideTo: 300, duration: 0.06, type: 'triangle', gain: 0.06 }],
@@ -48,7 +50,7 @@ export function createSfxPlayer(): { play(name: SoundName): void } {
           oscillator.type = tone.type
           oscillator.frequency.setValueAtTime(tone.frequency, start)
           oscillator.frequency.linearRampToValueAtTime(tone.slideTo, start + tone.duration)
-          gain.gain.setValueAtTime(tone.gain, start)
+          gain.gain.setValueAtTime(Math.min(1, tone.gain * SFX_VOLUME), start)
           gain.gain.exponentialRampToValueAtTime(0.0001, start + tone.duration)
           oscillator.connect(gain).connect(context.destination)
           oscillator.start(start)

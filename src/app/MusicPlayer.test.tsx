@@ -42,6 +42,7 @@ describe('MusicPlayer', () => {
     const audio = FakeAudio.created[0]
     expect(audio.src).toBe(MUSIC_TRACKS[0])
     expect(audio.paused).toBe(false)
+    expect(audio.volume).toBeCloseTo(0.18)
     act(() => {
       audio.dispatchEvent(new Event('ended'))
     })
