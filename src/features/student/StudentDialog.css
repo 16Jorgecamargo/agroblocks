@@ -1,0 +1,23 @@
+.student-dialog {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.student-dialog .field input {
+  width: 100%;
+}
+
+.student-dialog__error {
+  color: #b3261e;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.student-dialog__notice {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 10px;
+  background: #eef5ff;
+  color: #24323d;
+  font-size: 0.92rem;
+}
