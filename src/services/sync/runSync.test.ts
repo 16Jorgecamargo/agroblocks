@@ -1,4 +1,4 @@
-import { assignStudent, createInitialSave, registerHint } from '@/game/progress/progression'
+import { assignStudent, createInitialSave, registerHint, storeProgram } from '@/game/progress/progression'
 import type { RunSnapshot } from '@/shared/runSnapshot'
 import { createRunSync, PENDING_KEY } from '@/services/sync/runSync'
 
@@ -77,5 +77,18 @@ describe('createRunSync', () => {
     sync.schedule(registered)
     await vi.advanceTimersByTimeAsync(2000)
     expect(window.localStorage.getItem(PENDING_KEY)).toBe('run-0001')
+  })
+
+  it('does not restart the wait for changes that are not sent, like the program in edition', async () => {
+    const send = vi.fn(async (_snapshot: RunSnapshot) => true)
+    const sync = createRunSync({ send, storage: window.localStorage })
+    sync.schedule(registered)
+    for (let index = 0; index < 8; index += 1) {
+      await vi.advanceTimersByTimeAsync(500)
+      sync.schedule(storeProgram(registered, 'm0-training', `{"blocks":${index}}`))
+    }
+    expect(send).toHaveBeenCalledTimes(1)
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(send).toHaveBeenCalledTimes(1)
   })
 })

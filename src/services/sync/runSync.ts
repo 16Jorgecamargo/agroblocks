@@ -29,6 +29,13 @@ export function createRunSync({ send, storage, delayMs = 2000, now = () => new D
   let timer: ReturnType<typeof setTimeout> | null = null
   let inFlight = false
   let queued: SaveData | null = null
+  let scheduledKey: string | null = null
+  let sentKey: string | null = null
+
+  const contentKey = (save: SaveData) => {
+    const snapshot = toSnapshot(save, '')
+    return snapshot ? JSON.stringify(snapshot) : null
+  }
 
   const flush = async (save: SaveData) => {
     if (inFlight) {
@@ -38,6 +45,7 @@ export function createRunSync({ send, storage, delayMs = 2000, now = () => new D
     const snapshot = toSnapshot(save, now())
     if (!snapshot) return
     inFlight = true
+    const key = contentKey(save)
     let ok = false
     try {
       ok = await send(snapshot)
@@ -45,6 +53,7 @@ export function createRunSync({ send, storage, delayMs = 2000, now = () => new D
       ok = false
     }
     inFlight = false
+    if (ok) sentKey = key
     store(storage, (target) => (ok ? target.removeItem(PENDING_KEY) : target.setItem(PENDING_KEY, snapshot.runId)))
     if (queued) {
       const next = queued
@@ -55,15 +64,20 @@ export function createRunSync({ send, storage, delayMs = 2000, now = () => new D
 
   const later = (save: SaveData, ms: number) => {
     if (timer) clearTimeout(timer)
+    scheduledKey = contentKey(save)
     timer = setTimeout(() => {
       timer = null
+      scheduledKey = null
       void flush(save)
     }, ms)
   }
 
   return {
     schedule: (save) => {
-      if (save.runId && save.student) later(save, delayMs)
+      if (!save.runId || !save.student) return
+      const key = contentKey(save)
+      if (timer ? key === scheduledKey : key === sentKey && !inFlight) return
+      later(save, delayMs)
     },
     resumePending: (save) => {
       let pending: string | null = null
