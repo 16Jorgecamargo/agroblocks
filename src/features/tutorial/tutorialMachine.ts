@@ -1,66 +1,54 @@
+import { TUTORIAL_STEPS } from '@/features/tutorial/tutorialScript'
+import type { TutorialCondition, TutorialSignal } from '@/features/tutorial/tutorialTypes'
 import type { ExecutionSnapshot, ExecutionStatus } from '@/game/execution/types'
 
-export type TutorialSignal = 'blockAdded' | 'blockRemoved' | 'run' | 'pause' | 'resume' | 'stop' | 'error' | 'success'
-
-export interface TutorialStep {
-  id: string
-  text: string
-  waitFor: TutorialSignal | null
-  skipOn?: TutorialSignal[]
+export interface TutorialProgress {
+  index: number
+  partial: number
+  notice: string | null
 }
 
-export const TUTORIAL_STEPS: TutorialStep[] = [
-  {
-    id: 'welcome',
-    text: 'Este é o robô agrícola. Ele se move e trabalha seguindo, na ordem, as instruções do seu programa.',
-    waitFor: null,
-  },
-  {
-    id: 'add',
-    text: 'Abra a categoria Movimento e arraste o bloco "mover para frente" para dentro de "quando executar".',
-    waitFor: 'blockAdded',
-  },
-  {
-    id: 'remove',
-    text: 'Para remover um bloco, arraste-o de volta para a biblioteca ou para a lixeira. Experimente remover um.',
-    waitFor: 'blockRemoved',
-  },
-  {
-    id: 'build',
-    text: 'Monte três blocos "mover para frente" e depois "colher planta". Clique em Executar e observe o robô.',
-    waitFor: 'run',
-  },
-  {
-    id: 'stop',
-    text: 'Enquanto o robô anda, clique em Parar: a fazenda volta ao início. Depois clique em Executar de novo.',
-    waitFor: 'stop',
-    skipOn: ['error'],
-  },
-  {
-    id: 'fix',
-    text: 'Se o robô bateu na pedra, leia a explicação no console, remova um "mover para frente" e execute de novo.',
-    waitFor: 'success',
-  },
-]
+export const TUTORIAL_START: TutorialProgress = { index: 0, partial: 0, notice: null }
 
-const BUILD_INDEX = TUTORIAL_STEPS.findIndex((step) => step.id === 'build')
+const LAST_INDEX = TUTORIAL_STEPS.length - 1
 
-export function advanceTutorial(index: number, signal: TutorialSignal): number {
-  if (index >= TUTORIAL_STEPS.length) return index
-  if (signal === 'success' && index > BUILD_INDEX) return TUTORIAL_STEPS.length
-  const step = TUTORIAL_STEPS[index]
-  if (step.waitFor === signal) return index + 1
-  if (step.skipOn?.includes(signal)) return index + 1
-  return index
+function matches(condition: TutorialCondition, signal: TutorialSignal): boolean {
+  if (condition.type !== signal.type) return false
+  if (condition.type === 'stackSize' && signal.type === 'stackSize') return signal.size >= condition.atLeast
+  if (condition.type === 'tabOpened' && signal.type === 'tabOpened') return signal.tab === condition.tab
+  return true
+}
+
+export function advanceTutorial(progress: TutorialProgress, signal: TutorialSignal): TutorialProgress {
+  const step = TUTORIAL_STEPS[progress.index]
+  if (!step || step.kind !== 'practice') return progress
+  const condition = step.done[progress.partial]
+  if (condition && matches(condition, signal)) {
+    const partial = progress.partial + 1
+    if (partial >= step.done.length) return { index: Math.min(progress.index + 1, LAST_INDEX), partial: 0, notice: null }
+    return { index: progress.index, partial, notice: null }
+  }
+  const notice = step.notices?.[signal.type]
+  if (notice) return { index: progress.index, partial: 0, notice }
+  return progress
+}
+
+export function nextTutorial(progress: TutorialProgress): TutorialProgress {
+  const step = TUTORIAL_STEPS[progress.index]
+  if (!step || step.kind === 'practice' || progress.index >= LAST_INDEX) return progress
+  return { index: progress.index + 1, partial: 0, notice: null }
+}
+
+export function previousTutorial(progress: TutorialProgress): TutorialProgress {
+  return { index: Math.max(0, progress.index - 1), partial: 0, notice: null }
 }
 
 export function statusSignal(previous: ExecutionStatus, snapshot: ExecutionSnapshot): TutorialSignal | null {
   const next = snapshot.status
   if (previous === next) return null
-  if (next === 'running') return previous === 'paused' ? 'resume' : 'run'
-  if (next === 'paused' && previous === 'running') return 'pause'
-  if (next === 'idle' && (previous === 'running' || previous === 'paused')) return 'stop'
-  if (next === 'failed') return 'error'
-  if (next === 'finished') return snapshot.validation?.success ? 'success' : 'error'
+  if (next === 'running') return previous === 'paused' ? null : { type: 'run' }
+  if (next === 'idle' && (previous === 'running' || previous === 'paused')) return { type: 'stop' }
+  if (next === 'failed') return { type: 'error' }
+  if (next === 'finished') return snapshot.validation?.success ? { type: 'success' } : { type: 'error' }
   return null
 }
