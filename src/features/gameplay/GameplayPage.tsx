@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'
 import { animate, AnimatePresence, motion, useMotionValue, useTransform } from 'motion/react'
 import { BlocklyEditor } from '@/blocks/editor/BlocklyEditor'
@@ -27,6 +27,9 @@ import { SPRINGS } from '@/motion/springs'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { locateCell } from '@/render/cellLocator'
 import { FarmView } from '@/render/FarmView'
+import { createSignalBus } from '@/features/tutorial/signalBus'
+import type { SideTab, TutorialSignal } from '@/features/tutorial/tutorialTypes'
+import { tabSignals } from '@/features/gameplay/tutorialSignals'
 import { DemoDialog } from '@/features/demo/DemoDialog'
 import { useGameAudio } from '@/services/audio/useGameAudio'
 import { useFlightStore } from '@/stores/flightStore'
@@ -60,14 +63,12 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
   const { snapshot, controller } = session
   useGameAudio(snapshot)
   const launchFlight = useFlightStore((store) => store.launch)
-  const [showBriefing, setShowBriefing] = useState(true)
+  const [showBriefing, setShowBriefing] = useState(!mission.tutorial)
   const [showDemo, setShowDemo] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [stepMode, setStepMode] = useState(false)
   const [sideTab, setSideTab] = useState('console')
   const [pane, setPane] = useState('program')
-  const [blockEvent, setBlockEvent] = useState<{ kind: 'added' | 'removed'; id: number } | null>(null)
-  const blockEventId = useRef(0)
   const highlightCells = useMemo(() => objectiveCells(mission), [mission])
   const succeeded = snapshot.status === 'finished' && snapshot.validation?.success === true
 
@@ -87,10 +88,33 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
     }
   }, [snapshot.lastEvents, decorative, launchFlight])
 
+  const tutorialBus = useMemo(() => createSignalBus<TutorialSignal>(), [])
+  const emitTutorial = useCallback(
+    (signal: TutorialSignal) => {
+      if (mission.tutorial) tutorialBus.emit(signal)
+    },
+    [mission.tutorial, tutorialBus],
+  )
+  const stackSize = session.program?.main.length ?? 0
+  useEffect(() => {
+    emitTutorial({ type: 'stackSize', size: stackSize })
+  }, [stackSize, emitTutorial])
+  const stepOnce = useCallback(() => {
+    session.step()
+    emitTutorial({ type: 'stepped' })
+  }, [session, emitTutorial])
+  const openSideTab = useCallback(
+    (tab: string) => {
+      setSideTab(tab)
+      for (const signal of tabSignals(tab as SideTab, session.canReveal)) emitTutorial(signal)
+    },
+    [session.canReveal, emitTutorial],
+  )
+
   useGameplayShortcuts({
-    run: () => (stepMode ? session.step() : session.run()),
+    run: () => (stepMode ? stepOnce() : session.run()),
     toggle: () => (snapshot.status === 'running' ? controller.pause() : snapshot.status === 'paused' ? controller.resume() : session.run()),
-    step: () => session.step(),
+    step: stepOnce,
     stop: () => controller.stop(),
   })
 
@@ -128,7 +152,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
         data-running={locked}
         style={{ gridTemplateColumns: layoutColumns }}
       >
-        <section className="gameplay__editor" aria-label="Programa" id={panelId('pane', 'program')} aria-labelledby={tabId('pane', 'program')}>
+        <section className="gameplay__editor" data-tutorial="editor" aria-label="Programa" id={panelId('pane', 'program')} aria-labelledby={tabId('pane', 'program')}>
           <BlocklyEditor
             toolbox={session.toolbox}
             initialJson={session.initialJson}
@@ -138,13 +162,10 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             looseBlockIds={session.serialized?.looseBlockIds ?? []}
             onChange={session.onWorkspaceChange}
             onLoadFailed={() => controller.addLog('warning', 'Não foi possível abrir o programa salvo desta fase. O editor foi reiniciado.')}
-            onBlockEvent={(kind) => {
-              blockEventId.current += 1
-              setBlockEvent({ kind, id: blockEventId.current })
-            }}
+            onBlockEvent={(kind) => emitTutorial({ type: kind === 'added' ? 'blockAdded' : 'blockRemoved' })}
           />
         </section>
-        <section className="gameplay__farm" id={panelId('pane', 'farm')} aria-labelledby={tabId('pane', 'farm')}>
+        <section className="gameplay__farm" data-tutorial="farm" id={panelId('pane', 'farm')} aria-labelledby={tabId('pane', 'farm')}>
           <FarmView
             state={snapshot.state}
             lastEvents={snapshot.lastEvents}
@@ -157,7 +178,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             celebrating={succeeded}
           />
           <AnimatePresence>
-            {succeeded && (
+            {succeeded && !mission.tutorial && (
               <motion.div
                 key="celebration"
                 className="gameplay__celebration"
@@ -175,12 +196,10 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
                   transition={{ duration: DURATIONS.burst, ease: EASINGS.easeOutCubic }}
                 />
                 <strong>Missão concluída!</strong>
-                {mission.tutorial && <span> Você completou o treinamento.</span>}
               </motion.div>
             )}
           </AnimatePresence>
           {succeeded && <Confetti seed={`${mission.id}-play`} pieces={40} />}
-          {mission.tutorial && <TutorialOverlay snapshot={snapshot} blockEvent={blockEvent} />}
         </section>
         <aside className="gameplay__side" id={panelId('pane', 'run')} aria-labelledby={tabId('pane', 'run')}>
           <ExecutionPanel
@@ -188,13 +207,16 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             speed={snapshot.speed}
             stepMode={stepMode}
             onRun={session.run}
-            onStep={session.step}
+            onStep={stepOnce}
             onStop={() => controller.stop()}
             onSpeedChange={(speed) => controller.setSpeed(speed)}
-            onStepModeChange={setStepMode}
+            onStepModeChange={(value) => {
+              setStepMode(value)
+              if (value) emitTutorial({ type: 'stepModeOn' })
+            }}
           />
-          <div className="gameplay__side-tabs">
-            <PillTabs items={SIDE_TABS} active={sideTab} onChange={setSideTab} label="Informações da execução" idPrefix="side" variant="underline" />
+          <div className="gameplay__side-tabs" data-tutorial="side">
+            <PillTabs items={SIDE_TABS} active={sideTab} onChange={openSideTab} label="Informações da execução" idPrefix="side" variant="underline" />
             <motion.div
               key={sideTab}
               role="tabpanel"
@@ -212,7 +234,10 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
                   revealed={session.hintsRevealed}
                   canReveal={session.canReveal}
                   failedAttempts={session.failed}
-                  onReveal={session.revealHint}
+                  onReveal={() => {
+                    session.revealHint()
+                    emitTutorial({ type: 'hintRevealed' })
+                  }}
                 />
               )}
               {sideTab === 'pseudocode' && <PseudocodePanel text={session.pseudocode} valid={session.program !== null} />}
@@ -221,6 +246,15 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
         </aside>
       </motion.main>
       <HarvestFlights />
+      {mission.tutorial && (
+        <TutorialOverlay
+          snapshot={snapshot}
+          bus={tutorialBus}
+          facts={{ stackSize, stepMode }}
+          onSideTab={(tab) => setSideTab(tab)}
+          onExit={() => navigate('/missoes')}
+        />
+      )}
       <BriefingDialog
         open={showBriefing}
         mission={mission}

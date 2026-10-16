@@ -36,7 +36,7 @@ export interface HowToBeat {
 export interface HowToSegment {
   label: string
   caption: string
-  duration: number
+  lengthMs: number
   initial: Partial<ReplicaState>
   beats: HowToBeat[]
 }

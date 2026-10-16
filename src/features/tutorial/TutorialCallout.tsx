@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { motion } from 'motion/react'
 import { GameButton } from '@/components/game/GameButton'
 import { placeCallout, type Rect, type Size } from '@/features/tutorial/tutorialGeometry'
 import type { CalloutSide } from '@/features/tutorial/tutorialTypes'
@@ -53,11 +53,9 @@ export function TutorialCallout({ target, prefer, title, text, notice, practice,
       animate="visible"
     >
       <strong className="tutorial-callout__title">{title}</strong>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.p key={text} className="tutorial-callout__text" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: DURATIONS.calloutSwap }}>
-          {text}
-        </motion.p>
-      </AnimatePresence>
+      <motion.p key={text} className="tutorial-callout__text" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: DURATIONS.calloutSwap }}>
+        {text}
+      </motion.p>
       {notice && (
         <p className="tutorial-callout__notice" role="status">
           {notice}

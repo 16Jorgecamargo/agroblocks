@@ -90,11 +90,11 @@ export function GameHud({ mission, resources, onHelp, onSettings, onExit }: Game
   return (
     <motion.header className="game-hud" initial={{ y: -80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={SPRINGS.modal}>
       <Logo />
-      <div className="game-hud__mission">
+      <div className="game-hud__mission" data-tutorial="hud-goal">
         <h1 className="game-hud__title">{mission.tutorial ? mission.title : `Fase ${mission.order} - ${mission.title}`}</h1>
         <p className="game-hud__goal">{mission.briefing.goalText}</p>
       </div>
-      <div className="game-hud__resources" aria-label="Recursos">
+      <div className="game-hud__resources" aria-label="Recursos" data-tutorial="hud-harvest">
         {visible.has('seeds') && <ResourceChip icon="seed" label="Sementes" value={resources.seeds} max={maxima.seeds} tone="seed" />}
         {visible.has('water') && <ResourceChip icon="drop" label="Água" value={resources.water} max={maxima.water} tone="water" />}
         {visible.has('energy') && <ResourceChip icon="bolt" label="Energia" value={resources.energy} max={maxima.energy} tone="energy" />}
@@ -102,7 +102,7 @@ export function GameHud({ mission, resources, onHelp, onSettings, onExit }: Game
           <ResourceChip icon="basket" label="Colheita" value={resources.harvested} max={null} tone="harvest" flightTarget popKey={arrivals} />
         )}
       </div>
-      <div className="game-hud__actions">
+      <div className="game-hud__actions" data-tutorial="hud-actions">
         <GameButton tone="dark" icon="help" className="hud-button hud-button--square" onClick={onHelp} aria-label="Ver objetivo e conceito da fase" />
         <GameButton tone="dark" icon="gear" className="hud-button hud-button--square" onClick={onSettings} aria-label="Configurações" />
         <GameButton tone="danger" className="hud-button hud-button--exit" onClick={onExit}>

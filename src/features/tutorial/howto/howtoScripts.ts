@@ -54,7 +54,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Adicionar',
         caption: 'Clique em Movimento, segure o bloco "mover para frente" e solte dentro de "quando executar".',
-        duration: 4200,
+        lengthMs: 4200,
         initial: { stack: [] },
         beats: [idle(0, REST), ...openMovementAndDrag(600, stackBlockAt(0), [MOVE]), idle(4200, REST)],
       },
@@ -68,7 +68,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Encaixar',
         caption: 'Arraste outro bloco e solte logo embaixo do primeiro: ele encaixa sozinho.',
-        duration: 4200,
+        lengthMs: 4200,
         initial: { stack: [MOVE] },
         beats: [idle(0, REST), ...openMovementAndDrag(600, stackBlockAt(1), [MOVE, MOVE]), idle(4200, REST)],
       },
@@ -82,7 +82,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Lixeira',
         caption: 'Arraste o bloco até a lixeira e solte.',
-        duration: 3400,
+        lengthMs: 3400,
         initial: { stack: [MOVE, MOVE] },
         beats: [
           idle(0, REST),
@@ -96,7 +96,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Biblioteca',
         caption: 'Ou arraste o bloco de volta para as categorias, à esquerda.',
-        duration: 3400,
+        lengthMs: 3400,
         initial: { stack: [MOVE, MOVE] },
         beats: [
           idle(0, REST),
@@ -110,7 +110,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Delete',
         caption: 'Ou clique no bloco para selecionar e aperte a tecla Delete.',
-        duration: 3400,
+        lengthMs: 3400,
         initial: { stack: [MOVE, MOVE] },
         beats: [
           idle(0, REST),
@@ -133,7 +133,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Pseudocódigo',
         caption: 'Clique na aba Pseudocódigo: o programa aparece escrito em texto.',
-        duration: 2800,
+        lengthMs: 2800,
         initial: { stack: [MOVE] },
         beats: [idle(0, SIDE_REST), idle(700, TAB_POINTS.pseudocode), press(1000, TAB_POINTS.pseudocode, { tab: 'pseudocode' }), idle(1300, TAB_POINTS.pseudocode), idle(2800, SIDE_REST)],
       },
@@ -147,7 +147,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Executar e Parar',
         caption: 'Clique em Executar. Enquanto o robô anda, clique em Parar: tudo volta ao início.',
-        duration: 5200,
+        lengthMs: 5200,
         initial: { stack: [MOVE, MOVE] },
         beats: [
           idle(0, REST),
@@ -170,7 +170,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Passo a passo',
         caption: 'Ligue Passo a passo e clique em Próximo: o robô faz um bloco por clique.',
-        duration: 5600,
+        lengthMs: 5600,
         initial: { stack: [MOVE, MOVE] },
         beats: [
           idle(0, REST),
@@ -195,7 +195,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Dicas',
         caption: 'Abra a aba Dicas e clique em "Pedir dica".',
-        duration: 3800,
+        lengthMs: 3800,
         initial: {},
         beats: [
           idle(0, SIDE_REST),
@@ -218,7 +218,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Experimento',
         caption: 'Com três "mover para frente", o robô passa da planta e bate na pedra. O Console explica o erro.',
-        duration: 5800,
+        lengthMs: 5800,
         initial: { stack: [MOVE, MOVE, MOVE, HARVEST] },
         beats: [
           idle(0, REST),
@@ -241,7 +241,7 @@ export const HOWTO_SCRIPTS: Record<HowToId, HowToScript> = {
       {
         label: 'Corrigir',
         caption: 'Selecione um "mover para frente" a mais, aperte Delete e execute de novo: o robô colhe a planta.',
-        duration: 6400,
+        lengthMs: 6400,
         initial: { stack: [MOVE, MOVE, MOVE, HARVEST] },
         beats: [
           idle(0, REST),

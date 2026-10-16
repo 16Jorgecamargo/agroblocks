@@ -4,7 +4,7 @@ import type { HowToSegment } from '@/features/tutorial/howto/howtoTypes'
 const segment: HowToSegment = {
   label: 'Teste',
   caption: 'Legenda',
-  duration: 2000,
+  lengthMs: 2000,
   initial: { stack: ['mover para frente'] },
   beats: [
     { at: 0, hand: { x: 0, y: 0, mode: 'idle' } },

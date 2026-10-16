@@ -31,7 +31,7 @@ export function HowToDialog({ open, howTo, onPractice }: HowToDialogProps) {
 
   useEffect(() => {
     if (reduced || script.segments.length < 2 || !open) return
-    const cycle = script.segments[segment].duration + DURATIONS.howtoLoopPause * 1000
+    const cycle = script.segments[segment].lengthMs + DURATIONS.howtoLoopPause * 1000
     const timer = window.setTimeout(() => setSegment((value) => (value + 1) % script.segments.length), cycle)
     return () => window.clearTimeout(timer)
   }, [reduced, script, segment, open, playKey])

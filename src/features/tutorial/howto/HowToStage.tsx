@@ -29,8 +29,8 @@ export function HowToStage({ script, segment, reduced, playKey }: HowToStageProp
   useAnimationFrame((now) => {
     if (reduced) return
     if (started.current === null) started.current = now
-    const cycle = chosen.duration + DURATIONS.howtoLoopPause * 1000
-    setTime(Math.min((now - started.current) % cycle, chosen.duration))
+    const cycle = chosen.lengthMs + DURATIONS.howtoLoopPause * 1000
+    setTime(Math.min((now - started.current) % cycle, chosen.lengthMs))
   })
 
   const beats = chosen.beats

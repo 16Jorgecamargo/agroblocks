@@ -5,7 +5,7 @@ import { TUTORIAL_STEPS } from '@/features/tutorial/tutorialScript'
 
 const end = (id: keyof typeof HOWTO_SCRIPTS, segment = 0) => {
   const chosen = HOWTO_SCRIPTS[id].segments[segment]
-  return replicaAt(chosen, chosen.duration).state
+  return replicaAt(chosen, chosen.lengthMs).state
 }
 
 describe('HOWTO_SCRIPTS', () => {
@@ -18,7 +18,7 @@ describe('HOWTO_SCRIPTS', () => {
       for (const segment of script.segments) {
         const times = segment.beats.map((beat) => beat.at)
         expect(times).toEqual([...times].sort((a, b) => a - b))
-        expect(times.at(-1)).toBeLessThanOrEqual(segment.duration)
+        expect(times.at(-1)).toBeLessThanOrEqual(segment.lengthMs)
       }
     }
   })
@@ -39,7 +39,7 @@ describe('HOWTO_SCRIPTS', () => {
   it('drops the dragged block and closes the trash by the end of every segment', () => {
     for (const script of Object.values(HOWTO_SCRIPTS)) {
       for (const segment of script.segments) {
-        const state = replicaAt(segment, segment.duration).state
+        const state = replicaAt(segment, segment.lengthMs).state
         expect(state.dragging).toBeNull()
         expect(state.trashOpen).toBe(false)
         expect(state.keyDown).toBe(false)

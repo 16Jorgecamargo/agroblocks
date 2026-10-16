@@ -48,7 +48,7 @@ export function ExecutionPanel(props: ExecutionPanelProps) {
   }, [status, animatePanel, scope])
 
   return (
-    <section ref={scope} className="execution-panel" aria-labelledby="execution-title">
+    <section ref={scope} className="execution-panel" aria-labelledby="execution-title" data-tutorial="execution">
       <h2 id="execution-title" className="side-title">
         Execução
       </h2>

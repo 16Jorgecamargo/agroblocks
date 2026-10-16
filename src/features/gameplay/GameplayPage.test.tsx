@@ -152,4 +152,27 @@ describe('GameplayPage', () => {
     })
     expect(useFlightStore.getState().flights.length + useFlightStore.getState().arrivals).toBeGreaterThan(0)
   })
+
+  it('opens the training with the tutorial welcome instead of the briefing', () => {
+    renderAt('/jogar/m0-training')
+    expect(screen.getByRole('dialog', { name: 'Bem-vindo ao treinamento' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Objetivo' })).not.toBeInTheDocument()
+  })
+
+  it('marks the real screen areas the tutorial points at', () => {
+    renderAt('/jogar/m0-training')
+    for (const target of ['hud-goal', 'hud-harvest', 'hud-actions', 'farm', 'editor', 'execution', 'side']) {
+      expect(document.querySelector(`[data-tutorial="${target}"]`)).not.toBeNull()
+    }
+  })
+
+  it('counts opening Dicas as the reveal when no hint can be revealed', () => {
+    useProgressStore.setState((state) => ({
+      save: { ...state.save, missions: { ...state.save.missions, 'm0-training': { ...state.save.missions['m0-training'], hintsUsed: 3 } } },
+    }))
+    renderAt('/jogar/m0-training')
+    fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
+    for (let index = 0; index < 2; index += 1) fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
+    expect(screen.getByTestId('tutorial-progress')).toHaveTextContent('4/15')
+  })
 })
