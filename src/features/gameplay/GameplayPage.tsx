@@ -88,6 +88,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
     }
   }, [snapshot.lastEvents, decorative, launchFlight])
 
+  const recordTutorial = useProgressStore((store) => store.recordTutorial)
   const tutorialBus = useMemo(() => createSignalBus<TutorialSignal>(), [])
   const emitTutorial = useCallback(
     (signal: TutorialSignal) => {
@@ -252,7 +253,10 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
           bus={tutorialBus}
           facts={{ stackSize, stepMode }}
           onSideTab={(tab) => setSideTab(tab)}
-          onExit={() => navigate('/missoes')}
+          onExit={(outcome) => {
+            recordTutorial(outcome.status, outcome.step)
+            navigate('/missoes')
+          }}
         />
       )}
       <BriefingDialog

@@ -175,4 +175,13 @@ describe('GameplayPage', () => {
     for (let index = 0; index < 2; index += 1) fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
     expect(screen.getByTestId('tutorial-progress')).toHaveTextContent('6/15')
   })
+
+  it('records a skipped tutorial on the run', () => {
+    useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
+    renderAt('/jogar/m0-training')
+    fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Pular tutorial' }))
+    fireEvent.click(within(screen.getAllByRole('dialog', { name: 'Sair do treinamento?' }).at(-1) as HTMLElement).getByRole('button', { name: 'Sair do treinamento' }))
+    expect(useProgressStore.getState().save.tutorial).toMatchObject({ status: 'skipped', step: 2 })
+  })
 })

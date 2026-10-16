@@ -23,7 +23,7 @@ interface TutorialOverlayProps {
   bus: SignalBus<TutorialSignal>
   facts: TutorialFacts
   onSideTab: (tab: SideTab) => void
-  onExit: () => void
+  onExit: (outcome: { status: 'completed' | 'skipped'; step: number }) => void
 }
 
 const NO_TARGETS: TutorialTarget[] = []
@@ -108,7 +108,7 @@ export function TutorialOverlay({ snapshot, bus, facts, onSideTab, onExit }: Tut
               Começar treinamento
             </GameButton>
           ) : (
-            <GameButton tone="primary" size="lg" icon="forward" onClick={onExit}>
+            <GameButton tone="primary" size="lg" icon="forward" onClick={() => onExit({ status: 'completed', step: progress.index + 1 })}>
               Ir para as missões
             </GameButton>
           )}
@@ -122,7 +122,7 @@ export function TutorialOverlay({ snapshot, bus, facts, onSideTab, onExit }: Tut
           <GameButton tone="secondary" onClick={() => setConfirmSkip(false)}>
             Continuar treinamento
           </GameButton>
-          <GameButton tone="danger" onClick={onExit}>
+          <GameButton tone="danger" onClick={() => onExit({ status: 'skipped', step: progress.index + 1 })}>
             Sair do treinamento
           </GameButton>
         </DialogSection>

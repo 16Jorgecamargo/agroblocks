@@ -75,7 +75,7 @@ describe('TutorialOverlay', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Próximo' }))
     expect(screen.getByRole('dialog', { name: 'Treinamento concluído!' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Ir para as missões' }))
-    expect(onExit).toHaveBeenCalledTimes(1)
+    expect(onExit).toHaveBeenCalledWith({ status: 'completed', step: 15 })
   })
 
   it('completes a step at once when its condition is already true on entry', () => {
@@ -124,7 +124,7 @@ describe('TutorialOverlay', () => {
     expect(onExit).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Pular tutorial' }))
     fireEvent.click(within(screen.getAllByRole('dialog', { name: 'Sair do treinamento?' }).at(-1) as HTMLElement).getByRole('button', { name: 'Sair do treinamento' }))
-    expect(onExit).toHaveBeenCalledTimes(1)
+    expect(onExit).toHaveBeenCalledWith({ status: 'skipped', step: 2 })
   })
 
   it('goes back with Anterior', () => {
