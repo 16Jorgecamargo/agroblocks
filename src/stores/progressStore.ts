@@ -1,14 +1,17 @@
 import { create } from 'zustand'
 import { MISSIONS } from '@/data/missions'
 import {
+  assignStudent,
   createInitialSave,
   recordAttempt,
+  recordTutorial as recordTutorialOutcome,
   registerHint,
   storeAssessment,
   storeProgram,
 } from '@/game/progress/progression'
 import type { AssessmentResponse, AttemptInput, AttemptRecord, SaveData } from '@/game/progress/types'
 import { safeStorage } from '@/services/storage/jsonStorage'
+import type { StudentInfo } from '@/shared/student'
 import { loadSave, writeSave } from '@/services/storage/saveStorage'
 
 const missionRefs = MISSIONS.map(({ id, order }) => ({ id, order }))
@@ -20,6 +23,9 @@ interface ProgressState {
   storeProgram: (missionId: string, json: string) => void
   storeAssessment: (response: AssessmentResponse) => void
   resetProgress: () => void
+  startRun: (student: StudentInfo) => void
+  registerStudent: (student: StudentInfo) => void
+  recordTutorial: (status: 'completed' | 'skipped', step: number) => void
 }
 
 export const useProgressStore = create<ProgressState>((set, get) => {
@@ -40,5 +46,11 @@ export const useProgressStore = create<ProgressState>((set, get) => {
     storeProgram: (missionId, json) => commit(storeProgram(get().save, missionId, json)),
     storeAssessment: (response) => commit(storeAssessment(get().save, response)),
     resetProgress: () => commit(createInitialSave(missionRefs, new Date().toISOString())),
+    startRun: (student) => commit(assignStudent(createInitialSave(missionRefs, new Date().toISOString()), student, crypto.randomUUID())),
+    registerStudent: (student) => {
+      const save = get().save
+      commit(assignStudent(save, student, save.runId ?? crypto.randomUUID()))
+    },
+    recordTutorial: (status, step) => commit(recordTutorialOutcome(get().save, { status, step, at: new Date().toISOString() })),
   }
 })
