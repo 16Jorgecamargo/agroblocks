@@ -97,9 +97,10 @@
   translate: -50% 0;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
+  gap: var(--space-2);
+  padding: var(--space-2);
   border-radius: 16px;
+  white-space: nowrap;
   background: rgb(19 31 41 / 0.92);
   color: #ffffff;
   box-shadow: 0 12px 30px rgb(0 0 0 / 0.35);
@@ -117,25 +118,20 @@
   font-size: var(--text-sm);
 }
 
-.tutorial-bar__dots {
-  display: inline-flex;
-  gap: 5px;
+.tutorial-bar__meter {
+  width: 72px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.25);
+  overflow: hidden;
 }
 
-.tutorial-bar__dots span {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.3);
-}
-
-.tutorial-bar__dots span.is-done {
-  background: rgb(92 191 79 / 0.7);
-}
-
-.tutorial-bar__dots span.is-current {
+.tutorial-bar__meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
   background: #5cbf4f;
+  transition: width 0.3s ease-out;
 }
 
 .tutorial-intro__text {

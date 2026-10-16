@@ -1,23 +1,27 @@
 import { motion } from 'motion/react'
 import { GameButton } from '@/components/game/GameButton'
-import { EASINGS } from '@/motion/easings'
-import { DURATIONS } from '@/motion/presets'
-import { useMotionPrefs } from '@/motion/useMotionPrefs'
 
 interface TutorialBarProps {
   index: number
   total: number
   practice: boolean
+  centerX: number | null
   onPrevious: () => void
   onNext: () => void
   onShowHowTo: () => void
   onSkip: () => void
 }
 
-export function TutorialBar({ index, total, practice, onPrevious, onNext, onShowHowTo, onSkip }: TutorialBarProps) {
-  const { ambient } = useMotionPrefs()
+export function TutorialBar({ index, total, practice, centerX, onPrevious, onNext, onShowHowTo, onSkip }: TutorialBarProps) {
   return (
-    <motion.div className="tutorial-bar" role="toolbar" aria-label="Tutorial" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+    <motion.div
+      className="tutorial-bar"
+      role="toolbar"
+      aria-label="Tutorial"
+      style={{ left: centerX === null ? '50%' : `${centerX}px` }}
+      initial={{ y: 40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+    >
       <GameButton tone="dark" icon="back" onClick={onPrevious} disabled={index === 0} aria-label="Passo anterior" />
       <GameButton tone="ghost" className="tutorial-bar__skip" onClick={onSkip}>
         Pular tutorial
@@ -26,15 +30,8 @@ export function TutorialBar({ index, total, practice, onPrevious, onNext, onShow
         <span data-testid="tutorial-progress">
           {index + 1}/{total}
         </span>
-        <span className="tutorial-bar__dots" aria-hidden="true">
-          {Array.from({ length: total }, (_, position) => (
-            <motion.span
-              key={position}
-              className={position < index ? 'is-done' : position === index ? 'is-current' : ''}
-              animate={position === index && ambient ? { y: [0, -3, 0] } : { y: 0 }}
-              transition={position === index && ambient ? { duration: DURATIONS.tutorialDot, repeat: Infinity, ease: EASINGS.easeOutCubic } : { duration: DURATIONS.quickExit }}
-            />
-          ))}
+        <span className="tutorial-bar__meter" aria-hidden="true">
+          <span className="tutorial-bar__meter-fill" style={{ width: `${((index + 1) / total) * 100}%` }} />
         </span>
       </span>
       {practice ? (

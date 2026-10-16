@@ -27,6 +27,7 @@ interface TutorialOverlayProps {
 }
 
 const NO_TARGETS: TutorialTarget[] = []
+const BAR_COLUMN: TutorialTarget[] = ['farm']
 
 export function TutorialOverlay({ snapshot, bus, facts, onSideTab, onExit }: TutorialOverlayProps) {
   const [progress, setProgress] = useState(TUTORIAL_START)
@@ -60,6 +61,7 @@ export function TutorialOverlay({ snapshot, bus, facts, onSideTab, onExit }: Tut
   const guided = step.kind === 'tour' || step.kind === 'practice'
   const targets = guided ? step.targets : NO_TARGETS
   const rects = useTargetRects(targets)
+  const [column] = useTargetRects(BAR_COLUMN)
   const practice = step.kind === 'practice'
   const text = practice && progress.partial > 0 ? (step.followUps?.[progress.partial - 1] ?? step.text) : step.text
   const showGuide = guided && !(practice && howToOpen)
@@ -84,6 +86,7 @@ export function TutorialOverlay({ snapshot, bus, facts, onSideTab, onExit }: Tut
           index={progress.index}
           total={TUTORIAL_STEPS.length}
           practice={practice}
+          centerX={column ? column.x + column.width / 2 : null}
           onPrevious={() => setProgress(previousTutorial)}
           onNext={() => setProgress(nextTutorial)}
           onShowHowTo={() => setHowToOpen(true)}
