@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { GameplayPage } from '@/features/gameplay/GameplayPage'
 import { useProgressStore } from '@/stores/progressStore'
@@ -102,10 +102,25 @@ describe('GameplayPage', () => {
     expect(attempt.pseudocode).toContain('virar à direita')
   })
 
-  it('starts the student program instead of resuming a paused demonstration', () => {
+  it('shows the demonstration in its own dialog and leaves the program and console untouched', () => {
     renderAt('/jogar/m1-first-harvest')
     fireEvent.click(screen.getByRole('button', { name: /Ver demonstração/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
+    expect(screen.getByRole('dialog', { name: 'Demonstração' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Demonstração: o robô na fazenda' })).toBeInTheDocument()
+    act(() => {
+      vi.advanceTimersByTime(5000)
+    })
+    expect(screen.getByRole('log')).not.toHaveTextContent('Demonstração')
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Demonstração' })).getByRole('button', { name: 'Voltar' }))
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(screen.getByRole('heading', { name: 'Objetivo' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Ver demonstração/ }))
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Demonstração' })).getByRole('button', { name: 'Começar' }))
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
     act(() => {
       vi.advanceTimersByTime(10000)

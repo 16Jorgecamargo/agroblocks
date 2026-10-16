@@ -37,7 +37,6 @@ export function useGameplaySession(mission: MissionDefinition) {
   const saveTimer = useRef<number | null>(null)
   const repetitionTipShown = useRef(false)
   const recordedRunId = useRef<number | null>(null)
-  const demoRunId = useRef<number | null>(null)
   const runMeta = useRef<{ runId: number; blockCount: number; pseudocode: string } | null>(null)
 
   const onWorkspaceChange = useCallback(
@@ -82,12 +81,6 @@ export function useGameplaySession(mission: MissionDefinition) {
     for (const warning of serialized.warnings) controller.addLog('warning', warning.message)
   }, [serialized, controller])
 
-  const leaveDemo = useCallback(() => {
-    const current = controller.getSnapshot()
-    const demoActive = demoRunId.current === current.runId && (current.status === 'running' || current.status === 'paused')
-    if (demoActive) controller.reset()
-  }, [controller])
-
   const rememberRun = useCallback(() => {
     const runId = controller.getSnapshot().runId
     if (runMeta.current?.runId === runId) return
@@ -97,32 +90,21 @@ export function useGameplaySession(mission: MissionDefinition) {
   const run = useCallback(() => {
     const ready = readyProgram()
     if (!ready) return
-    leaveDemo()
     controller.run(ready)
     rememberRun()
     logWarnings()
-  }, [readyProgram, controller, logWarnings, leaveDemo, rememberRun])
+  }, [readyProgram, controller, logWarnings, rememberRun])
 
   const step = useCallback(() => {
     const ready = readyProgram()
     if (!ready) return
-    leaveDemo()
     controller.step(ready)
     rememberRun()
-  }, [readyProgram, controller, leaveDemo, rememberRun])
-
-  const runDemo = useCallback(() => {
-    const demo = mission.briefing.demo
-    if (!demo) return
-    controller.reset()
-    controller.addLog('info', 'Demonstração: observe o que o robô faz. Depois clique em Parar e monte o seu programa.')
-    controller.run(demo)
-    demoRunId.current = controller.getSnapshot().runId
-  }, [mission, controller])
+  }, [readyProgram, controller, rememberRun])
 
   useEffect(() => {
     const ended = snapshot.status === 'finished' || snapshot.status === 'failed'
-    if (!ended || recordedRunId.current === snapshot.runId || demoRunId.current === snapshot.runId) return
+    if (!ended || recordedRunId.current === snapshot.runId) return
     recordedRunId.current = snapshot.runId
     const meta = runMeta.current?.runId === snapshot.runId ? runMeta.current : null
     const blockCount = meta ? meta.blockCount : serialized?.ok ? serialized.blockCount : 0
@@ -156,7 +138,6 @@ export function useGameplaySession(mission: MissionDefinition) {
     onWorkspaceChange,
     run,
     step,
-    runDemo,
     hintsRevealed,
     canReveal,
     failed,

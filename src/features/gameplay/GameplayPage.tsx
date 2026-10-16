@@ -27,6 +27,7 @@ import { SPRINGS } from '@/motion/springs'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { locateCell } from '@/render/cellLocator'
 import { FarmView } from '@/render/FarmView'
+import { DemoDialog } from '@/features/demo/DemoDialog'
 import { useGameAudio } from '@/services/audio/useGameAudio'
 import { useFlightStore } from '@/stores/flightStore'
 import { useProgressStore } from '@/stores/progressStore'
@@ -60,6 +61,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
   useGameAudio(snapshot)
   const launchFlight = useFlightStore((store) => store.launch)
   const [showBriefing, setShowBriefing] = useState(true)
+  const [showDemo, setShowDemo] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [stepMode, setStepMode] = useState(false)
   const [sideTab, setSideTab] = useState('console')
@@ -225,8 +227,17 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
         onStart={() => setShowBriefing(false)}
         onDemo={() => {
           setShowBriefing(false)
-          session.runDemo()
+          setShowDemo(true)
         }}
+      />
+      <DemoDialog
+        open={showDemo}
+        mission={mission}
+        onBack={() => {
+          setShowDemo(false)
+          setShowBriefing(true)
+        }}
+        onStart={() => setShowDemo(false)}
       />
       <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
     </div>
