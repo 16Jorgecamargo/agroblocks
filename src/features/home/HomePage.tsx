@@ -45,12 +45,14 @@ export function HomePage() {
         <Link to="/painel">Painel do professor</Link>
       </motion.nav>
       <motion.header className="home__hero" variants={staggerContainer(0.1, 0.1)} initial="hidden" animate="visible">
-        <motion.h1 className="home__brand" variants={softRise}>
-          <Logo size="lg" animated={ambient} />
-        </motion.h1>
-        <motion.p className="home__tagline" variants={staggerItem}>
-          Automatize. Programe. Cultive.
-        </motion.p>
+        <div className="home__lockup">
+          <motion.h1 className="home__brand" variants={softRise}>
+            <Logo size="lg" animated={ambient} />
+          </motion.h1>
+          <motion.p className="home__tagline" variants={staggerItem}>
+            Automatize. Programe. Cultive.
+          </motion.p>
+        </div>
         <motion.p className="home__intro" variants={staggerItem}>
           Construa algoritmos, controle robôs e transforme sua fazenda em um sistema inteligente.
         </motion.p>

@@ -59,12 +59,18 @@
   margin: 0;
 }
 
+.home__lockup {
+  display: grid;
+  justify-items: end;
+}
+
 .home__tagline {
-  margin: -0.2em 0 0;
-  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
-  font-weight: 800;
-  color: #1f5a2c;
-  text-shadow: 0 1px 0 rgb(255 255 255 / 0.7);
+  margin: -0.15em 0.2em 0 0;
+  font-family: var(--font-logo);
+  font-size: clamp(1rem, 1.85vw, 1.4rem);
+  font-weight: 700;
+  color: #1f6a30;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.8), 0 0 6px rgb(255 255 255 / 0.5);
 }
 
 .home__intro {
