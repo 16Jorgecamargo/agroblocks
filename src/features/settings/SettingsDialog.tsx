@@ -9,7 +9,6 @@ import { SPEEDS, type Speed } from '@/game/execution/types'
 import { fadeSlide, NUDGE } from '@/motion/presets'
 import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import type { Settings } from '@/services/storage/settingsStorage'
 import './SettingsDialog.css'
 
 const TABS: TabItem[] = [
@@ -123,14 +122,6 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
                   checked={settings.lowGraphics}
                   onChange={(on) => update({ lowGraphics: on })}
                 />
-                <label className="field">
-                  <span className="field__label">Visualização da fazenda</span>
-                  <select value={settings.renderMode} onChange={(event) => update({ renderMode: event.target.value as Settings['renderMode'] })}>
-                    <option value="auto">Automática</option>
-                    <option value="3d">3D</option>
-                    <option value="2d">2D (grade simples)</option>
-                  </select>
-                </label>
               </>
             )}
             {tab === 'controls' && (

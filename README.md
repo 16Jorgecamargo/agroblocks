@@ -18,7 +18,7 @@ Jogo educativo de automação agrícola e programação visual para o Ensino Mé
 ## Requisitos
 
 - Node.js 20.19 ou superior (testado com Node 22) e npm 10.
-- Navegador moderno com WebGL para a fazenda 3D (há modo 2D automático sem WebGL).
+- Navegador moderno com WebGL. A fazenda é sempre 3D; só um navegador sem WebGL cai numa grade 2D simples.
 
 ## Instalação e execução
 

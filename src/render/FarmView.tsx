@@ -60,15 +60,15 @@ function ToolButton({ wide = false, children, ...rest }: ToolButtonProps) {
 }
 
 export function FarmView(props: FarmViewProps) {
-  const { renderMode, lowGraphics } = useSettingsStore((store) => store.settings)
+  const { lowGraphics } = useSettingsStore((store) => store.settings)
   const reducedMotion = useReducedMotion()
   const { decorative } = useMotionPrefs()
   const webgl = useMemo(() => hasWebGL(), [])
   const [quarterTurns, setQuarterTurns] = useState(0)
   const [zoomIndex, setZoomIndex] = useState(2)
   const [showLegend, setShowLegend] = useState(false)
-  const use3d = renderMode !== '2d' && webgl
-  const missingWebgl = renderMode !== '2d' && !webgl
+  const use3d = webgl
+  const missingWebgl = !webgl
 
   return (
     <section className="farm-view" aria-label="Fazenda">

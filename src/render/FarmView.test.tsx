@@ -16,21 +16,15 @@ describe('FarmView', () => {
     seedKey: 'test',
   }
 
-  it('uses the 2D grid when 2D mode is selected', () => {
-    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, renderMode: '2d' } })
-    render(<FarmView {...props} />)
-    expect(screen.getByRole('grid', { name: 'Mapa da fazenda' })).toBeInTheDocument()
-  })
-
-  it('falls back to 2D with a notice when WebGL is unavailable', () => {
-    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, renderMode: 'auto' } })
+  it('falls back to 2D with a notice only when WebGL is unavailable, ignoring an old 2D preference', () => {
+    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, ...({ renderMode: '2d' } as object) } })
     render(<FarmView {...props} />)
     expect(screen.getByRole('grid', { name: 'Mapa da fazenda' })).toBeInTheDocument()
     expect(screen.getByText(/3D não está disponível/)).toBeInTheDocument()
   })
 
   it('announces the robot description for screen readers', () => {
-    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, renderMode: '2d' } })
+    useSettingsStore.setState({ settings: DEFAULT_SETTINGS })
     render(<FarmView {...props} />)
     expect(screen.getByText(/Robô na coluna 1, linha 1/)).toHaveAttribute('aria-live', 'polite')
   })

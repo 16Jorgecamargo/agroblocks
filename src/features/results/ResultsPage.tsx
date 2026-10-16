@@ -25,7 +25,6 @@ export function ResultsPage() {
   const { missionId = '' } = useParams()
   const mission = getMission(missionId)
   const save = useProgressStore((store) => store.save)
-  const renderMode = useSettingsStore((store) => store.settings.renderMode)
   const lowGraphics = useSettingsStore((store) => store.settings.lowGraphics)
   const { reduced } = useMotionPrefs()
   const webgl = useMemo(() => hasWebGL(), [])
@@ -39,7 +38,7 @@ export function ResultsPage() {
   const previous = previousBestBefore(save, attempt)
   const progress = save.missions[mission.id]
   const next = nextStep(mission, save)
-  const show3d = renderMode !== '2d' && webgl
+  const show3d = webgl
 
   return (
     <div className="results">

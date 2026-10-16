@@ -28,7 +28,7 @@ async function calloutClearOfTarget(page: Page, target: string) {
 }
 
 test('the training teaches every part of the screen with real actions', async ({ page }) => {
-  test.setTimeout(120_000)
+  test.setTimeout(240_000)
   await seedStorage(page, { settings: { motion: 'reduced' } })
   await openMission(page, 'm0-training')
   await progress(page, '2/15')

@@ -32,7 +32,7 @@ export function saveWithProgram(missionId: string, program: Program, completed: 
 }
 
 export async function seedStorage(page: Page, options: { settings?: Partial<Settings>; save?: SaveData }): Promise<void> {
-  const settings = { ...DEFAULT_SETTINGS, renderMode: '2d', motion: 'reduced', defaultSpeed: 4, soundEnabled: false, ...options.settings }
+  const settings = { ...DEFAULT_SETTINGS, motion: 'reduced', lowGraphics: true, defaultSpeed: 4, ...options.settings }
   await page.addInitScript(
     ({ settingsKey, settingsValue, saveKey, saveValue }) => {
       if (!window.localStorage.getItem(settingsKey)) window.localStorage.setItem(settingsKey, settingsValue)

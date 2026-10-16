@@ -30,11 +30,11 @@ describe('SettingsDialog', () => {
     expect(useSettingsStore.getState().settings.theme).toBe('dark')
   })
 
-  it('switches tabs and changes the render mode', async () => {
+  it('offers no 2D view: the farm is always 3D', async () => {
     renderDialog()
     fireEvent.click(screen.getByRole('tab', { name: /Visual/ }))
-    fireEvent.change(await screen.findByLabelText('Visualização da fazenda'), { target: { value: '2d' } })
-    expect(useSettingsStore.getState().settings.renderMode).toBe('2d')
+    expect(await screen.findByRole('switch', { name: 'Gráficos leves' })).toBeInTheDocument()
+    expect(screen.queryByLabelText('Visualização da fazenda')).not.toBeInTheDocument()
   })
 
   it('asks for confirmation before resetting progress', async () => {

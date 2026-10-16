@@ -37,7 +37,7 @@ test('step mode executes one instruction per click', async ({ page }) => {
   await page.getByRole('button', { name: 'Próximo' }).click()
   await expect(page.getByRole('log').getByText(/Robô: mover para frente/)).toHaveCount(2)
   await expect(page.getByRole('group', { name: 'Controles do passo a passo' }).getByRole('button', { name: 'Parar' })).toBeVisible()
-  await expect(page.getByRole('gridcell', { name: /coluna 1, linha 3: .*robô/ })).toBeVisible()
+  await expect(page.getByText(/Robô na coluna 1, linha 3/)).toBeAttached()
 })
 
 test('completes a phase, shows the result and advances to the next phase', async ({ page }) => {
@@ -82,7 +82,7 @@ test('the dashboard shows real recorded data and the empty state before it', asy
 test('renders the 3D farm without runtime errors', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' } })
   await openMission(page, 'm1-first-harvest')
   await expect(page.locator('.farm-view canvas')).toBeVisible()
   await page.waitForTimeout(1500)
@@ -90,6 +90,7 @@ test('renders the 3D farm without runtime errors', async ({ page }) => {
 })
 
 test('the workspace cannot be edited while the program runs', async ({ page }) => {
+  test.setTimeout(120_000)
   await seedStorage(page, { settings: { defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
   await openMission(page, 'm1-first-harvest')
   await page.locator('.blocklyBlockCanvas .blocklyDraggable').filter({ hasText: 'colher planta' }).last().click()
@@ -97,7 +98,7 @@ test('the workspace cannot be edited while the program runs', async ({ page }) =
   await expect(page.getByRole('button', { name: 'Parar' })).toBeVisible()
   const remove = page.locator('.blocklyContextMenu .blocklyMenuItem').filter({ hasText: /xcluir|eletar|pagar/i }).first()
   if (await remove.isVisible()) await remove.click({ force: true })
-  await expect(page.getByRole('log')).toContainText('Missão cumprida!', { timeout: 30_000 })
+  await expect(page.getByRole('log')).toContainText('Missão cumprida!', { timeout: 60_000 })
   const attempt = await page.evaluate(() => JSON.parse(window.localStorage.getItem('agroblocks:v1') ?? '{}').attempts[0])
   expect(attempt.blocks).toBe(8)
   await page.keyboard.press('Escape')
@@ -159,7 +160,7 @@ test('the program view follows the block being executed', async ({ page }) => {
 
 test('the farm panel opens and closes over a fixed, centered 3D view', async ({ page }) => {
   const short = program([act('moveForward'), act('moveForward')])
-  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full', defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', short) })
+  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', short) })
   await openMission(page, 'm1-first-harvest')
   await expect(page.locator('.farm-view canvas')).toBeVisible()
   const measure = () =>

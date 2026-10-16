@@ -23,7 +23,7 @@ interface DemoDialogProps {
 }
 
 function DemoStage({ mission }: { mission: MissionDefinition }) {
-  const { renderMode, lowGraphics } = useSettingsStore((store) => store.settings)
+  const { lowGraphics } = useSettingsStore((store) => store.settings)
   const reducedMotion = useReducedMotion()
   const webgl = useMemo(() => hasWebGL(), [])
   const frames = useMemo(() => demoFrames(mission), [mission])
@@ -31,7 +31,7 @@ function DemoStage({ mission }: { mission: MissionDefinition }) {
   const frame = frames[index]
   if (!frame) return null
   const eventKey = cycle * frames.length + index
-  const use3d = renderMode !== '2d' && webgl
+  const use3d = webgl
 
   return (
     <div className="demo-dialog__stage" role="img" aria-label="Demonstração: o robô na fazenda" data-frame={index} data-cycle={cycle}>

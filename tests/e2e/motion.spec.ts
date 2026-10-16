@@ -32,7 +32,7 @@ test('the 3D farm loads only local assets, including any GLB models, without err
     const font = url.startsWith('https://fonts.googleapis.com') || url.startsWith('https://fonts.gstatic.com')
     if (!local && !font) external.push(url)
   })
-  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' } })
   await openMission(page, 'm1-first-harvest')
   await expect(page.locator('.farm-view canvas')).toBeVisible()
   await page.waitForTimeout(2500)
@@ -53,7 +53,7 @@ test('reduced motion starts screens without transform animations and without con
 })
 
 test('the running block glows and the harvest flies to the counter in full motion', async ({ page }) => {
-  await seedStorage(page, { settings: { motion: 'full', renderMode: '2d', defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
+  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
   await openMission(page, 'm1-first-harvest')
   await page.getByRole('button', { name: 'Executar' }).click()
   await expect
@@ -72,7 +72,7 @@ test('the running block glows and the harvest flies to the counter in full motio
 test('the mission map and the home screen render their 3D worlds without errors', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' } })
   await page.goto('/')
   await expect(page.locator('.home-scene canvas')).toBeVisible()
   await expect(page.locator('.home-scene .scene-splash')).toHaveCount(0, { timeout: 30_000 })
@@ -85,7 +85,7 @@ test('the mission map and the home screen render their 3D worlds without errors'
 test('the legend opens as a paged dialog with one 3D preview and closes', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' } })
   await openMission(page, 'm1-first-harvest')
   await page.getByRole('button', { name: 'Legenda' }).click()
   const dialog = page.getByRole('dialog', { name: 'Legenda' })
@@ -102,7 +102,7 @@ test('the legend opens as a paged dialog with one 3D preview and closes', async 
 test('the success screen renders a full 3D celebration without errors', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution, ['m1-first-harvest']) })
+  await seedStorage(page, { settings: { motion: 'full' }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution, ['m1-first-harvest']) })
   await page.goto('/#/resultado/m1-first-harvest')
   await expect(page.getByRole('heading', { name: 'Missão concluída!' })).toBeVisible()
   await expect(page.locator('.results__scene canvas')).toBeVisible()
@@ -111,7 +111,7 @@ test('the success screen renders a full 3D celebration without errors', async ({
 })
 
 test('screens fill the window without page scroll or overscroll bounce', async ({ page }) => {
-  await seedStorage(page, { settings: { renderMode: '2d', motion: 'reduced' } })
+  await seedStorage(page, { settings: { motion: 'reduced' } })
   for (const route of ['/', '/#/missoes', '/#/jogar/m1-first-harvest']) {
     await page.goto(route)
     await page.mouse.move(700, 450)
@@ -127,7 +127,7 @@ test('screens fill the window without page scroll or overscroll bounce', async (
 })
 
 test('farm view tool buttons animate, and the rotate arrows spin with the camera', async ({ page }) => {
-  await seedStorage(page, { settings: { renderMode: '3d', motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' } })
   await openMission(page, 'm1-first-harvest')
   const right = page.getByRole('button', { name: 'Girar câmera para a direita' })
   await right.click()

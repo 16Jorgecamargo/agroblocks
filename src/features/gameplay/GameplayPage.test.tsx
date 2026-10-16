@@ -40,7 +40,7 @@ function renderAt(path: string) {
 describe('GameplayPage', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, renderMode: '2d', motion: 'reduced' } })
+    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, motion: 'reduced' } })
     useProgressStore.getState().resetProgress()
   })
 
@@ -49,7 +49,7 @@ describe('GameplayPage', () => {
   })
 
   it('swaps the side panel at once when changing tabs, without an empty gap', () => {
-    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, renderMode: '2d', motion: 'full' } })
+    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, motion: 'full' } })
     renderAt('/jogar/m1-first-harvest')
     fireEvent.click(screen.getByRole('tab', { name: 'Dicas' }))
     const panels = screen.getAllByRole('tabpanel', { hidden: true }).filter((panel) => panel.id.startsWith('side-panel'))
@@ -143,7 +143,7 @@ describe('GameplayPage', () => {
   })
 
   it('launches a harvest flight toward the harvest counter when a plant is harvested', () => {
-    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, renderMode: '2d', motion: 'full' } })
+    useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, motion: 'full' } })
     renderAt('/jogar/m1-first-harvest')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))

@@ -6,7 +6,6 @@ export const settingsSchema = z.object({
   musicEnabled: z.boolean(),
   motion: z.enum(['system', 'reduced', 'full']),
   lowGraphics: z.boolean(),
-  renderMode: z.enum(['auto', '3d', '2d']),
   defaultSpeed: z.union([z.literal(0.5), z.literal(1), z.literal(2), z.literal(4)]),
   theme: z.enum(['light', 'dark']),
 })
@@ -20,7 +19,6 @@ export const DEFAULT_SETTINGS: Settings = {
   musicEnabled: true,
   motion: 'system',
   lowGraphics: false,
-  renderMode: 'auto',
   defaultSpeed: 1,
   theme: 'light',
 }

@@ -251,7 +251,7 @@ for (const name of CLIP_NAMES) {
     const recipe = RECIPES[name]
     await page.addInitScript(installGhostHand)
     await seedStorage(page, {
-      settings: { motion: 'full', renderMode: '3d', defaultSpeed: 1, soundEnabled: false },
+      settings: { motion: 'full', defaultSpeed: 1, soundEnabled: false },
       save: saveWithProgram('m0-training', recipe.start),
     })
     await page.goto('/#/jogar/m0-training')

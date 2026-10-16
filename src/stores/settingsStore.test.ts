@@ -19,9 +19,14 @@ describe('settings', () => {
     expect(loadSettings(window.localStorage)).toMatchObject({ musicEnabled: true, soundEnabled: true, lowGraphics: true })
   })
 
+  it('drops the old 2D view preference', () => {
+    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify({ renderMode: '2d' }))
+    expect(loadSettings(window.localStorage)).not.toHaveProperty('renderMode')
+  })
+
   it('persists updates', () => {
-    useSettingsStore.getState().update({ renderMode: '2d', defaultSpeed: 2 })
-    expect(useSettingsStore.getState().settings.renderMode).toBe('2d')
-    expect(JSON.parse(window.localStorage.getItem(SETTINGS_KEY) ?? '{}')).toMatchObject({ renderMode: '2d', defaultSpeed: 2 })
+    useSettingsStore.getState().update({ lowGraphics: true, defaultSpeed: 2 })
+    expect(useSettingsStore.getState().settings.lowGraphics).toBe(true)
+    expect(JSON.parse(window.localStorage.getItem(SETTINGS_KEY) ?? '{}')).toMatchObject({ lowGraphics: true, defaultSpeed: 2 })
   })
 })

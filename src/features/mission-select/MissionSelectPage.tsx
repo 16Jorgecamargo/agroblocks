@@ -50,14 +50,14 @@ function ListBadge({ status, order, celebrate }: { status: MissionStatus; order:
 
 export function MissionSelectPage() {
   const save = useProgressStore((store) => store.save)
-  const { renderMode, lowGraphics } = useSettingsStore((store) => store.settings)
+  const { lowGraphics } = useSettingsStore((store) => store.settings)
   const { ambient } = useMotionPrefs()
   const webgl = useMemo(() => hasWebGL(), [])
   const [selectedId, setSelectedId] = useState(() => continueMissionId(save, MISSIONS) ?? 'm0-training')
   const [celebrateIds] = useState(() => newlyUnlocked(save, MISSIONS.map((mission) => mission.id), loadSeenUnlocks(safeStorage())))
   const statuses = Object.fromEntries(MISSIONS.map((mission) => [mission.id, save.missions[mission.id]?.status ?? 'locked'])) as Record<string, MissionStatus>
   const selected = MISSIONS.find((mission) => mission.id === selectedId) ?? MISSIONS[0]
-  const show3d = renderMode !== '2d' && webgl
+  const show3d = webgl
 
   useEffect(() => {
     if (show3d) void import('@/render/models/Model').then((module) => module.preloadModels())
