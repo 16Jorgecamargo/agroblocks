@@ -1,5 +1,6 @@
 import type { EfficiencyStars } from '@/game/missions/efficiency'
 import type { ErrorCode, ResourceUsage } from '@/game/world/types'
+import type { StudentInfo, TutorialRecord } from '@/shared/student'
 
 export const MAX_HINTS = 4
 
@@ -52,7 +53,9 @@ export interface AssessmentResponse {
 
 export interface SaveData {
   version: 1
-  participantCode: string | null
+  runId: string | null
+  student: StudentInfo | null
+  tutorial: TutorialRecord | null
   createdAt: string
   missions: Record<string, MissionProgress>
   attempts: AttemptRecord[]

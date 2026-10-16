@@ -29,11 +29,11 @@ const OUTCOME_LABELS: Record<AttemptOutcome, string> = {
 export function attemptsCsv(save: SaveData, missions: MissionDefinition[]): string {
   const byId = new Map(missions.map((mission) => [mission.id, mission]))
   return toCsv(
-    ['participante', 'missao', 'fase', 'conceito', 'tentativa', 'data_hora', 'resultado', 'codigo_erro', 'comandos', 'blocos', 'sementes', 'agua', 'energia', 'dicas', 'eficiencia'],
+    ['aluno', 'missao', 'fase', 'conceito', 'tentativa', 'data_hora', 'resultado', 'codigo_erro', 'comandos', 'blocos', 'sementes', 'agua', 'energia', 'dicas', 'eficiencia'],
     save.attempts.map((attempt) => {
       const mission = byId.get(attempt.missionId)
       return [
-        save.participantCode,
+        save.student?.name ?? null,
         attempt.missionId,
         mission?.order ?? null,
         mission ? CONCEPT_LABELS[mission.concept] : null,
@@ -53,11 +53,11 @@ export function attemptsCsv(save: SaveData, missions: MissionDefinition[]): stri
   )
 }
 
-export function missionsCsv(stats: DashboardStats, participantCode: string | null): string {
+export function missionsCsv(stats: DashboardStats, studentName: string | null): string {
   return toCsv(
-    ['participante', 'missao', 'titulo', 'conceito', 'estado', 'tentativas', 'sucessos', 'erros', 'dicas', 'melhor_comandos', 'melhor_eficiencia'],
+    ['aluno', 'missao', 'titulo', 'conceito', 'estado', 'tentativas', 'sucessos', 'erros', 'dicas', 'melhor_comandos', 'melhor_eficiencia'],
     stats.missions.map((row) => [
-      participantCode,
+      studentName,
       row.missionId,
       row.title,
       row.conceptLabel,
@@ -77,13 +77,13 @@ export function assessmentCsv(save: SaveData): string {
   for (const response of [save.assessments.pre, save.assessments.post]) {
     if (!response) continue
     if (response.skipped) {
-      rows.push([save.participantCode, response.form, null, null, null, null, 'pulado'])
+      rows.push([save.student?.name ?? null, response.form, null, null, null, null, 'pulado'])
       continue
     }
     for (const item of itemsForForm(response.form)) {
       const answer = response.answers[item.id]
       rows.push([
-        save.participantCode,
+        save.student?.name ?? null,
         response.form,
         item.id,
         item.pairId,
@@ -93,7 +93,7 @@ export function assessmentCsv(save: SaveData): string {
       ])
     }
   }
-  return toCsv(['participante', 'forma', 'item', 'par', 'conceito', 'resposta', 'correta'], rows)
+  return toCsv(['aluno', 'forma', 'item', 'par', 'conceito', 'resposta', 'correta'], rows)
 }
 
 export function downloadText(filename: string, content: string): void {

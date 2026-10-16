@@ -37,9 +37,14 @@ const assessmentResponse = z.object({
   answers: z.record(z.string(), z.number().int()),
 })
 
+const student = z.object({ name: z.string(), school: z.string() })
+const tutorial = z.object({ status: z.enum(['completed', 'skipped']), step: z.number().int(), at: z.string() })
+
 export const saveDataSchema = z.object({
   version: z.literal(1),
-  participantCode: z.string().nullable(),
+  runId: z.string().nullable().default(null),
+  student: student.nullable().default(null),
+  tutorial: tutorial.nullable().default(null),
   createdAt: z.string(),
   missions: z.record(z.string(), missionProgress),
   attempts: z.array(attemptRecord),

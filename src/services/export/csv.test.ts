@@ -1,7 +1,7 @@
 import { assessmentCsv, attemptsCsv, missionsCsv, toCsv } from '@/services/export/csv'
 import { MISSIONS } from '@/data/missions'
 import { computeDashboard } from '@/features/dashboard/dashboardStats'
-import { createInitialSave, recordAttempt, setParticipantCode, storeAssessment } from '@/game/progress/progression'
+import { assignStudent, createInitialSave, recordAttempt, storeAssessment } from '@/game/progress/progression'
 import { itemsForForm } from '@/data/assessment/items'
 
 const refs = MISSIONS.map(({ id, order }) => ({ id, order }))
@@ -13,8 +13,8 @@ describe('csv', () => {
     expect(csv.slice(1).split('\r\n')).toEqual(['a;b', '"x;y";"diz ""oi"""', "'=1+1;", "-3;'+5", ''])
   })
 
-  it('exports attempts with participant code and concept', () => {
-    let save = setParticipantCode(createInitialSave(refs, 'now'), 'ALUNO-07')
+  it('exports attempts with the student name and concept', () => {
+    let save = assignStudent(createInitialSave(refs, 'now'), { name: 'Ana Souza', school: 'Escola Azul' }, 'run-1')
     save = recordAttempt(
       save,
       {
@@ -32,9 +32,9 @@ describe('csv', () => {
     )
     const lines = attemptsCsv(save, MISSIONS).slice(1).split('\r\n')
     expect(lines[0]).toBe(
-      'participante;missao;fase;conceito;tentativa;data_hora;resultado;codigo_erro;comandos;blocos;sementes;agua;energia;dicas;eficiencia',
+      'aluno;missao;fase;conceito;tentativa;data_hora;resultado;codigo_erro;comandos;blocos;sementes;agua;energia;dicas;eficiencia',
     )
-    expect(lines[1]).toBe('ALUNO-07;m1-first-harvest;1;Sequenciamento;1;2026-10-14T12:00:00.000Z;erro;HIT_OBSTACLE;3;4;0;0;3;0;')
+    expect(lines[1]).toBe('Ana Souza;m1-first-harvest;1;Sequenciamento;1;2026-10-14T12:00:00.000Z;erro;HIT_OBSTACLE;3;4;0;0;3;0;')
   })
 
   it('exports missions and assessment answers', () => {
@@ -43,7 +43,7 @@ describe('csv', () => {
     save = storeAssessment(save, { form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers })
     expect(missionsCsv(computeDashboard(save, MISSIONS), null).slice(1).split('\r\n')).toHaveLength(MISSIONS.length + 2)
     const assessment = assessmentCsv(save).slice(1).split('\r\n')
-    expect(assessment[0]).toBe('participante;forma;item;par;conceito;resposta;correta')
+    expect(assessment[0]).toBe('aluno;forma;item;par;conceito;resposta;correta')
     expect(assessment).toHaveLength(12)
     expect(assessment[1]).toMatch(/^;pre;seq-1-A;seq-1;Sequenciamento;1;sim$/)
   })

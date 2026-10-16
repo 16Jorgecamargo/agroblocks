@@ -20,7 +20,7 @@ export function DashboardPage() {
   const realHasData = useMemo(() => computeDashboard(realSave, MISSIONS).hasData, [realSave])
   const canExport = !demo && realHasData
   const stamp = new Date().toISOString().slice(0, 10)
-  const code = realSave.participantCode ?? 'anonimo'
+  const code = realSave.student ? realSave.student.name.replace(/\s+/g, '-') : 'anonimo'
 
   return (
     <div className="chrome-page">
@@ -39,7 +39,7 @@ export function DashboardPage() {
           <button type="button" className="button" disabled={!canExport} onClick={() => downloadText(`agroblocks_tentativas_${code}_${stamp}.csv`, attemptsCsv(realSave, MISSIONS))}>
             <Icon name="database" /> Exportar tentativas (CSV)
           </button>
-          <button type="button" className="button" disabled={!canExport} onClick={() => downloadText(`agroblocks_missoes_${code}_${stamp}.csv`, missionsCsv(computeDashboard(realSave, MISSIONS), realSave.participantCode))}>
+          <button type="button" className="button" disabled={!canExport} onClick={() => downloadText(`agroblocks_missoes_${code}_${stamp}.csv`, missionsCsv(computeDashboard(realSave, MISSIONS), realSave.student?.name ?? null))}>
             <Icon name="database" /> Exportar missões (CSV)
           </button>
           <button type="button" className="button" disabled={!canExport} onClick={() => downloadText(`agroblocks_avaliacao_${code}_${stamp}.csv`, assessmentCsv(realSave))}>

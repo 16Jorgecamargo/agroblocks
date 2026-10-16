@@ -26,10 +26,7 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
   const [confirmReset, setConfirmReset] = useState(false)
   const settings = useSettingsStore((store) => store.settings)
   const update = useSettingsStore((store) => store.update)
-  const participantCode = useProgressStore((store) => store.save.participantCode)
-  const setParticipantCode = useProgressStore((store) => store.setParticipantCode)
   const resetProgress = useProgressStore((store) => store.resetProgress)
-  const [code, setCode] = useState(participantCode ?? '')
   const [warningScope, animateWarning] = useAnimate()
 
   const askReset = () => {
@@ -51,7 +48,6 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
                         onClick={() => {
                           resetProgress()
                           setConfirmReset(false)
-                          setCode('')
                         }}
                       >
                         Sim, apagar tudo
@@ -150,13 +146,6 @@ export function SettingsDialog({ open, onClose }: { open: boolean; onClose: () =
             )}
             {tab === 'data' && (
               <>
-                <label className="field">
-                  <span className="field__label">Código de participante (opcional)</span>
-                  <input value={code} maxLength={32} placeholder="Ex.: ALUNO-07" onChange={(event) => setCode(event.target.value)} onBlur={() => setParticipantCode(code)} />
-                </label>
-                <p className="settings__note">
-                  Use apenas um código combinado com o professor. Não digite nome, e-mail ou outros dados pessoais. Os dados ficam somente neste navegador.
-                </p>
                 <GameLink to="/painel" tone="secondary" icon="chart" onClick={onClose}>
                   Abrir painel e exportar dados
                 </GameLink>

@@ -1,10 +1,12 @@
 import {
+  assignStudent,
   continueMissionId,
   createInitialSave,
   failedAttempts,
   hasProgress,
   isBetterResult,
   recordAttempt,
+  recordTutorial,
   registerHint,
   storeProgram,
   syncMissions,
@@ -108,5 +110,31 @@ describe('progression', () => {
     expect(isBetterResult({ ...base, efficiencyStars: 3 }, base)).toBe(true)
     expect(isBetterResult({ ...base, actions: 8 }, base)).toBe(true)
     expect(isBetterResult({ ...base, actions: 12 }, base)).toBe(false)
+  })
+})
+
+describe('student and tutorial', () => {
+  const refs = [{ id: 'm0-training', order: 0 }, { id: 'm1-first-harvest', order: 1 }]
+
+  it('starts with no run, student or tutorial outcome', () => {
+    const save = createInitialSave(refs, '2026-10-16T10:00:00.000Z')
+    expect(save).toMatchObject({ runId: null, student: null, tutorial: null })
+    expect(save).not.toHaveProperty('participantCode')
+  })
+
+  it('assigns a cleaned student and a run id', () => {
+    const save = assignStudent(createInitialSave(refs, 'now'), { name: '  Ana   Souza ', school: ' Escola  Azul ' }, 'run-1')
+    expect(save.student).toEqual({ name: 'Ana Souza', school: 'Escola Azul' })
+    expect(save.runId).toBe('run-1')
+  })
+
+  it('keeps completed over skipped but lets skipped become completed', () => {
+    let save = createInitialSave(refs, 'now')
+    save = recordTutorial(save, { status: 'skipped', step: 3, at: 't1' })
+    expect(save.tutorial).toEqual({ status: 'skipped', step: 3, at: 't1' })
+    save = recordTutorial(save, { status: 'completed', step: 15, at: 't2' })
+    expect(save.tutorial?.status).toBe('completed')
+    save = recordTutorial(save, { status: 'skipped', step: 4, at: 't3' })
+    expect(save.tutorial).toEqual({ status: 'completed', step: 15, at: 't2' })
   })
 })

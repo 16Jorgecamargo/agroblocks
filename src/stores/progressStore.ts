@@ -4,7 +4,6 @@ import {
   createInitialSave,
   recordAttempt,
   registerHint,
-  setParticipantCode,
   storeAssessment,
   storeProgram,
 } from '@/game/progress/progression'
@@ -19,7 +18,6 @@ interface ProgressState {
   recordAttempt: (input: AttemptInput) => AttemptRecord
   registerHint: (missionId: string) => void
   storeProgram: (missionId: string, json: string) => void
-  setParticipantCode: (code: string | null) => void
   storeAssessment: (response: AssessmentResponse) => void
   resetProgress: () => void
 }
@@ -40,7 +38,6 @@ export const useProgressStore = create<ProgressState>((set, get) => {
     },
     registerHint: (missionId) => commit(registerHint(get().save, missionId)),
     storeProgram: (missionId, json) => commit(storeProgram(get().save, missionId, json)),
-    setParticipantCode: (code) => commit(setParticipantCode(get().save, code)),
     storeAssessment: (response) => commit(storeAssessment(get().save, response)),
     resetProgress: () => commit(createInitialSave(missionRefs, new Date().toISOString())),
   }

@@ -53,3 +53,21 @@ describe('saveStorage', () => {
     expect(window.localStorage.getItem(CORRUPT_KEY)).toBe('{"version":99}')
   })
 })
+
+describe('legacy saves', () => {
+  it('loads a save with participantCode and no run fields', () => {
+    const legacy = {
+      version: 1,
+      participantCode: 'ALUNO-07',
+      createdAt: '2026-10-14T12:00:00.000Z',
+      missions: {},
+      attempts: [],
+      assessments: { pre: null, post: null },
+    }
+    window.localStorage.setItem(SAVE_KEY, JSON.stringify(legacy))
+    const save = loadSave(window.localStorage, [{ id: 'm0-training', order: 0 }], 'now')
+    expect(save.createdAt).toBe('2026-10-14T12:00:00.000Z')
+    expect(save).toMatchObject({ runId: null, student: null, tutorial: null })
+    expect(save).not.toHaveProperty('participantCode')
+  })
+})

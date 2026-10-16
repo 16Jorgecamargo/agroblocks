@@ -8,6 +8,7 @@ import {
   type MissionRef,
   type SaveData,
 } from '@/game/progress/types'
+import { cleanText, type StudentInfo, type TutorialRecord } from '@/shared/student'
 
 function emptyProgress(status: MissionProgress['status']): MissionProgress {
   return { status, attempts: 0, bestResult: null, hintsUsed: 0, errorCounts: {}, savedProgram: null }
@@ -27,7 +28,9 @@ export function createInitialSave(missions: MissionRef[], now: string): SaveData
   const ordered = sorted(missions)
   return {
     version: 1,
-    participantCode: null,
+    runId: null,
+    student: null,
+    tutorial: null,
     createdAt: now,
     missions: Object.fromEntries(ordered.map((mission) => [mission.id, emptyProgress(initialStatus(mission, ordered, null))])),
     attempts: [],
@@ -98,9 +101,13 @@ export function storeProgram(save: SaveData, missionId: string, json: string): S
   return { ...save, missions: { ...save.missions, [missionId]: { ...progress, savedProgram: json } } }
 }
 
-export function setParticipantCode(save: SaveData, code: string | null): SaveData {
-  const trimmed = code?.trim() ?? ''
-  return { ...save, participantCode: trimmed === '' ? null : trimmed.slice(0, 32) }
+export function assignStudent(save: SaveData, student: StudentInfo, runId: string): SaveData {
+  return { ...save, runId, student: { name: cleanText(student.name), school: cleanText(student.school) } }
+}
+
+export function recordTutorial(save: SaveData, record: TutorialRecord): SaveData {
+  if (save.tutorial?.status === 'completed' && record.status === 'skipped') return save
+  return { ...save, tutorial: record }
 }
 
 export function storeAssessment(save: SaveData, response: AssessmentResponse): SaveData {
