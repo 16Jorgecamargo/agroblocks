@@ -69,17 +69,6 @@ test('reloading the page keeps progress and the saved program', async ({ page })
   await expect(page.locator('.pseudocode-panel__code')).toContainText('virar à direita')
 })
 
-test('the dashboard shows real recorded data and the empty state before it', async ({ page }) => {
-  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
-  await page.goto('/#/painel')
-  await expect(page.getByText('Ainda não existem registros neste navegador.')).toBeVisible()
-  await openMission(page, 'm1-first-harvest')
-  await page.getByRole('button', { name: 'Executar' }).click()
-  await expect(page).toHaveURL(/#\/resultado\/m1-first-harvest$/)
-  await page.goto('/#/painel')
-  await expect(page.getByRole('group', { name: 'Fases concluídas' })).toContainText('1 de 6')
-})
-
 test('renders the 3D farm without runtime errors', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))

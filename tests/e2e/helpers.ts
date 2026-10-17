@@ -95,3 +95,13 @@ export async function registerStudent(page: Page, name = 'Ana Souza', school = '
   await dialog.getByLabel('Escola').fill(school)
   await dialog.getByRole('button', { name: 'Começar' }).click()
 }
+
+export function withStudent(save: SaveData, name: string, school: string, runId: string): SaveData {
+  return { ...save, runId, student: { name, school } }
+}
+
+export async function teacherLogin(page: Page, password = 'dashboard'): Promise<void> {
+  const dialog = page.getByRole('dialog', { name: 'Senha do professor' })
+  await dialog.getByLabel('Senha').fill(password)
+  await dialog.getByRole('button', { name: 'Entrar' }).click()
+}
