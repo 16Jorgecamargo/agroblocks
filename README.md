@@ -12,7 +12,7 @@ Jogo educativo de automação agrícola e programação visual para o Ensino Mé
 - Treinamento guiado em 15 etapas: holofote na área real da tela com balão apontando, e antes de cada ação um vídeo gravado do próprio jogo, com uma mão fantasma, mostra como fazer (adicionar, encaixar e apagar blocos, executar e parar, passo a passo, dicas, console, pseudocódigo e corrigir erro) + 6 fases (sequência, repetição, condicionais, sensores, variáveis, depuração e eficiência).
 - Feedback educativo com mensagens de erro explicativas, dicas graduais e pseudocódigo gerado dos blocos.
 - Tela de resultado que separa correção de eficiência e compara soluções corretas.
-- Pré-teste e pós-teste equivalentes, painel do professor e exportação CSV anônima.
+- Cadastro do aluno (nome e escola), envio de cada jogada para o servidor e painel do professor com senha, gráficos, detalhe por aluno e exportação CSV.
 - Tudo local no navegador (LocalStorage). Nenhum dado é enviado a servidores.
 
 ## Requisitos
@@ -40,13 +40,27 @@ Abra `http://localhost:5173`.
 | `npm run build` | typecheck + build de produção em `dist/` |
 | `npm run preview` | serve o build localmente |
 
+## Painel do professor e banco de dados
+
+Ao iniciar uma fazenda, o aluno informa nome completo e escola. Cada fazenda vira uma "jogada" enviada ao servidor (Vercel Functions em `api/`) e guardada no Upstash Redis: cadastro, tutorial (concluído, pulado e em qual etapa), fases, tentativas com pseudocódigo e respostas das avaliações. O envio acontece 2 s depois de cada mudança e é refeito sozinho se a internet cair.
+
+O painel (`/#/painel` ou "Painel do professor" na tela inicial) pede a senha, conferida no servidor. Ele mostra todos os alunos com filtros por escola, nome e período, gráficos, tabela ordenável, detalhe de cada jogada, exportação CSV e dados de demonstração.
+
+### Configuração no Vercel (uma vez)
+
+1. Projeto → **Storage** → **Create** → **Upstash for Redis** (plano Free) → **Connect** ao projeto.
+2. **Settings → Environment Variables**: `TEACHER_PASSWORD` = `dashboard` e `TEACHER_TOKEN_SECRET` = um texto aleatório longo.
+3. Faça um **Redeploy**.
+
+Sem essas variáveis o jogo funciona normalmente, mas o painel mostra "Painel indisponível: servidor não configurado." Em `npm run dev` e `npm run preview` a API roda dentro do Vite com um banco em memória (senha `dashboard`), apagado ao reiniciar.
+
 ## Publicação (hospedagem estática)
 
 O build usa caminhos relativos (`base: './'`) e rotas com `#` (HashRouter), então funciona em qualquer servidor estático, inclusive em subpastas.
 
 - **GitHub Pages:** `npm run build` e publique o conteúdo de `dist/` (por exemplo, com a action `actions/deploy-pages`).
 - **Netlify:** comando `npm run build`, pasta `dist`.
-- **Vercel:** framework "Vite", saída `dist`.
+- **Vercel:** framework "Vite", saída `dist`. As funções em `api/` são publicadas junto; veja "Painel do professor e banco de dados".
 - **Laboratório sem internet:** copie `dist/` para qualquer servidor local (`npx serve dist`). A fonte Inter vem do Google Fonts; sem internet o navegador usa a fonte do sistema.
 
 ## Arquitetura
@@ -142,7 +156,7 @@ Cada missão é um objeto em `src/data/missions/` com mapa, recursos, blocos per
 
 ## Privacidade e pesquisa
 
-Os dados ficam apenas no navegador do aluno. O código de participante é opcional e deve ser combinado com o professor (nunca nome ou e-mail). O painel deixa claro que dados de uso não são evidência de aprendizagem. Veja `docs/metodologia.md`.
+O aluno informa nome completo e escola; esses dados, o progresso nas missões e as respostas das avaliações são enviados ao servidor e só aparecem no painel protegido por senha. O dialog de cadastro avisa o aluno sobre esse envio. Dados de uso não são, sozinhos, evidência de aprendizagem. Veja `docs/metodologia.md`.
 
 ## Áudio
 

@@ -36,12 +36,12 @@ Por avaliação (`avaliacao.csv`): forma, item, par, conceito, resposta e se est
 ## 5. Procedimento sugerido
 
 1. Obter autorização da escola e, para menores de idade, Termo de Consentimento dos responsáveis (TCLE) e Termo de Assentimento do estudante (TALE), conforme as normas do comitê de ética aplicável.
-2. Combinar um código de participante por aluno (ex.: `ALUNO-07`), sem dados pessoais. O aluno o digita em Configurações › Dados.
+2. Cada aluno informa nome completo e escola ao iniciar a fazenda. Os dados vão para o servidor do projeto (veja o README).
 3. Sessão 1: pré-teste + Treinamento + Fases 1–2.
 4. Sessões seguintes: Fases 3–6, no ritmo da turma.
 5. Última sessão: pós-teste.
-6. Em cada computador, abrir `#/painel` e exportar os três CSV. Juntar as planilhas pelo campo `participante`.
-7. Limpar o navegador (Configurações › Dados › Reiniciar progresso) antes de outro aluno usar a mesma máquina.
+6. Abrir `#/painel` (senha do professor) e exportar os três CSV, que já trazem todos os alunos com nome e escola.
+7. Antes de outro aluno usar a mesma máquina, ele clica em "Iniciar nova fazenda" e se cadastra; os dados do anterior continuam no servidor.
 
 ## 6. Análise
 
@@ -64,4 +64,4 @@ Dados de uso mostram **o que aconteceu no jogo** (quantas tentativas, quais erro
 
 ## 9. Ética e privacidade
 
-Nenhum dado pessoal é coletado e nada é transmitido pela rede. Ainda assim, a participação de menores em pesquisa exige autorização institucional e consentimento dos responsáveis. Os resultados só devem ser apresentados como evidência depois da coleta e análise reais; antes disso, o painel deve ser tratado como demonstração.
+Nome completo e escola do aluno, progresso e respostas são enviados ao servidor do projeto e ficam acessíveis só com a senha do professor. Por isso, a participação de menores em pesquisa exige autorização institucional e consentimento dos responsáveis. Os resultados só devem ser apresentados como evidência depois da coleta e análise reais; antes disso, o painel deve ser tratado como demonstração.
