@@ -3,6 +3,7 @@ import { celebrationLayout } from '@/render/world/celebrationLayout'
 import { farmLayout } from '@/render/world/farmLayout'
 import { homeLayout } from '@/render/world/homeLayout'
 import { mapLayout } from '@/render/world/mapLayout'
+import { worldMapLayout } from '@/render/world/worldMapLayout'
 import type { World, WorldInput } from '@/render/world/worldTypes'
 
 export function gridSizeOf(cells: string[]): { width: number; height: number } {
@@ -12,6 +13,7 @@ export function gridSizeOf(cells: string[]): { width: number; height: number } {
 export function buildWorld(input: WorldInput): World {
   const random = createRandom(hashString(`${input.layout}:${input.seed}:${input.gridWidth}x${input.gridHeight}`))
   if (input.layout === 'map') return mapLayout(input, random)
+  if (input.layout === 'worldMap') return worldMapLayout(input, random)
   if (input.layout === 'home') return homeLayout(input, random)
   if (input.layout === 'celebration') return celebrationLayout(input, random)
   return farmLayout(input, random)

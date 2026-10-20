@@ -38,7 +38,7 @@ export interface AnimalSpawn {
   scale: number
 }
 
-export type WorldLayout = 'farm' | 'map' | 'home' | 'celebration'
+export type WorldLayout = 'farm' | 'map' | 'worldMap' | 'home' | 'celebration'
 
 export type WorldDensity = 'full' | 'light'
 
