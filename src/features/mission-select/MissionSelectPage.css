@@ -216,9 +216,9 @@
 
 .world-stage {
   position: relative;
-  margin: 0 var(--space-5);
-  height: calc(100vh - 190px);
-  min-height: 480px;
+  flex: 1;
+  min-height: 0;
+  margin: 0 var(--space-4) var(--space-4);
   border-radius: 22px;
   overflow: hidden;
   background: #131f29;
@@ -381,10 +381,17 @@
 }
 
 .world-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 4;
   display: flex;
   justify-content: center;
   gap: var(--space-4);
-  padding: var(--space-4) 0 var(--space-5);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgb(19 31 41 / 0.78);
+  transform: translateX(-50%);
 }
 
 .world-dots__item {
@@ -440,4 +447,53 @@
 
 .map-scene .map-label:not(.is-selected):not(.map-label--current) .map-label__inner {
   padding-right: 4px;
+}
+
+.world-stage__stars {
+  font-weight: 700;
+  color: #b07d0a;
+}
+
+.map-label__stars {
+  margin-left: 2px;
+  color: #f5c542;
+  font-size: 13px;
+  letter-spacing: -1px;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+}
+
+.map-label__stars-off {
+  color: rgb(255 255 255 / 0.35);
+}
+
+.map-scene .map-label--done .map-label__inner {
+  padding-right: 8px;
+}
+
+.mission-select {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mission-select .page-header {
+  flex: none;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+.world-stage .map-scene {
+  cursor: grab;
+  touch-action: none;
+}
+
+.world-stage .map-scene:active {
+  cursor: grabbing;
+}
+
+.world-stage__card {
+  bottom: 84px;
+  max-height: calc(100% - 110px);
 }

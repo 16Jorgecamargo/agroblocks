@@ -20,7 +20,13 @@ function spiral(): Vec2[] {
   })
 }
 
-export const WORLD_TRAILS: Record<WorldId, Vec2[]> = {
+const SPREAD = 1.5
+
+function spread(trail: Vec2[]): Vec2[] {
+  return trail.map(({ x, z }) => ({ x: Math.round(x * SPREAD * 100) / 100, z: Math.round(z * SPREAD * 100) / 100 }))
+}
+
+const BASE_TRAILS: Record<WorldId, Vec2[]> = {
   garden: points([
     [-7.5, -8],
     [-4.8, -7.2],
@@ -67,3 +73,5 @@ export const WORLD_TRAILS: Record<WorldId, Vec2[]> = {
   barnyard: arc(0, 0, 7.4, 5.6, Math.PI * 0.6, 0.5),
   homestead: spiral(),
 }
+
+export const WORLD_TRAILS: Record<WorldId, Vec2[]> = Object.fromEntries(Object.entries(BASE_TRAILS).map(([world, trail]) => [world, spread(trail)])) as Record<WorldId, Vec2[]>

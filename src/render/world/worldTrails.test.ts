@@ -3,12 +3,12 @@ import { buildWorld } from '@/render/world/buildWorld'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'
 
 describe('world trails', () => {
-  it.each(WORLD_IDS)('%s trail has 12 points inside the island, well spaced', (world) => {
+  it.each(WORLD_IDS)('%s trail has 12 points inside the island, well spaced on the bigger island', (world) => {
     const trail = WORLD_TRAILS[world]
     expect(trail).toHaveLength(12)
-    for (const point of trail) expect(Math.abs(point.x) < 9.5 && Math.abs(point.z) < 9.5).toBe(true)
+    for (const point of trail) expect(Math.abs(point.x) < 14.5 && Math.abs(point.z) < 14.5).toBe(true)
     for (let index = 1; index < trail.length; index += 1) {
-      expect(Math.hypot(trail[index].x - trail[index - 1].x, trail[index].z - trail[index - 1].z)).toBeGreaterThanOrEqual(2.2)
+      expect(Math.hypot(trail[index].x - trail[index - 1].x, trail[index].z - trail[index - 1].z)).toBeGreaterThanOrEqual(3.2)
     }
   })
 

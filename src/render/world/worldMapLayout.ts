@@ -8,9 +8,10 @@ import { addThemeFeatures, themePalette } from '@/render/world/worldThemes'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
-export const WORLD_MAP_ISLAND: Rect = { minX: -10.5, maxX: 10.5, minZ: -10.5, maxZ: 10.5 }
+export const WORLD_MAP_ISLAND: Rect = { minX: -15.5, maxX: 15.5, minZ: -15.5, maxZ: 15.5 }
 
-const NODE_CLEARANCE = 1.3
+const NODE_CLEARANCE = 1.6
+const LANDMARK_SPREAD = 1.5
 const EDGE = 0.6
 
 const LANDMARKS: Record<WorldId, [ModelId, number, number, number][]> = {
@@ -32,11 +33,12 @@ export function worldMapLayout(input: WorldInput, random: () => number): World {
   const draft = new WorldDraft(random, { grid: null, paths: [trailPath], river: null, keepOut: nodeZones, frontGuard: null, bounds: inner })
   const onIsland = (point: Vec2) => point.x > inner.minX && point.x < inner.maxX && point.z > inner.minZ && point.z < inner.maxZ
 
-  for (const [model, x, z, scale] of LANDMARKS[theme]) draft.placeNear(model, { x, z }, random() * Math.PI * 2, scale)
+  for (const [model, x, z, scale] of LANDMARKS[theme]) draft.placeNear(model, { x: x * LANDMARK_SPREAD, z: z * LANDMARK_SPREAD }, random() * Math.PI * 2, scale * 1.4)
   addThemeFeatures(draft, theme, inner, input.density, random)
-  draft.scatter(FOREST_MODELS, full ? 60 : 30, WORLD_MAP_ISLAND, [0.5, 0.75], onIsland)
+  addThemeFeatures(draft, theme, inner, input.density, random)
+  draft.scatter(FOREST_MODELS, full ? 120 : 60, WORLD_MAP_ISLAND, [0.7, 1], onIsland)
   const awayFromNodes = (point: Vec2) => onIsland(point) && trail.every((node) => Math.hypot(point.x - node.x, point.z - node.z) >= NODE_CLEARANCE)
-  addClutter(draft, WORLD_MAP_ISLAND, input.density, 200, awayFromNodes)
+  addClutter(draft, WORLD_MAP_ISLAND, input.density, 420, awayFromNodes)
 
   return {
     ground: WORLD_MAP_ISLAND,
@@ -47,7 +49,7 @@ export function worldMapLayout(input: WorldInput, random: () => number): World {
     props: draft.props,
     pasture: null,
     animals: [],
-    butterflies: addButterflies(random, WORLD_MAP_ISLAND, 6),
+    butterflies: addButterflies(random, WORLD_MAP_ISLAND, 10),
     features: draft.features,
     palette: themePalette(theme),
   }

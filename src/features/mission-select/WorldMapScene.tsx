@@ -1,13 +1,12 @@
-import { useMemo, useRef, type RefObject } from 'react'
+import { useEffect, useMemo, useRef, type PointerEvent as ReactPointerEvent, type RefObject } from 'react'
 import { motion } from 'motion/react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Vector3 } from 'three'
+import { Vector3, type OrthographicCamera } from 'three'
 import { Icon } from '@/components/icons/Icon'
 import { nodeKey, type NodeState, type TrailNode } from '@/features/mission-select/trailNodes'
 import type { WorldId } from '@/game/worlds/worldTypes'
 import { SPRINGS } from '@/motion/springs'
 import { CANVAS_RESIZE } from '@/render/canvasResize'
-import { CameraRig } from '@/render/farm3d/CameraRig'
 import { PALETTE } from '@/render/palette'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
@@ -20,6 +19,7 @@ interface WorldMapSceneProps {
   world: WorldId
   nodes: TrailNode[]
   states: NodeState[]
+  stars: number[]
   selected: string
   onSelect: (key: string) => void
   lowGraphics: boolean
@@ -49,17 +49,84 @@ function LabelProjector({ labels, trail }: { labels: RefObject<(HTMLButtonElemen
   return null
 }
 
+const VIEW_EXTENT = 17
+const CAMERA_DISTANCE = 24
+const CAMERA_ANGLE = Math.PI / 4
+const FOLLOW = 6
+const DRAG_THRESHOLD = 6
+const PAN_LIMIT = 13
+
+interface Pan {
+  x: number
+  z: number
+}
+
+function MapCamera({ focus, pan, instant }: { focus: Vec2; pan: RefObject<Pan>; instant: boolean }) {
+  const camera = useThree((three) => three.camera) as OrthographicCamera
+  const size = useThree((three) => three.size)
+  const target = useRef<Vec2 | null>(null)
+  useFrame((_, delta) => {
+    const goal = { x: focus.x + (pan.current?.x ?? 0), z: focus.z + (pan.current?.z ?? 0) }
+    const current = target.current ?? goal
+    const blend = instant ? 1 : 1 - Math.exp(-delta * FOLLOW)
+    const next = { x: current.x + (goal.x - current.x) * blend, z: current.z + (goal.z - current.z) * blend }
+    target.current = next
+    camera.zoom = Math.min(size.width, size.height) / VIEW_EXTENT
+    camera.updateProjectionMatrix()
+    camera.position.set(next.x + Math.sin(CAMERA_ANGLE) * CAMERA_DISTANCE, CAMERA_DISTANCE * 0.82, next.z + Math.cos(CAMERA_ANGLE) * CAMERA_DISTANCE)
+    camera.lookAt(next.x, 0, next.z)
+  })
+  return null
+}
+
+function screenToGround(dx: number, dy: number, zoom: number): Pan {
+  const right = { x: Math.cos(CAMERA_ANGLE), z: -Math.sin(CAMERA_ANGLE) }
+  const forward = { x: -Math.sin(CAMERA_ANGLE), z: -Math.cos(CAMERA_ANGLE) }
+  const scale = 1 / zoom
+  return { x: -(dx * right.x) * scale + dy * forward.x * scale * 1.4, z: -(dx * right.z) * scale + dy * forward.z * scale * 1.4 }
+}
+
 function labelText(node: TrailNode): string {
   if (node.kind === 'mission') return node.mission.title
   return node.kind === 'preTest' ? 'Prova inicial' : 'Prova final'
 }
 
-export default function WorldMapScene({ world, nodes, states, selected, onSelect, lowGraphics, ambient, onReady }: WorldMapSceneProps) {
+export default function WorldMapScene({ world, nodes, states, stars, selected, onSelect, lowGraphics, ambient, onReady }: WorldMapSceneProps) {
   const map = useMemo(() => buildWorld({ layout: 'worldMap', gridWidth: 0, gridHeight: 0, seed: world, density: lowGraphics ? 'light' : 'full', theme: world }), [world, lowGraphics])
   const labels = useRef<(HTMLButtonElement | null)[]>([])
   const alive = ambient && !lowGraphics
+  const pan = useRef<Pan>({ x: 0, z: 0 })
+  const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null)
+  const wrapper = useRef<HTMLDivElement>(null)
+  const selectedIndex = Math.max(0, nodes.findIndex((node) => nodeKey(node) === selected))
+  const focus = map.trail[selectedIndex] ?? { x: 0, z: 0 }
+
+  useEffect(() => {
+    pan.current = { x: 0, z: 0 }
+  }, [selected, world])
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    drag.current = { x: event.clientX, y: event.clientY, moved: false }
+  }
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const state = drag.current
+    if (!state) return
+    const dx = event.clientX - state.x
+    const dy = event.clientY - state.y
+    if (!state.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return
+    state.moved = true
+    const height = wrapper.current?.clientHeight ?? 1
+    const width = wrapper.current?.clientWidth ?? 1
+    const delta = screenToGround(dx, dy, Math.min(width, height) / VIEW_EXTENT)
+    const clamp = (value: number) => Math.max(-PAN_LIMIT, Math.min(PAN_LIMIT, value))
+    pan.current = { x: clamp(pan.current.x + delta.x), z: clamp(pan.current.z + delta.z) }
+    drag.current = { x: event.clientX, y: event.clientY, moved: true }
+  }
+  const onPointerUp = () => {
+    drag.current = null
+  }
   return (
-    <div className="map-scene">
+    <div ref={wrapper} className="map-scene" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}>
       <Canvas
         resize={CANVAS_RESIZE}
         orthographic
@@ -71,7 +138,7 @@ export default function WorldMapScene({ world, nodes, states, selected, onSelect
       >
         <color attach="background" args={['#131f29']} />
         <LabelProjector labels={labels} trail={map.trail} />
-        <CameraRig gridWidth={16} gridHeight={16} quarterTurns={0} zoomLevel={0.92} showcase={false} reducedMotion />
+        <MapCamera focus={focus} pan={pan} instant={!ambient} />
         <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
         <directionalLight position={[10, 18, 8]} intensity={1.5} castShadow={!lowGraphics} shadow-mapSize={[2048, 2048]} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={14} shadow-camera-bottom={-14} />
         <WorldTerrain world={map} />
@@ -127,6 +194,12 @@ export default function WorldMapScene({ world, nodes, states, selected, onSelect
                 {state === 'locked' && <Icon name="lock" size={14} />}
               </span>
               <span className="map-label__text">{labelText(node)}</span>
+              {node.kind === 'mission' && state === 'done' && (
+                <span className="map-label__stars" aria-hidden="true">
+                  {'★'.repeat(stars[index])}
+                  <span className="map-label__stars-off">{'★'.repeat(3 - stars[index])}</span>
+                </span>
+              )}
             </motion.span>
           </button>
         )

@@ -70,4 +70,23 @@ describe('MissionSelectPage', () => {
     const card = await screen.findByRole('region', { name: 'Missão 2 - Hora de plantar' })
     expect(within(card).getByRole('button', { name: 'Jogar' })).toBeDisabled()
   })
+
+  it('shows the stars won in each mission and in the world', () => {
+    storeGardenPre()
+    useProgressStore.getState().recordAttempt({
+      missionId: 'garden-01',
+      timestamp: 't',
+      outcome: 'success',
+      errorCode: null,
+      actions: 4,
+      blocks: 4,
+      usage: { seeds: 0, water: 0, energy: 4 },
+      efficiencyStars: 2,
+      pseudocode: '',
+    })
+    renderPage()
+    const trail = screen.getByRole('list', { name: 'Trilha de Horta' })
+    expect(within(trail).getByRole('button', { name: /^Missão 1 · Primeiros passos · Concluída · 2 de 3 estrelas/ })).toBeInTheDocument()
+    expect(screen.getByText('★ 2 de 30 estrelas')).toBeInTheDocument()
+  })
 })

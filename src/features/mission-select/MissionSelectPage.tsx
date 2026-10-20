@@ -31,8 +31,12 @@ function worldState(save: SaveData, world: WorldId): WorldProgressState {
   return worldStep(save, world, REFS).kind === 'done' ? 'concluído' : 'em andamento'
 }
 
-function nodeName(node: TrailNode, state: NodeState): string {
-  if (node.kind === 'mission') return `Missão ${node.mission.slot} · ${node.mission.title} · ${STATE_TEXT[state]}`
+function starsOf(save: SaveData, node: TrailNode): number {
+  return node.kind === 'mission' ? (save.missions[node.mission.id]?.bestResult?.efficiencyStars ?? 0) : 0
+}
+
+function nodeName(node: TrailNode, state: NodeState, stars: number): string {
+  if (node.kind === 'mission') return `Missão ${node.mission.slot} · ${node.mission.title} · ${STATE_TEXT[state]}${stars > 0 ? ` · ${stars} de 3 estrelas` : ''}`
   return `${node.kind === 'preTest' ? 'Prova inicial' : 'Prova final'} · ${STATE_TEXT[state]}`
 }
 
@@ -52,6 +56,8 @@ export function MissionSelectPage() {
   const world = getWorld(worldId)
   const open = isWorldOpen(save, worldId, REFS)
   const states = nodes.map((node) => nodeState(save, worldId, node, REFS))
+  const stars = nodes.map((node) => starsOf(save, node))
+  const worldStars = stars.reduce((sum, value) => sum + value, 0)
   const selectedIndex = Math.max(0, nodes.findIndex((node) => nodeKey(node) === selected))
   const selectedNode = nodes[selectedIndex]
   const previous = WORLDS.find((candidate) => candidate.order === world.order - 1)
@@ -78,7 +84,7 @@ export function MissionSelectPage() {
           <div className="world-stage__map">
             <SceneWithSplash label="Carregando a fazenda…">
               {(onReady) => (
-                <WorldMapScene world={worldId} nodes={nodes} states={states} selected={selected} onSelect={setSelected} lowGraphics={lowGraphics} ambient={ambient} onReady={onReady} />
+                <WorldMapScene world={worldId} nodes={nodes} states={states} stars={stars} selected={selected} onSelect={setSelected} lowGraphics={lowGraphics} ambient={ambient} onReady={onReady} />
               )}
             </SceneWithSplash>
           </div>
@@ -90,7 +96,7 @@ export function MissionSelectPage() {
                 type="button"
                 className={`world-trail__item world-trail__item--${states[index]}`}
                 aria-pressed={nodeKey(node) === selected}
-                aria-label={nodeName(node, states[index])}
+                aria-label={nodeName(node, states[index], stars[index])}
                 onClick={() => setSelected(nodeKey(node))}
               >
                 {node.kind === 'mission' ? node.mission.slot : node.kind === 'preTest' ? 'Início' : 'Fim'}
@@ -101,6 +107,7 @@ export function MissionSelectPage() {
         <div className="world-stage__label">
           <strong>{`Mundo ${world.order}: ${world.name}`}</strong>
           <span>{`${world.conceptLabel} · ${completedIn(save, worldId)} de 10 missões`}</span>
+          <span className="world-stage__stars">{`★ ${worldStars} de 30 estrelas`}</span>
           <span className="world-stage__bar" aria-hidden="true">
             <i style={{ width: `${completedIn(save, worldId) * 10}%` }} />
           </span>
@@ -130,8 +137,8 @@ export function MissionSelectPage() {
             </AnimatePresence>
           </div>
         )}
+        <WorldDots worlds={WORLDS} states={dots} current={worldId} onSelect={goTo} />
       </div>
-      <WorldDots worlds={WORLDS} states={dots} current={worldId} onSelect={goTo} />
     </div>
   )
 }
