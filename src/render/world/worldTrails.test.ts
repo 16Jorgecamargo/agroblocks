@@ -1,5 +1,6 @@
 import { WORLD_IDS } from '@/game/worlds/worldTypes'
 import { buildWorld } from '@/render/world/buildWorld'
+import { crossings, distanceToPolyline, rectDistance } from '@/render/world/geometry'
 import { TREE_MODELS } from '@/render/world/worldCatalog'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'
 
@@ -38,12 +39,12 @@ describe('world map landscapes', () => {
   })
 
   it('gives every world its own organised zones', () => {
-    expect(count('garden', 'vegetableBed')).toBeGreaterThanOrEqual(16)
+    expect(count('garden', 'vegetableBed')).toBeGreaterThanOrEqual(12)
     expect(count('cornfield', 'cornStalk')).toBeGreaterThanOrEqual(80)
-    expect(count('orchard', 'fruitTree')).toBeGreaterThanOrEqual(16)
+    expect(count('orchard', 'fruitTree')).toBeGreaterThanOrEqual(12)
     expect(count('greenhouse', 'greenhouse')).toBeGreaterThanOrEqual(3)
     expect(map('barnyard').animals.length).toBeGreaterThanOrEqual(6)
-    expect(new Set(map('homestead').features.map((feature) => feature.kind)).size).toBeGreaterThanOrEqual(4)
+    expect(new Set(map('homestead').features.map((feature) => feature.kind)).size).toBeGreaterThanOrEqual(3)
   })
 
   it('fences the zones without crossing the trail', () => {
@@ -60,5 +61,32 @@ describe('world map landscapes', () => {
         }
       }
     }
+  })
+})
+
+describe('trail rules on world maps', () => {
+  const map = (theme: (typeof WORLD_IDS)[number]) => buildWorld({ layout: 'worldMap', gridWidth: 0, gridHeight: 0, seed: theme, density: 'full', theme })
+  const CROPS = new Set(['cornStalk', 'vegetableBed', 'fruitTree', 'greenhouse'])
+
+  it.each(WORLD_IDS)('%s keeps plantations and their ground off the trail', (theme) => {
+    const world = map(theme)
+    for (const feature of world.features.filter((item) => CROPS.has(item.kind))) expect(distanceToPolyline(feature, world.trail)).toBeGreaterThan(1.1)
+    for (const patch of world.patches ?? []) {
+      for (let index = 1; index < world.trail.length; index += 1) {
+        const a = world.trail[index - 1]
+        const b = world.trail[index]
+        for (let step = 0; step <= 40; step += 1) {
+          const point = { x: a.x + ((b.x - a.x) * step) / 40, z: a.z + ((b.z - a.z) * step) / 40 }
+          expect(rectDistance(point, patch.rect)).toBeGreaterThan(0.55)
+        }
+      }
+    }
+  })
+
+  it.each(WORLD_IDS)('%s never crosses the pond', (theme) => {
+    const world = map(theme)
+    if (!world.river) return
+    expect(crossings({ points: world.trail, width: 1 }, world.river)).toEqual([])
+    for (const node of world.trail) expect(distanceToPolyline(node, world.river.points)).toBeGreaterThan(world.river.width / 2 + 0.8)
   })
 })

@@ -7,27 +7,51 @@ import type { WorldFeature } from '@/render/world/worldTypes'
 const SWAY_SPEED = 1.3
 const SWAY_ANGLE = 0.05
 
+const CORN_LEAVES: [number, number, number][] = [
+  [0.35, 0, 1],
+  [0.55, 2.3, 0.95],
+  [0.78, 4.4, 0.9],
+  [1.0, 1.2, 0.8],
+  [1.2, 3.5, 0.7],
+]
+
 function CornStalk() {
   return (
-    <group>
-      <mesh position={[0, 0.75, 0]} castShadow>
-        <cylinderGeometry args={[0.035, 0.05, 1.5, 5]} />
-        <Flat color="#5f9a32" />
-      </mesh>
-      {[0.45, 0.8, 1.15].map((height, index) => (
-        <mesh key={height} position={[index % 2 === 0 ? 0.16 : -0.16, height, 0]} rotation={[0, 0, index % 2 === 0 ? -0.9 : 0.9]} castShadow>
-          <boxGeometry args={[0.4, 0.03, 0.12]} />
-          <Flat color="#74b43f" />
+    <group rotation={[0.04, 0, 0.03]}>
+      {[0, 1, 2].map((segment) => (
+        <mesh key={segment} position={[0, 0.25 + segment * 0.48, 0]} castShadow>
+          <cylinderGeometry args={[0.032 - segment * 0.006, 0.042 - segment * 0.006, 0.5, 5]} />
+          <Flat color={segment === 2 ? '#7aa63c' : '#5f9a32'} />
         </mesh>
       ))}
-      <mesh position={[0.07, 1.0, 0.04]} rotation={[0, 0, -0.35]} castShadow>
-        <cylinderGeometry args={[0.06, 0.05, 0.3, 6]} />
-        <Flat color="#f2c14e" />
-      </mesh>
-      <mesh position={[0, 1.55, 0]}>
-        <coneGeometry args={[0.08, 0.2, 5]} />
-        <Flat color="#c9a227" />
-      </mesh>
+      {CORN_LEAVES.map(([height, angle, length]) => (
+        <group key={height} position={[0, height, 0]} rotation={[0, angle, 0]}>
+          <mesh position={[0.24 * length, -0.06, 0]} rotation={[0, 0, -1.05]} scale={[1, 1, 0.22]} castShadow>
+            <coneGeometry args={[0.07, 0.62 * length, 3]} />
+            <Flat color="#6fae3b" />
+          </mesh>
+        </group>
+      ))}
+      <group position={[0.07, 0.72, 0.03]} rotation={[0, 0, -0.4]}>
+        <mesh castShadow>
+          <cylinderGeometry args={[0.055, 0.06, 0.24, 6]} />
+          <Flat color="#f2c14e" />
+        </mesh>
+        <mesh position={[0, 0.16, 0]}>
+          <coneGeometry args={[0.055, 0.1, 6]} />
+          <Flat color="#e8b33c" />
+        </mesh>
+        <mesh position={[0.02, -0.02, 0]} scale={[1, 1, 0.6]}>
+          <coneGeometry args={[0.07, 0.3, 4]} />
+          <Flat color="#86b94a" />
+        </mesh>
+      </group>
+      {[0, 1.6, 3.2, 4.7].map((angle) => (
+        <mesh key={angle} position={[Math.cos(angle) * 0.04, 1.5, Math.sin(angle) * 0.04]} rotation={[Math.sin(angle) * 0.5, 0, Math.cos(angle) * -0.5]}>
+          <coneGeometry args={[0.02, 0.22, 3]} />
+          <Flat color="#d8b866" />
+        </mesh>
+      ))}
     </group>
   )
 }

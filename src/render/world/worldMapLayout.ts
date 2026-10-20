@@ -1,6 +1,6 @@
 import type { WorldId } from '@/game/worlds/worldTypes'
 import type { ModelId } from '@/render/models/manifest'
-import { crossings, rectPolygon } from '@/render/world/geometry'
+import { rectDistance, rectPolygon } from '@/render/world/geometry'
 import { addButterflies, addClutter, addLilies, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import { WorldDraft } from '@/render/world/worldDraft'
@@ -41,7 +41,6 @@ const PATCH_COLORS: Partial<Record<FeatureKind, string>> = {
 }
 
 const PASTURE_COLOR = '#8fcf63'
-const HEDGE_STEP = 1.1
 
 const ZONES: Record<WorldId, Zone[]> = {
   garden: [
@@ -66,8 +65,9 @@ const ZONES: Record<WorldId, Zone[]> = {
   greenhouse: [
     { kind: 'field', feature: 'greenhouse', quadrant: 'north', spacing: [4.8, 3.6], fenced: false },
     { kind: 'field', feature: 'greenhouse', quadrant: 'east', spacing: [4.8, 3.6], fenced: false },
-    { kind: 'field', feature: 'vegetableBed', quadrant: 'south', spacing: [1.9, 1.3], fenced: true },
-    { kind: 'yard', quadrant: 'west', models: [['water-tower', 0.8], ['reservoir', 1], ['small-barn', 0.8]] },
+    { kind: 'field', feature: 'greenhouse', quadrant: 'south', spacing: [4.8, 3.6], fenced: false },
+    { kind: 'field', feature: 'vegetableBed', quadrant: 'west', spacing: [1.9, 1.3], fenced: true },
+    { kind: 'yard', quadrant: 'west', models: [['water-tower', 0.8], ['reservoir', 1]] },
   ],
   barnyard: [
     { kind: 'yard', quadrant: 'north', models: [['barn', 0.8], ['silo', 0.8], ['silo-house', 0.8]] },
@@ -81,9 +81,75 @@ const ZONES: Record<WorldId, Zone[]> = {
     { kind: 'field', feature: 'cornStalk', quadrant: 'north', spacing: [0.8, 1], fenced: false },
     { kind: 'field', feature: 'fruitTree', quadrant: 'east', spacing: [2.4, 2.4], fenced: true, tints: FRUIT_TINTS },
     { kind: 'pasture', quadrant: 'south', herd: [['cow', 2], ['sheep', 3]] },
-    { kind: 'field', feature: 'greenhouse', quadrant: 'west', spacing: [4.8, 3.6], fenced: false },
-    { kind: 'scatter', feature: 'vegetableBed', quadrant: 'west', count: 4 },
+    { kind: 'field', feature: 'vegetableBed', quadrant: 'west', spacing: [1.9, 1.3], fenced: true },
+    { kind: 'scatter', feature: 'hayBale', quadrant: 'south', count: 3 },
   ],
+}
+
+const CELL = 1.2
+const TRAIL_CLEARANCE = 1.05
+const MIN_PARCEL_CELLS = 4
+
+function trailDistance(rect: Rect, trail: Vec2[]): number {
+  let best = Number.POSITIVE_INFINITY
+  for (let index = 1; index < trail.length; index += 1) {
+    const a = trail[index - 1]
+    const b = trail[index]
+    const steps = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.25)
+    for (let step = 0; step <= steps; step += 1) {
+      best = Math.min(best, rectDistance({ x: a.x + ((b.x - a.x) * step) / steps, z: a.z + ((b.z - a.z) * step) / steps }, rect))
+    }
+  }
+  return best
+}
+
+function freeGrid(rect: Rect, trail: Vec2[], clearance: number): boolean[][] {
+  const columns = Math.floor((rect.maxX - rect.minX) / CELL)
+  const rows = Math.floor((rect.maxZ - rect.minZ) / CELL)
+  return Array.from({ length: rows }, (_, row) =>
+    Array.from({ length: columns }, (_, column) => {
+      const cell = { minX: rect.minX + column * CELL, maxX: rect.minX + (column + 1) * CELL, minZ: rect.minZ + row * CELL, maxZ: rect.minZ + (row + 1) * CELL }
+      return trailDistance(cell, trail) > clearance
+    }),
+  )
+}
+
+function largestBlock(grid: boolean[][]): { row: number; column: number; rows: number; columns: number } | null {
+  let best: { row: number; column: number; rows: number; columns: number } | null = null
+  const rows = grid.length
+  const columns = grid[0]?.length ?? 0
+  for (let top = 0; top < rows; top += 1) {
+    for (let left = 0; left < columns; left += 1) {
+      if (!grid[top][left]) continue
+      let width = columns - left
+      for (let bottom = top; bottom < rows; bottom += 1) {
+        let run = 0
+        while (run < width && grid[bottom][left + run]) run += 1
+        width = run
+        if (width === 0) break
+        const area = width * (bottom - top + 1)
+        if (!best || area > best.rows * best.columns) best = { row: top, column: left, rows: bottom - top + 1, columns: width }
+      }
+    }
+  }
+  return best
+}
+
+function parcels(rect: Rect, trail: Vec2[], limit: number): Rect[] {
+  const grid = freeGrid(rect, trail, TRAIL_CLEARANCE)
+  const found: Rect[] = []
+  while (found.length < limit) {
+    const block = largestBlock(grid)
+    if (!block || block.rows * block.columns < MIN_PARCEL_CELLS) break
+    for (let row = block.row; row < block.row + block.rows; row += 1) for (let column = block.column; column < block.column + block.columns; column += 1) grid[row][column] = false
+    found.push({
+      minX: rect.minX + block.column * CELL,
+      maxX: rect.minX + (block.column + block.columns) * CELL,
+      minZ: rect.minZ + block.row * CELL,
+      maxZ: rect.minZ + (block.row + block.rows) * CELL,
+    })
+  }
+  return found
 }
 
 function inset(rect: Rect, amount: number): Rect {
@@ -112,25 +178,8 @@ function fenceRect(draft: WorldDraft, rect: Rect): void {
   }
 }
 
-function hedgeRect(draft: WorldDraft, rect: Rect, random: () => number): void {
-  const edges: [Vec2, Vec2][] = [
-    [{ x: rect.minX, z: rect.minZ }, { x: rect.maxX, z: rect.minZ }],
-    [{ x: rect.maxX, z: rect.minZ }, { x: rect.maxX, z: rect.maxZ }],
-    [{ x: rect.maxX, z: rect.maxZ }, { x: rect.minX, z: rect.maxZ }],
-    [{ x: rect.minX, z: rect.maxZ }, { x: rect.minX, z: rect.minZ }],
-  ]
-  for (const [from, to] of edges) {
-    const length = Math.hypot(to.x - from.x, to.z - from.z)
-    const steps = Math.max(1, Math.round(length / HEDGE_STEP))
-    for (let index = 0; index <= steps; index += 1) {
-      const t = index / steps
-      draft.place('bush', { x: from.x + (to.x - from.x) * t, z: from.z + (to.z - from.z) * t }, random() * Math.PI * 2, 0.8 + random() * 0.3)
-    }
-  }
-}
-
 function field(draft: WorldDraft, rect: Rect, feature: FeatureKind, [stepX, stepZ]: [number, number], random: () => number, tints?: string[]): void {
-  const area = inset(rect, 0.9)
+  const area = inset(rect, feature === 'greenhouse' ? 1.6 : 0.5)
   for (let z = area.minZ; z <= area.maxZ; z += stepZ) {
     for (let x = area.minX; x <= area.maxX; x += stepX) {
       const tint = tints ? tints[Math.floor(random() * tints.length)] : undefined
@@ -147,20 +196,26 @@ function scatterFeature(draft: WorldDraft, rect: Rect, feature: FeatureKind, cou
   }
 }
 
-function pondFor(rect: Rect): Polyline {
-  const { x, z } = center(rect)
-  return {
-    points: [
-      { x: x - 3, z: z - 1.2 },
-      { x: x - 1.5, z: z - 2.4 },
-      { x: x + 1.5, z: z - 2.2 },
-      { x: x + 3, z: z - 0.4 },
-      { x: x + 2, z: z + 1.8 },
-      { x: x - 1, z: z + 2.2 },
-      { x: x - 3, z: z + 0.6 },
-    ],
-    width: 2.6,
-  }
+const POND_SHAPE: [number, number][] = [
+  [-1, -0.4],
+  [-0.5, -0.9],
+  [0.5, -0.85],
+  [1, -0.15],
+  [0.65, 0.75],
+  [-0.35, 0.9],
+  [-1, 0.25],
+]
+
+function pondFor(rect: Rect, trail: Vec2[]): Polyline | null {
+  const grid = freeGrid(rect, trail, 2.2)
+  const block = largestBlock(grid)
+  if (!block || block.rows < 4 || block.columns < 4) return null
+  const area = { minX: rect.minX + block.column * CELL, maxX: rect.minX + (block.column + block.columns) * CELL, minZ: rect.minZ + block.row * CELL, maxZ: rect.minZ + (block.row + block.rows) * CELL }
+  const { x, z } = center(area)
+  const width = 1.8
+  const radiusX = Math.min(3.2, (area.maxX - area.minX) / 2 - width / 2 - 0.3)
+  const radiusZ = Math.min(2.6, (area.maxZ - area.minZ) / 2 - width / 2 - 0.3)
+  return { points: POND_SHAPE.map(([px, pz]) => ({ x: x + px * radiusX, z: z + pz * radiusZ })), width }
 }
 
 export function worldMapLayout(input: WorldInput, random: () => number): World {
@@ -170,7 +225,7 @@ export function worldMapLayout(input: WorldInput, random: () => number): World {
   const trailPath: Polyline = { points: trail, width: 1.1 }
   const zones = ZONES[theme]
   const pondZone = zones.find((zone) => zone.kind === 'pond')
-  const pond = pondZone ? pondFor(QUADRANTS[pondZone.quadrant]) : null
+  const pond = pondZone ? pondFor(QUADRANTS[pondZone.quadrant], trail) : null
   const nodeZones = trail.map((node) => rectPolygon({ minX: node.x - NODE_CLEARANCE, maxX: node.x + NODE_CLEARANCE, minZ: node.z - NODE_CLEARANCE, maxZ: node.z + NODE_CLEARANCE }))
   const inner: Rect = { minX: WORLD_MAP_ISLAND.minX + EDGE, maxX: WORLD_MAP_ISLAND.maxX - EDGE, minZ: WORLD_MAP_ISLAND.minZ + EDGE, maxZ: WORLD_MAP_ISLAND.maxZ - EDGE }
   const draft = new WorldDraft(random, { grid: null, paths: [trailPath], river: pond, keepOut: nodeZones, frontGuard: null, bounds: inner })
@@ -178,19 +233,17 @@ export function worldMapLayout(input: WorldInput, random: () => number): World {
   const patches: GroundPatch[] = []
   let pasture: Vec2[] | null = null
 
-  if (pond) {
-    for (const crossing of crossings(trailPath, pond)) draft.force('bridge', crossing.point, crossing.angle, 0.8)
-    addLilies(draft, pond, 4)
-  }
+  if (pond) addLilies(draft, pond, 4)
 
   for (const [index, zone] of zones.entries()) {
     const rect = QUADRANTS[zone.quadrant]
     if (zone.kind === 'field') {
       const color = PATCH_COLORS[zone.feature]
-      if (color) patches.push({ rect: inset(rect, 0.4), color })
-      if (zone.fenced) fenceRect(draft, inset(rect, 0.3))
-      else if (zone.feature === 'cornStalk') hedgeRect(draft, inset(rect, 0.1), random)
-      field(draft, rect, zone.feature, zone.spacing, random, zone.tints)
+      for (const parcel of parcels(rect, trail, 4)) {
+        if (color) patches.push({ rect: inset(parcel, 0.15), color })
+        if (zone.fenced) fenceRect(draft, inset(parcel, 0.05))
+        field(draft, parcel, zone.feature, zone.spacing, random, zone.tints)
+      }
     }
     if (zone.kind === 'yard') {
       const middle = center(rect)
@@ -200,7 +253,9 @@ export function worldMapLayout(input: WorldInput, random: () => number): World {
       })
     }
     if (zone.kind === 'pasture') {
-      const area = inset(rect, 0.4)
+      const [best] = parcels(rect, trail, 1)
+      if (!best) continue
+      const area = inset(best, 0.1)
       patches.push({ rect: area, color: PASTURE_COLOR })
       fenceRect(draft, area)
       const polygon = rectPolygon(inset(area, 0.6))
