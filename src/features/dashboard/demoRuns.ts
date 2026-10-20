@@ -79,7 +79,7 @@ function demoRun(person: DemoPerson, index: number, missions: MissionDefinition[
     }
   })
   const response = (form: 'pre' | 'post', correct: number | null) =>
-    correct === null ? null : { form, startedAt: at(0), completedAt: at(0), skipped: false, answers: answers(form, correct) }
+    correct === null ? null : { world: 'garden' as const, form, startedAt: at(0), completedAt: at(0), skipped: false, answers: answers(form, correct) }
   return {
     runId: `demo-run-${index}-${runIndex}`,
     student: { name: person.name, school: person.school },
@@ -89,7 +89,14 @@ function demoRun(person: DemoPerson, index: number, missions: MissionDefinition[
     tutorial: person.tutorial ? { status: person.tutorial, step: person.tutorial === 'completed' ? 15 : 3 + index, at: at(1) } : null,
     missions: progress,
     attempts,
-    assessments: { pre: response('pre', person.pre), post: response('post', person.post) },
+    assessments: {
+      garden: { pre: response('pre', person.pre), post: response('post', person.post) },
+      cornfield: { pre: null, post: null },
+      orchard: { pre: null, post: null },
+      greenhouse: { pre: null, post: null },
+      barnyard: { pre: null, post: null },
+      homestead: { pre: null, post: null },
+    },
   }
 }
 

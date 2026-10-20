@@ -27,6 +27,11 @@ describe('handleApi', () => {
     expect((await handleApi(request('POST', '/api/runs', { body: 'x'.repeat(512 * 1024 + 1) }), deps())).status).toBe(413)
   })
 
+  it('answers 400 to a run in the old single pre/post format', async () => {
+    const old = { ...validSnapshot, assessments: { pre: null, post: null } }
+    expect((await handleApi(request('POST', '/api/runs', { body: JSON.stringify(old) }), deps())).status).toBe(400)
+  })
+
   it('logs in with the right password only, waiting before a refusal', async () => {
     const d = deps()
     const ok = await handleApi(request('POST', '/api/teacher/login', { body: JSON.stringify({ password: 'dashboard' }) }), d)

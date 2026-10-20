@@ -69,7 +69,7 @@ export interface DashboardModel {
   schoolScores: { school: string; pre: number | null; post: number | null }[]
 }
 
-export function scoreAssessment(response: RunSnapshot['assessments']['pre']): number | null {
+export function scoreAssessment(response: RunSnapshot['assessments']['garden']['pre']): number | null {
   if (!response || response.skipped) return null
   return itemsForForm(response.form).filter((item) => response.answers[item.id] === item.correctIndex).length
 }
@@ -118,8 +118,8 @@ function studentRow(key: string, runs: RunSnapshot[], phaseIds: Set<string>, mis
   const ordered = [...runs].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const newest = ordered[0]
   const attempts = ordered.flatMap((run) => run.attempts)
-  const pre = firstWith(ordered, (run) => scoreAssessment(run.assessments.pre))
-  const post = firstWith(ordered, (run) => scoreAssessment(run.assessments.post))
+  const pre = firstWith(ordered, (run) => scoreAssessment(run.assessments.garden.pre))
+  const post = firstWith(ordered, (run) => scoreAssessment(run.assessments.garden.post))
   return {
     key,
     name: cleanText(newest.student.name),

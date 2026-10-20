@@ -13,6 +13,13 @@ describe('runSnapshotSchema', () => {
     expect(runSnapshotSchema.safeParse(long).success).toBe(false)
   })
 
+  it('accepts per-world assessments and rejects the old pre/post shape', () => {
+    expect(runSnapshotSchema.safeParse(validSnapshot).success).toBe(true)
+    expect(runSnapshotSchema.safeParse({ ...validSnapshot, assessments: { pre: null, post: null } }).success).toBe(false)
+    const answered = { world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: { 'garden-1-A': 1 } }
+    expect(runSnapshotSchema.safeParse({ ...validSnapshot, assessments: { ...validSnapshot.assessments, garden: { pre: answered, post: null } } }).success).toBe(true)
+  })
+
   it('rejects an invalid student', () => {
     expect(runSnapshotSchema.safeParse({ ...validSnapshot, student: { name: 'Ana', school: 'Escola Azul' } }).success).toBe(false)
   })

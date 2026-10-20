@@ -2,6 +2,7 @@ import { getMission } from '@/data/missions'
 import { WORLDS } from '@/data/worlds'
 import { missionLabel } from '@/game/worlds/missionLabel'
 import { roleForSlot, WORLD_IDS } from '@/game/worlds/worldTypes'
+import { WORLD_ID_VALUES } from '@/shared/runSnapshot'
 
 describe('worlds', () => {
   it('lists the six worlds in order with their names and concepts', () => {
@@ -14,6 +15,10 @@ describe('worlds', () => {
       ['homestead', 6, 'Fazenda completa'],
     ])
     expect(WORLDS.map((world) => world.id)).toEqual(WORLD_IDS)
+  })
+
+  it('keeps the shared world ids in sync with the game', () => {
+    expect([...WORLD_ID_VALUES]).toEqual([...WORLD_IDS])
   })
 
   it('maps slots to roles', () => {

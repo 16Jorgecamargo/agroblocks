@@ -26,5 +26,12 @@ export const validSnapshot: RunSnapshot = {
       pseudocode: 'quando executar:\n    mover para frente',
     },
   ],
-  assessments: { pre: null, post: null },
+  assessments: {
+    garden: { pre: null, post: null },
+    cornfield: { pre: null, post: null },
+    orchard: { pre: null, post: null },
+    greenhouse: { pre: null, post: null },
+    barnyard: { pre: null, post: null },
+    homestead: { pre: null, post: null },
+  },
 }

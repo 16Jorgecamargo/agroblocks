@@ -44,7 +44,7 @@ export function assessmentsCsv(rows: StudentRow[]): string {
   const lines: (string | number | null)[][] = []
   for (const row of rows) {
     for (const run of row.runs) {
-      for (const response of [run.assessments.pre, run.assessments.post]) {
+      for (const response of [run.assessments.garden.pre, run.assessments.garden.post]) {
         if (!response) continue
         if (response.skipped) {
           lines.push([row.name, row.school, run.runId, response.form, null, null, null, 'pulado'])

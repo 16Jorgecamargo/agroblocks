@@ -78,7 +78,7 @@ function MissionFacts({ run, missionId }: { run: RunSnapshot; missionId: string 
   )
 }
 
-function Answers({ response, label }: { response: RunSnapshot['assessments']['pre']; label: string }) {
+function Answers({ response, label }: { response: RunSnapshot['assessments']['garden']['pre']; label: string }) {
   if (!response) return <p className="run__note">{label}: não respondida.</p>
   if (response.skipped) return <p className="run__note">{label}: pulada.</p>
   return (
@@ -172,8 +172,8 @@ function RunSection({ run, demo, onDelete }: { run: RunSnapshot; demo: boolean; 
         </ol>
       )}
       <h4>Avaliações</h4>
-      <Answers response={run.assessments.pre} label="Avaliação pré" />
-      <Answers response={run.assessments.post} label="Avaliação pós" />
+      <Answers response={run.assessments.garden.pre} label="Avaliação pré" />
+      <Answers response={run.assessments.garden.post} label="Avaliação pós" />
       {!demo && !confirming && (
         <button type="button" className="dash-button dash-button--danger-quiet run__delete" onClick={() => setConfirming(true)}>
           Apagar jogada

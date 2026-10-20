@@ -21,7 +21,7 @@ const runs: RunSnapshot[] = [
     updatedAt: '2026-10-10T10:00:00.000Z',
     tutorial: { status: 'skipped', step: 3, at: 't' },
     attempts: [failed],
-    assessments: { pre: { form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: answers('pre', 4) }, post: null },
+    assessments: { ...validSnapshot.assessments, garden: { pre: { world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: answers('pre', 4) }, post: null } },
   }),
   run({
     runId: 'run-a2',
@@ -32,15 +32,15 @@ const runs: RunSnapshot[] = [
       ...validSnapshot.missions,
       'garden-04': { status: 'completed', attempts: 2, bestResult: { actions: 8, blocks: 8, usage: { seeds: 0, water: 0, energy: 8 }, efficiencyStars: 2 }, hintsUsed: 1, errorCounts: { HIT_OBSTACLE: 1 } },
     },
-    assessments: { pre: null, post: { form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: answers('post', 9) } },
+    assessments: { ...validSnapshot.assessments, garden: { pre: null, post: { world: 'garden', form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: answers('post', 9) } } },
   }),
   run({ runId: 'run-b1', student: { name: 'Bia Lima', school: 'Escola Verde' }, updatedAt: '2026-10-11T10:00:00.000Z', tutorial: null }),
 ]
 
 describe('dashboard model', () => {
   it('scores assessments and labels tutorial outcomes', () => {
-    expect(scoreAssessment({ form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: answers('pre', 7) })).toBe(7)
-    expect(scoreAssessment({ form: 'pre', startedAt: 's', completedAt: 'c', skipped: true, answers: {} })).toBeNull()
+    expect(scoreAssessment({ world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: answers('pre', 7) })).toBe(7)
+    expect(scoreAssessment({ world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: true, answers: {} })).toBeNull()
     expect(scoreAssessment(null)).toBeNull()
     expect(tutorialLabel({ status: 'completed', step: 15, at: 't' })).toBe('Concluído')
     expect(tutorialLabel({ status: 'skipped', step: 3, at: 't' })).toBe('Pulado na etapa 3 de 15')

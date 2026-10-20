@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { validateStudent } from './student.js'
 
+export const WORLD_ID_VALUES = ['garden', 'cornfield', 'orchard', 'greenhouse', 'barnyard', 'homestead'] as const
+
 export const MAX_ATTEMPTS = 2000
 export const MAX_PSEUDOCODE = 4000
 export const MAX_BODY_BYTES = 512 * 1024
@@ -39,6 +41,7 @@ const mission = z.object({
 })
 
 const assessment = z.object({
+  world: z.enum(WORLD_ID_VALUES),
   form: z.enum(['pre', 'post']),
   startedAt: z.string(),
   completedAt: z.string(),
@@ -55,7 +58,7 @@ export const runSnapshotSchema = z.object({
   tutorial: z.object({ status: z.enum(['completed', 'skipped']), step: z.number().int().min(1).max(99), at: z.string().max(40) }).nullable(),
   missions: z.record(z.string(), mission),
   attempts: z.array(attempt).max(MAX_ATTEMPTS),
-  assessments: z.object({ pre: assessment.nullable(), post: assessment.nullable() }),
+  assessments: z.object(Object.fromEntries(WORLD_ID_VALUES.map((world) => [world, z.object({ pre: assessment.nullable(), post: assessment.nullable() })])) as Record<(typeof WORLD_ID_VALUES)[number], z.ZodObject<{ pre: z.ZodNullable<typeof assessment>; post: z.ZodNullable<typeof assessment> }>>),
 })
 
 export type RunSnapshot = z.infer<typeof runSnapshotSchema>
