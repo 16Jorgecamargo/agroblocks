@@ -34,10 +34,23 @@ export function HowItWorks({ mission, savedProgram, pseudocode, reference, attem
     <motion.section className="how-it-works" aria-labelledby="explain-title" variants={rowExpand} initial="hidden" animate="visible" exit="hidden">
       <h2 id="explain-title">Como funciona?</h2>
       <p className="how-it-works__lead">{mission.solutionExplanation}</p>
+      <div className="how-it-works__columns how-it-works__code">
+        <figure>
+          <figcaption>O pseudocódigo que você fez para passar</figcaption>
+          <pre>{pseudocode}</pre>
+        </figure>
+        <figure>
+          <figcaption>Solução da missão em pseudocódigo</figcaption>
+          <pre>{reference.pseudocode}</pre>
+          <p className="how-it-works__note">Existem outras soluções corretas.</p>
+        </figure>
+      </div>
       <div className="how-it-works__grid">
-        <div className="how-it-works__blocks">
-          {parsed ? <BlockPreview json={parsed.json} label={`Blocos do seu programa. ${pseudocode}`} /> : <pre>{pseudocode}</pre>}
-        </div>
+        {parsed && (
+          <div className="how-it-works__blocks">
+            <BlockPreview json={parsed.json} label={`Blocos do seu programa. ${pseudocode}`} />
+          </div>
+        )}
         <div className="how-it-works__steps">
           <h3>O que o robô fez?</h3>
           {steps.length > 0 ? (
@@ -52,7 +65,7 @@ export function HowItWorks({ mission, savedProgram, pseudocode, reference, attem
               ))}
             </motion.ol>
           ) : (
-            <pre>{pseudocode}</pre>
+            <p>Veja o pseudocódigo acima.</p>
           )}
         </div>
       </div>
@@ -63,41 +76,28 @@ export function HowItWorks({ mission, savedProgram, pseudocode, reference, attem
           <p>{CONCEPT_TIPS[mission.concept]}</p>
         </div>
       </aside>
-      <details className="how-it-works__compare">
-        <summary>Comparar com a solução de referência</summary>
-        <div className="how-it-works__columns">
-          <figure>
-            <figcaption>O seu algoritmo</figcaption>
-            <pre>{pseudocode}</pre>
-          </figure>
-          <figure>
-            <figcaption>Uma solução de referência (existem outras corretas)</figcaption>
-            <pre>{reference.pseudocode}</pre>
-          </figure>
-        </div>
-        <table className="results__table">
-          <caption>Comparação entre soluções corretas</caption>
-          <thead>
-            <tr>
-              <th scope="col">Medida</th>
-              <th scope="col">Sua solução</th>
-              <th scope="col">Referência</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Comandos executados</th>
-              <td>{attempt.actions}</td>
-              <td>{reference.actions}</td>
-            </tr>
-            <tr>
-              <th scope="row">Blocos usados</th>
-              <td>{attempt.blocks}</td>
-              <td>{reference.blocks}</td>
-            </tr>
-          </tbody>
-        </table>
-      </details>
+      <table className="results__table">
+        <caption>Comparação com a solução da missão</caption>
+        <thead>
+          <tr>
+            <th scope="col">Medida</th>
+            <th scope="col">Sua solução</th>
+            <th scope="col">Solução da missão</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Comandos executados</th>
+            <td>{attempt.actions}</td>
+            <td>{reference.actions}</td>
+          </tr>
+          <tr>
+            <th scope="row">Blocos usados</th>
+            <td>{attempt.blocks}</td>
+            <td>{reference.blocks}</td>
+          </tr>
+        </tbody>
+      </table>
     </motion.section>
   )
 }
