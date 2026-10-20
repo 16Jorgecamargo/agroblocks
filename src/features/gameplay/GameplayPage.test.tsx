@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { MemoryRouter, Route, Routes, useParams } from 'react-router'
 import { GameplayPage } from '@/features/gameplay/GameplayPage'
 import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -32,6 +32,11 @@ vi.mock('@/blocks/editor/BlocklyEditor', async () => {
   }
 })
 
+function TestRoute() {
+  const { world, form } = useParams()
+  return <p>{`Prova ${world} ${form}`}</p>
+}
+
 function openMission(id: string) {
   useProgressStore.setState((state) => ({
     save: { ...state.save, missions: { ...state.save.missions, [id]: { ...state.save.missions[id], status: 'available' } } },
@@ -45,7 +50,7 @@ function renderAt(path: string) {
         <Route path="/jogar/:missionId" element={<GameplayPage />} />
         <Route path="/resultado/:missionId" element={<p>Tela de resultado</p>} />
         <Route path="/missoes" element={<p>Mapa de missões</p>} />
-        <Route path="/avaliacao/pre" element={<p>Avaliação inicial</p>} />
+        <Route path="/avaliacao/:world/:form" element={<TestRoute />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -210,10 +215,21 @@ describe('GameplayPage', () => {
     expect(screen.getByTestId('tutorial-progress')).toHaveTextContent('6/15')
   })
 
-  it('sends a registered student to the pre-test before a world mission', () => {
+  it('sends a registered student to the world pre-test before its first mission', () => {
     useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
-    renderAt('/jogar/garden-01')
-    expect(screen.getByText('Avaliação inicial')).toBeInTheDocument()
+    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'post', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
+    renderAt('/jogar/cornfield-01')
+    expect(screen.getByText('Prova cornfield pre')).toBeInTheDocument()
+  })
+
+  it('lets a student replay a finished mission without a test', () => {
+    useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
+    useProgressStore.setState((state) => ({
+      save: { ...state.save, missions: { ...state.save.missions, 'garden-02': { ...state.save.missions['garden-02'], status: 'completed' } } },
+    }))
+    renderAt('/jogar/garden-02')
+    expect(screen.queryByText(/^Prova /)).not.toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { name: 'Horta · Missão 2 - Hora de plantar' }).length).toBeGreaterThan(0)
   })
 
   it('records a skipped tutorial on the run', () => {

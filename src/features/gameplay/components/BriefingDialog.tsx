@@ -10,6 +10,7 @@ import { visibleResources, type HudResource } from '@/features/gameplay/hudLogic
 import { DURATIONS, questBanner, softRise, staggerContainer, staggerItem } from '@/motion/presets'
 import { EASINGS } from '@/motion/easings'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
+import { missionHeading } from '@/game/worlds/missionLabel'
 
 interface BriefingDialogProps {
   open: boolean
@@ -27,7 +28,7 @@ const RESOURCE_CHIPS: Record<Exclude<HudResource, 'harvest'>, { icon: IconName; 
 export function BriefingDialog({ open, mission, onStart, onDemo }: BriefingDialogProps) {
   const { ambient } = useMotionPrefs()
   const [showConcept, setShowConcept] = useState(false)
-  const title = mission.tutorial ? mission.title : `Fase ${mission.order} - ${mission.title}`
+  const title = missionHeading(mission)
   const resources = visibleResources(mission).filter((resource): resource is Exclude<HudResource, 'harvest'> => resource !== 'harvest')
   const constraints = mission.constraints ?? []
   const blockLimit = mission.rules.maxBlocks

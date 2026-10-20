@@ -35,16 +35,14 @@ describe('resultsLogic', () => {
     expect(stats.pseudocode).toContain('repita 6 vezes')
   })
 
-  it('points to the next mission, or to the final assessment after the last one', () => {
+  it('points to the next mission of the world, then to the world post-test', () => {
     const save = createInitialSave(refs, 'now')
-    const second = getMission('cornfield-02')
-    const last = getMission('homestead-10')
-    if (!second || !last) throw new Error('missing')
-    expect(nextStep(second, save)).toEqual({ label: 'Próxima fase', to: '/jogar/cornfield-03' })
-    expect(nextStep(last, save)).toEqual({ label: 'Fazer avaliação final', to: '/avaliacao/pos' })
-    expect(nextStep(last, { ...save, assessments: { ...save.assessments, homestead: { pre: null, post: { world: 'homestead', form: 'post', startedAt: '', completedAt: '', skipped: false, answers: {} } } } })).toEqual({
-      label: 'Voltar às missões',
-      to: '/missoes',
-    })
+    const third = getMission('garden-03')
+    const last = getMission('garden-10')
+    if (!third || !last) throw new Error('missing')
+    expect(nextStep(third, save)).toEqual({ label: 'Próxima missão', to: '/jogar/garden-04' })
+    expect(nextStep(last, save)).toEqual({ label: 'Fazer a prova final', to: '/avaliacao/garden/pos' })
+    const post = { world: 'garden' as const, form: 'post' as const, startedAt: '', completedAt: '', skipped: false, answers: {} }
+    expect(nextStep(last, { ...save, assessments: { ...save.assessments, garden: { pre: null, post } } })).toEqual({ label: 'Voltar às missões', to: '/missoes' })
   })
 })

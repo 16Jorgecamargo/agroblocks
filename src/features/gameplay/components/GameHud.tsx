@@ -13,6 +13,7 @@ import { BADGE_POP, DURATIONS, ERROR_SHAKE } from '@/motion/presets'
 import { SPRINGS } from '@/motion/springs'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { useFlightStore } from '@/stores/flightStore'
+import { missionHeading } from '@/game/worlds/missionLabel'
 import './panels.css'
 
 interface ResourceChipProps {
@@ -91,7 +92,7 @@ export function GameHud({ mission, resources, onHelp, onSettings, onExit }: Game
     <motion.header className="game-hud" initial={{ y: -80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={SPRINGS.modal}>
       <Logo />
       <div className="game-hud__mission" data-tutorial="hud-goal">
-        <h1 className="game-hud__title">{mission.tutorial ? mission.title : `Fase ${mission.order} - ${mission.title}`}</h1>
+        <h1 className="game-hud__title">{missionHeading(mission)}</h1>
         <p className="game-hud__goal">
           {mission.briefing.goalText}
           {mission.rules.maxBlocks !== undefined && <span className="game-hud__limit"> Limite: {mission.rules.maxBlocks} blocos</span>}

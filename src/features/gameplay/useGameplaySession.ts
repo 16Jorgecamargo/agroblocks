@@ -60,12 +60,12 @@ export function useGameplaySession(mission: MissionDefinition) {
   const pseudocode = useMemo(() => (program ? programToPseudocode(program) : ''), [program])
 
   useEffect(() => {
-    if (!program || mission.order < 2 || repetitionTipShown.current) return
+    if (!program || mission.world === null || mission.world === 'garden' || repetitionTipShown.current) return
     if (detectRepetition(program)) {
       repetitionTipShown.current = true
       controller.addLog('info', REPETITION_TIP)
     }
-  }, [program, mission.order, controller])
+  }, [program, mission.world, controller])
 
   const readyProgram = useCallback((): Program | null => {
     if (!serialized) return null

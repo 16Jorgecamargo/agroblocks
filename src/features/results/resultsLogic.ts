@@ -1,6 +1,7 @@
 import { runProgram } from '@/blocks/interpreter/runProgram'
 import { programToPseudocode } from '@/blocks/pseudocode/pseudocode'
 import { getNextMission } from '@/data/missions'
+import { assessmentPath } from '@/features/assessment/assessmentPath'
 import type { MissionConcept, MissionDefinition } from '@/game/missions/missionTypes'
 import { toControllerMission } from '@/game/missions/toControllerMission'
 import type { AttemptRecord, SaveData } from '@/game/progress/types'
@@ -46,7 +47,8 @@ export const CONCEPT_TIPS: Record<MissionConcept, string> = {
 
 export function nextStep(mission: MissionDefinition, save: SaveData): { label: string; to: string } {
   const next = getNextMission(mission.id)
-  if (next) return { label: 'Próxima fase', to: `/jogar/${next.id}` }
-  if (!save.assessments.homestead.post) return { label: 'Fazer avaliação final', to: '/avaliacao/pos' }
+  if (mission.world === null) return next ? { label: 'Próxima missão', to: `/jogar/${next.id}` } : { label: 'Voltar às missões', to: '/missoes' }
+  if (next && next.world === mission.world) return { label: 'Próxima missão', to: `/jogar/${next.id}` }
+  if (!save.assessments[mission.world]?.post) return { label: 'Fazer a prova final', to: assessmentPath(mission.world, 'post') }
   return { label: 'Voltar às missões', to: '/missoes' }
 }

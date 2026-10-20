@@ -10,6 +10,7 @@ function renderHome() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/jogar/:missionId" element={<p>jogando</p>} />
+        <Route path="/avaliacao/:world/:form" element={<p>prova</p>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -41,7 +42,7 @@ describe('HomePage', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'AgroBlocks' })).toBeInTheDocument()
     expect(screen.getByText('Automatize. Programe. Cultive.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Continuar missão/ })).toBeDisabled()
-    expect(screen.getByText(`0 de ${MISSIONS.length - 1} fases concluídas`)).toBeInTheDocument()
+    expect(screen.getByText(`0 de ${MISSIONS.length - 1} missões concluídas`)).toBeInTheDocument()
   })
 
   it('continues at the next mission and shows its name', () => {
@@ -51,8 +52,8 @@ describe('HomePage', () => {
     renderHome()
     const continueButton = screen.getByRole('button', { name: /Continuar missão/ })
     expect(continueButton).toBeEnabled()
-    expect(continueButton).toHaveTextContent('Fase 2 - Hora de plantar')
-    expect(screen.getByText(`1 de ${MISSIONS.length - 1} fases concluídas`)).toBeInTheDocument()
+    expect(continueButton).toHaveTextContent('Horta · Missão 2 - Hora de plantar')
+    expect(screen.getByText(`1 de ${MISSIONS.length - 1} missões concluídas`)).toBeInTheDocument()
   })
 
   it('asks who is playing before starting a new farm', () => {
@@ -89,8 +90,18 @@ describe('HomePage', () => {
     expect(screen.queryByText('jogando')).not.toBeInTheDocument()
   })
 
+  it('has no separate assessment link and leads to the pending world test', () => {
+    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
+    for (const mission of MISSIONS.filter((item) => item.world === 'garden')) useProgressStore.getState().recordAttempt(success(mission.id))
+    renderHome()
+    expect(screen.queryByRole('link', { name: 'Avaliação' })).not.toBeInTheDocument()
+    const continueButton = screen.getByRole('button', { name: /Continuar missão/ })
+    expect(continueButton).toHaveTextContent('Prova final · Horta')
+  })
+
   it('registers an old save before continuing without losing progress', () => {
     useProgressStore.getState().recordAttempt(success('m0-training'))
+    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
     renderHome()
     fireEvent.click(screen.getByRole('button', { name: /Continuar missão/ }))
     register()
@@ -99,11 +110,11 @@ describe('HomePage', () => {
     expect(useProgressStore.getState().save.student?.name).toBe('Ana Souza')
   })
 
-  it('continues directly when the student is known', () => {
+  it('continues to the Horta pre-test after the training when the student is known', () => {
     useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
     useProgressStore.getState().recordAttempt(success('m0-training'))
     renderHome()
     fireEvent.click(screen.getByRole('button', { name: /Continuar missão/ }))
-    expect(screen.getByText('jogando')).toBeInTheDocument()
+    expect(screen.getByText('prova')).toBeInTheDocument()
   })
 })

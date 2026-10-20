@@ -29,7 +29,7 @@ describe('gameplay components', () => {
         onExit={vi.fn()}
       />,
     )
-    expect(screen.getByRole('heading', { name: 'Fase 12 - Plantação em série' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Milharal · Missão 2 - Plantação em série' })).toBeInTheDocument()
     expect(screen.getByLabelText('Sementes: 5')).toBeInTheDocument()
     expect(screen.queryByLabelText(/^Água/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument()

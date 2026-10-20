@@ -5,6 +5,7 @@ import { BlocklyEditor } from '@/blocks/editor/BlocklyEditor'
 import { Confetti } from '@/components/game/Confetti'
 import { PillTabs, panelId, tabId, type TabItem } from '@/components/game/PillTabs'
 import { getMission } from '@/data/missions'
+import { assessmentPath } from '@/features/assessment/assessmentPath'
 import { BriefingDialog } from '@/features/gameplay/components/BriefingDialog'
 import { ConsolePanel } from '@/features/gameplay/components/ConsolePanel'
 import { ExecutionPanel } from '@/features/gameplay/components/ExecutionPanel'
@@ -286,8 +287,10 @@ export function GameplayPage() {
   const { missionId = '' } = useParams()
   const mission = getMission(missionId)
   const status = useProgressStore((store) => store.save.missions[missionId]?.status)
-  const needsPreTest = useProgressStore((store) => store.save.student !== null && mission?.world != null && store.save.assessments[mission.world]?.pre == null)
+  const needsPreTest = useProgressStore(
+    (store) => store.save.student !== null && mission?.world != null && status !== 'completed' && store.save.assessments[mission.world]?.pre == null,
+  )
   if (!mission || !status || status === 'locked') return <Navigate to="/missoes" replace />
-  if (needsPreTest) return <Navigate to="/avaliacao/pre" replace />
+  if (needsPreTest && mission.world) return <Navigate to={assessmentPath(mission.world, 'pre')} replace />
   return <GameplayScreen key={mission.id} mission={mission} />
 }
