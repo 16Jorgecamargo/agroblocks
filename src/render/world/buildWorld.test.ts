@@ -4,7 +4,6 @@ import { distanceToPolyline, pointInPolygon, rectDistance } from '@/render/world
 import { CLUTTER_MODELS, EXEMPT_MODELS, GRID_CLEARANCE, TALL_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import type { World } from '@/render/world/worldTypes'
 import { HOME_BEDS, HOME_ROBOT, HOME_TITLE_LANE } from '@/render/world/homeLayout'
-import { MAP_ISLAND } from '@/render/world/mapLayout'
 import { HOME_HILLS, hillSurfaceY } from '@/render/world/hillScatter'
 
 const BUILDINGS = ['barn', 'small-barn', 'open-barn', 'silo', 'silo-house', 'tower-windmill', 'windmill', 'water-tower', 'reservoir', 'chicken-coop']
@@ -67,36 +66,6 @@ describe('buildWorld farm', () => {
   })
 })
 
-describe('buildWorld map', () => {
-  const world = buildWorld({ layout: 'map', gridWidth: 0, gridHeight: 0, seed: 'mission-map', density: 'full' })
-
-  it('lays the seven mission nodes along a path on an island', () => {
-    expect(world.island).toBe(true)
-    expect(world.trail).toHaveLength(7)
-    expect(world.paths[0].points).toEqual(world.trail)
-  })
-
-  it('bridges the river where the trail crosses it', () => {
-    expect(world.props.filter((prop) => prop.model === 'bridge').length).toBeGreaterThanOrEqual(2)
-  })
-
-  it('keeps nodes clear of props and the river', () => {
-    for (const node of world.trail) {
-      for (const prop of world.props) if (!EXEMPT_MODELS.has(prop.model)) expect(Math.hypot(prop.x - node.x, prop.z - node.z)).toBeGreaterThanOrEqual(1.2)
-      if (world.river) expect(distanceToPolyline(node, world.river.points)).toBeGreaterThanOrEqual(1.2)
-    }
-  })
-
-  it('keeps everything on the island', () => {
-    for (const prop of world.props) expect(rectDistance(prop, MAP_ISLAND)).toBe(0)
-  })
-
-  it('is dense', () => {
-    expect(world.props.filter((prop) => (TREE_MODELS as readonly string[]).includes(prop.model)).length).toBeGreaterThanOrEqual(90)
-    expect(world.animals.length).toBeGreaterThanOrEqual(5)
-  })
-})
-
 describe('buildWorld home', () => {
   const world = buildWorld({ layout: 'home', gridWidth: 0, gridHeight: 0, seed: 'home', density: 'full' })
 
@@ -134,13 +103,6 @@ describe('world feedback fixes', () => {
   it('keeps the area around the grid natural, without aligned crop rows', () => {
     const world = buildWorld({ layout: 'farm', gridWidth: 5, gridHeight: 5, seed: 'rows', density: 'full' })
     expect(world.props.some((prop) => prop.model.endsWith('-row'))).toBe(false)
-  })
-
-  it('shrinks map animals to the scale of the map scenery', () => {
-    const world = buildWorld({ layout: 'map', gridWidth: 0, gridHeight: 0, seed: 'mission-map', density: 'full' })
-    for (const animal of world.animals) expect(animal.scale).toBeLessThanOrEqual(0.6)
-    const farm = buildWorld({ layout: 'farm', gridWidth: 5, gridHeight: 5, seed: 'scale', density: 'full' })
-    for (const animal of farm.animals) expect(animal.scale).toBe(1)
   })
 })
 })

@@ -1,51 +1,44 @@
 import { lazy, useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
-import { Icon } from '@/components/icons/Icon'
+import { AnimatePresence } from 'motion/react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { MISSIONS } from '@/data/missions'
+import { getWorld, missionsOfWorld, WORLDS } from '@/data/worlds'
 import { MissionDetailCard } from '@/features/mission-select/MissionDetailCard'
-import { newlyUnlocked } from '@/features/mission-select/unlocks'
-import { continueMissionId } from '@/game/progress/progression'
-import type { MissionStatus } from '@/game/progress/types'
-import { EASINGS } from '@/motion/easings'
-import { DURATIONS, gridWaveItem, PRESSABLE } from '@/motion/presets'
-import { SPRINGS } from '@/motion/springs'
+import { nodeKey, nodeState, trailNodes, type NodeState, type TrailNode } from '@/features/mission-select/trailNodes'
+import { WorldDots, type WorldProgressState } from '@/features/mission-select/WorldDots'
+import { currentWorld, isWorldOpen, worldStep } from '@/game/progress/progression'
+import type { SaveData } from '@/game/progress/types'
+import type { WorldId } from '@/game/worlds/worldTypes'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { hasWebGL } from '@/render/hasWebGL'
-import { safeStorage } from '@/services/storage/jsonStorage'
-import { loadSeenUnlocks, saveSeenUnlocks } from '@/services/storage/seenUnlocks'
+import { SceneWithSplash } from '@/render/SceneWithSplash'
 import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './MissionSelectPage.css'
-import { SceneWithSplash } from '@/render/SceneWithSplash'
 
-const MissionMapScene = lazy(() => import('@/features/mission-select/MissionMapScene'))
+const WorldMapScene = lazy(() => import('@/features/mission-select/WorldMapScene'))
 
-const STATUS_TEXT: Record<MissionStatus, string> = { completed: 'Concluída', available: 'Disponível', locked: 'Bloqueada' }
+const REFS = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
 
-function ListBadge({ status, order, celebrate }: { status: MissionStatus; order: number; celebrate: boolean }) {
-  const [opened, setOpened] = useState(!celebrate)
-  useEffect(() => {
-    if (!celebrate) return
-    const timer = window.setTimeout(() => setOpened(true), 900)
-    return () => window.clearTimeout(timer)
-  }, [celebrate])
-  const content = status === 'locked' || !opened ? 'lock' : status === 'completed' ? 'check' : 'number'
-  return (
-    <span className="mission-list__badge" aria-hidden="true">
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={content}
-          initial={{ scale: 0, rotate: -90 }}
-          animate={celebrate && content === 'lock' ? { scale: [1, 1.2, 1], rotate: [0, -15, 15, 0] } : { scale: 1, rotate: 0 }}
-          exit={{ scale: 0, rotate: 90, transition: { duration: DURATIONS.quickExit } }}
-          transition={SPRINGS.jelly}
-        >
-          {content === 'lock' ? <Icon name="lock" size={16} /> : content === 'check' ? <Icon name="check" size={16} /> : order}
-        </motion.span>
-      </AnimatePresence>
-    </span>
-  )
+const STATE_TEXT: Record<NodeState, string> = { done: 'Concluída', current: 'Agora', open: 'Disponível', locked: 'Bloqueada' }
+
+function completedIn(save: SaveData, world: WorldId): number {
+  return missionsOfWorld(world, MISSIONS).filter((mission) => save.missions[mission.id]?.status === 'completed').length
+}
+
+function worldState(save: SaveData, world: WorldId): WorldProgressState {
+  if (!isWorldOpen(save, world, REFS)) return 'fechado'
+  return worldStep(save, world, REFS).kind === 'done' ? 'concluído' : 'em andamento'
+}
+
+function nodeName(node: TrailNode, state: NodeState): string {
+  if (node.kind === 'mission') return `Missão ${node.mission.slot} · ${node.mission.title} · ${STATE_TEXT[state]}`
+  return `${node.kind === 'preTest' ? 'Prova inicial' : 'Prova final'} · ${STATE_TEXT[state]}`
+}
+
+function initialSelection(save: SaveData, world: WorldId, nodes: TrailNode[]): string {
+  const current = nodes.find((node) => nodeState(save, world, node, REFS) === 'current')
+  return nodeKey(current ?? nodes[0])
 }
 
 export function MissionSelectPage() {
@@ -53,77 +46,92 @@ export function MissionSelectPage() {
   const { lowGraphics } = useSettingsStore((store) => store.settings)
   const { ambient } = useMotionPrefs()
   const webgl = useMemo(() => hasWebGL(), [])
-  const [selectedId, setSelectedId] = useState(() => continueMissionId(save, MISSIONS) ?? 'm0-training')
-  const [celebrateIds] = useState(() => newlyUnlocked(save, MISSIONS.map((mission) => mission.id), loadSeenUnlocks(safeStorage())))
-  const statuses = Object.fromEntries(MISSIONS.map((mission) => [mission.id, save.missions[mission.id]?.status ?? 'locked'])) as Record<string, MissionStatus>
-  const selected = MISSIONS.find((mission) => mission.id === selectedId) ?? MISSIONS[0]
-  const show3d = webgl
+  const [worldId, setWorldId] = useState<WorldId>(() => currentWorld(save, REFS))
+  const nodes = useMemo(() => trailNodes(worldId, MISSIONS), [worldId])
+  const [selected, setSelected] = useState(() => initialSelection(save, worldId, nodes))
+  const world = getWorld(worldId)
+  const open = isWorldOpen(save, worldId, REFS)
+  const states = nodes.map((node) => nodeState(save, worldId, node, REFS))
+  const selectedIndex = Math.max(0, nodes.findIndex((node) => nodeKey(node) === selected))
+  const selectedNode = nodes[selectedIndex]
+  const previous = WORLDS.find((candidate) => candidate.order === world.order - 1)
+  const next = WORLDS.find((candidate) => candidate.order === world.order + 1)
+  const dots = Object.fromEntries(WORLDS.map((item) => [item.id, { state: worldState(save, item.id), completed: completedIn(save, item.id) }])) as Record<
+    WorldId,
+    { state: WorldProgressState; completed: number }
+  >
 
   useEffect(() => {
-    if (show3d) void import('@/render/models/Model').then((module) => module.preloadModels())
-  }, [show3d])
+    if (webgl) void import('@/render/models/Model').then((module) => module.preloadModels())
+  }, [webgl])
 
-  useEffect(() => {
-    if (celebrateIds.length === 0) return
-    saveSeenUnlocks(safeStorage(), [...loadSeenUnlocks(safeStorage()), ...celebrateIds])
-  }, [celebrateIds])
+  const goTo = (target: WorldId) => {
+    setWorldId(target)
+    setSelected(initialSelection(save, target, trailNodes(target, MISSIONS)))
+  }
 
   return (
     <div className="chrome-page mission-select">
-      <PageHeader
-        title="Seus desafios"
-        subtitle="Complete as missões e aprenda novos conceitos de programação."
-        backTo="/"
-      />
-      <div className={`mission-select__body${show3d ? '' : ' mission-select__body--flat'}`}>
-        {show3d && (
-          <div className="mission-select__map">
-            <SceneWithSplash label="Carregando mapa…">
+      <PageHeader title="Seus desafios" subtitle="Cada mundo é uma fazenda. Siga a trilha e conclua as 10 missões para abrir o próximo." backTo="/" />
+      <div className="world-stage">
+        {webgl && (
+          <div className="world-stage__map">
+            <SceneWithSplash label="Carregando a fazenda…">
               {(onReady) => (
-                <MissionMapScene
-                  missions={MISSIONS}
-                  statuses={statuses}
-                  selectedId={selected.id}
-                  onSelect={setSelectedId}
-                  lowGraphics={lowGraphics}
-                  ambient={ambient}
-                  celebrateIds={celebrateIds}
-                  onReady={onReady}
-                />
+                <WorldMapScene world={worldId} nodes={nodes} states={states} selected={selected} onSelect={setSelected} lowGraphics={lowGraphics} ambient={ambient} onReady={onReady} />
               )}
             </SceneWithSplash>
           </div>
         )}
-        <ol className={`mission-list${show3d ? ' mission-list--hidden' : ''}`} aria-label="Lista de fases">
-          {MISSIONS.map((mission, index) => {
-            const status = statuses[mission.id]
-            const name = mission.tutorial ? `Treinamento · ${STATUS_TEXT[status]}` : `Fase ${mission.order} · ${mission.title} · ${STATUS_TEXT[status]}`
-            const available = status === 'available'
-            return (
-              <motion.li key={mission.id} custom={index} variants={gridWaveItem} initial="hidden" animate="visible">
-                <motion.button
-                  type="button"
-                  className={`mission-list__item mission-list__item--${status}`}
-                  aria-pressed={mission.id === selected.id}
-                  aria-label={name}
-                  onClick={() => setSelectedId(mission.id)}
-                  {...PRESSABLE}
-                  animate={available && ambient ? { boxShadow: ['0 0 0 0 rgba(65,133,214,0.6)', '0 0 0 8px rgba(65,133,214,0)'] } : undefined}
-                  transition={available && ambient ? { duration: DURATIONS.glowPulse, repeat: Infinity, ease: EASINGS.easeOutCubic } : PRESSABLE.transition}
-                >
-                  <ListBadge status={status} order={mission.order} celebrate={celebrateIds.includes(mission.id)} />
-                  <span className="mission-list__name">{mission.tutorial ? 'Treinamento' : mission.title}</span>
-                </motion.button>
-              </motion.li>
-            )
-          })}
+        <ol className={`world-trail${webgl ? ' visually-hidden' : ''}`} aria-label={`Trilha de ${world.name}`}>
+          {nodes.map((node, index) => (
+            <li key={nodeKey(node)}>
+              <button
+                type="button"
+                className={`world-trail__item world-trail__item--${states[index]}`}
+                aria-pressed={nodeKey(node) === selected}
+                aria-label={nodeName(node, states[index])}
+                onClick={() => setSelected(nodeKey(node))}
+              >
+                {node.kind === 'mission' ? node.mission.slot : node.kind === 'preTest' ? 'Início' : 'Fim'}
+              </button>
+            </li>
+          ))}
         </ol>
-        <div className="mission-select__detail">
-          <AnimatePresence mode="wait" initial={false}>
-            <MissionDetailCard key={selected.id} mission={selected} progress={save.missions[selected.id]} />
-          </AnimatePresence>
+        <div className="world-stage__label">
+          <strong>{`Mundo ${world.order}: ${world.name}`}</strong>
+          <span>{`${world.conceptLabel} · ${completedIn(save, worldId)} de 10 missões`}</span>
+          <span className="world-stage__bar" aria-hidden="true">
+            <i style={{ width: `${completedIn(save, worldId) * 10}%` }} />
+          </span>
         </div>
+        <button type="button" className="world-stage__nav world-stage__nav--prev" aria-label="Mundo anterior" disabled={!previous} onClick={() => previous && goTo(previous.id)}>
+          ‹
+        </button>
+        <button type="button" className="world-stage__nav world-stage__nav--next" aria-label="Próximo mundo" disabled={!next} onClick={() => next && goTo(next.id)}>
+          ›
+        </button>
+        {!open && previous && (
+          <div className="world-stage__veil">
+            <span aria-hidden="true">🔒</span>
+            <p>{`Conclua o mundo ${previous.name} para abrir este`}</p>
+          </div>
+        )}
+        {open && (
+          <div className="world-stage__card">
+            <AnimatePresence mode="wait" initial={false}>
+              <MissionDetailCard
+                key={nodeKey(selectedNode)}
+                world={world}
+                node={selectedNode}
+                state={states[selectedIndex]}
+                progress={selectedNode.kind === 'mission' ? save.missions[selectedNode.mission.id] : undefined}
+              />
+            </AnimatePresence>
+          </div>
+        )}
       </div>
+      <WorldDots worlds={WORLDS} states={dots} current={worldId} onSelect={goTo} />
     </div>
   )
 }
