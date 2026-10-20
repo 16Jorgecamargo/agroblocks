@@ -17,9 +17,9 @@ describe('progressStore', () => {
       pseudocode: 'quando executar:',
     })
     expect(record.attemptNumber).toBe(1)
-    expect(useProgressStore.getState().save.missions['cornfield-02'].status).toBe('locked')
+    expect(useProgressStore.getState().save.missions['cornfield-01'].status).toBe('locked')
     useProgressStore.getState().storeAssessment({ world: 'garden', form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
-    expect(useProgressStore.getState().save.missions['cornfield-02'].status).toBe('available')
+    expect(useProgressStore.getState().save.missions['cornfield-01'].status).toBe('available')
     expect(window.localStorage.getItem(SAVE_KEY)).toContain('garden-04')
   })
 

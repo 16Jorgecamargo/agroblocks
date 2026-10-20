@@ -40,7 +40,7 @@ describe('resultsLogic', () => {
     const second = getMission('cornfield-02')
     const last = getMission('homestead-10')
     if (!second || !last) throw new Error('missing')
-    expect(nextStep(second, save)).toEqual({ label: 'Próxima fase', to: '/jogar/orchard-04' })
+    expect(nextStep(second, save)).toEqual({ label: 'Próxima fase', to: '/jogar/cornfield-03' })
     expect(nextStep(last, save)).toEqual({ label: 'Fazer avaliação final', to: '/avaliacao/pos' })
     expect(nextStep(last, { ...save, assessments: { ...save.assessments, homestead: { pre: null, post: { world: 'homestead', form: 'post', startedAt: '', completedAt: '', skipped: false, answers: {} } } } })).toEqual({
       label: 'Voltar às missões',

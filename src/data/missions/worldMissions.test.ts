@@ -4,7 +4,7 @@ import { getWorld, missionsOfWorld, WORLDS } from '@/data/worlds'
 import { playMission } from '@/game/testing/playMission'
 import type { WorldId } from '@/game/worlds/worldTypes'
 
-const READY_WORLDS: WorldId[] = ['garden']
+const READY_WORLDS: WorldId[] = ['garden', 'cornfield']
 const MOVED = new Set(['garden-04', 'cornfield-02', 'orchard-04', 'greenhouse-03', 'barnyard-05', 'homestead-10'])
 
 describe('world missions', () => {
@@ -19,7 +19,8 @@ describe('world missions', () => {
   it.each(READY_WORLDS)('%s mission 9 starts from a program that fails', (world) => {
     const debug = missionsOfWorld(world, MISSIONS)[8]
     if (!debug.initialProgram) throw new Error('debug mission without a starting program')
-    expect(playMission(debug, debug.initialProgram).validation.success).toBe(false)
+    const result = playMission(debug, debug.initialProgram)
+    expect(result.outcome.status === 'completed' && result.validation.success).toBe(false)
   })
 
   it.each(READY_WORLDS)('%s missions 7 and 8 have a limit', (world) => {
