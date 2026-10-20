@@ -36,7 +36,7 @@ describe('AssessmentPage', () => {
     await answerAll('pre', true)
     expect(await screen.findByRole('heading', { name: 'Obrigado!' })).toBeInTheDocument()
     expect(screen.queryByText(/correta|errada/i)).not.toBeInTheDocument()
-    const stored = useProgressStore.getState().save.assessments.pre
+    const stored = useProgressStore.getState().save.assessments.garden.pre
     expect(stored?.skipped).toBe(false)
     expect(Object.keys(stored?.answers ?? {})).toHaveLength(10)
   })
@@ -58,7 +58,7 @@ describe('AssessmentPage', () => {
   })
 
   it('compares pre and post by concept after the post-test', async () => {
-    useProgressStore.getState().storeAssessment({ form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
+    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
     useProgressStore.getState().recordAttempt({
       missionId: 'homestead-10',
       timestamp: 'now',

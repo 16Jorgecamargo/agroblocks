@@ -47,6 +47,6 @@ export const CONCEPT_TIPS: Record<MissionConcept, string> = {
 export function nextStep(mission: MissionDefinition, save: SaveData): { label: string; to: string } {
   const next = getNextMission(mission.id)
   if (next) return { label: 'Próxima fase', to: `/jogar/${next.id}` }
-  if (!save.assessments.post) return { label: 'Fazer avaliação final', to: '/avaliacao/pos' }
+  if (!save.assessments.homestead.post) return { label: 'Fazer avaliação final', to: '/avaliacao/pos' }
   return { label: 'Voltar às missões', to: '/missoes' }
 }

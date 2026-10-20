@@ -71,4 +71,29 @@ describe('legacy saves', () => {
     expect(save).toMatchObject({ runId: null, student: null, tutorial: null })
     expect(save).not.toHaveProperty('participantCode')
   })
+
+  it('migrates a version 1 save', () => {
+    const versionOneSave = {
+      version: 1,
+      runId: 'run-7',
+      student: { name: 'Ana Souza', school: 'Escola Azul' },
+      tutorial: { status: 'completed', step: 15, at: 't' },
+      createdAt: '2026-10-14T12:00:00.000Z',
+      missions: {
+        'm0-training': { status: 'completed', attempts: 1, bestResult: null, hintsUsed: 0, errorCounts: {}, savedProgram: null },
+        'm1-first-harvest': { status: 'completed', attempts: 2, bestResult: null, hintsUsed: 0, errorCounts: {}, savedProgram: null },
+      },
+      attempts: [],
+      assessments: { pre: null, post: null },
+    }
+    window.localStorage.setItem(SAVE_KEY, JSON.stringify(versionOneSave))
+    const save = loadSave(window.localStorage, missions, now)
+    expect(save.version).toBe(2)
+    expect(save.runId).toBe('run-7')
+    expect(save.student).toEqual(versionOneSave.student)
+    expect(save.tutorial).toEqual(versionOneSave.tutorial)
+    expect(window.localStorage.getItem(CORRUPT_KEY)).toBeNull()
+    expect(save.assessments.garden).toEqual({ pre: null, post: null })
+    expect(save.missions['m1-first-harvest']).toBeUndefined()
+  })
 })

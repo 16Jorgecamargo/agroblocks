@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { ERROR_CODES } from '@/game/world/types'
+import { WORLD_IDS } from '@/game/worlds/worldTypes'
 
 const errorCode = z.enum(ERROR_CODES)
 const usage = z.object({ seeds: z.number(), water: z.number(), energy: z.number() })
@@ -30,6 +31,7 @@ const missionProgress = z.object({
 })
 
 const assessmentResponse = z.object({
+  world: z.enum(WORLD_IDS),
   form: z.enum(['pre', 'post']),
   startedAt: z.string(),
   completedAt: z.string(),
@@ -40,13 +42,24 @@ const assessmentResponse = z.object({
 const student = z.object({ name: z.string(), school: z.string() })
 const tutorial = z.object({ status: z.enum(['completed', 'skipped']), step: z.number().int(), at: z.string() })
 
+const worldAssessments = z.object({ pre: assessmentResponse.nullable(), post: assessmentResponse.nullable() })
+
 export const saveDataSchema = z.object({
-  version: z.literal(1),
+  version: z.literal(2),
   runId: z.string().nullable().default(null),
   student: student.nullable().default(null),
   tutorial: tutorial.nullable().default(null),
   createdAt: z.string(),
   missions: z.record(z.string(), missionProgress),
   attempts: z.array(attemptRecord),
-  assessments: z.object({ pre: assessmentResponse.nullable(), post: assessmentResponse.nullable() }),
+  assessments: z.partialRecord(z.enum(WORLD_IDS), worldAssessments),
+})
+
+export const legacySaveSchema = z.object({
+  version: z.literal(1),
+  runId: z.string().nullable().default(null),
+  student: student.nullable().default(null),
+  tutorial: tutorial.nullable().default(null),
+  createdAt: z.string(),
+  missions: z.record(z.string(), missionProgress.partial()),
 })

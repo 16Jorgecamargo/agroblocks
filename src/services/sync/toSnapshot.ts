@@ -18,6 +18,6 @@ export function toSnapshot(save: SaveData, now: string): RunSnapshot | null {
     tutorial: save.tutorial,
     missions,
     attempts: save.attempts,
-    assessments: save.assessments,
+    assessments: { pre: save.assessments.garden.pre, post: save.assessments.homestead.post },
   }
 }

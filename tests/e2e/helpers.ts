@@ -109,8 +109,8 @@ export async function takePreTest(page: Page): Promise<void> {
 }
 
 export function withStudent(save: SaveData, name: string, school: string, runId: string): SaveData {
-  const pre = save.assessments.pre ?? { form: 'pre' as const, startedAt: save.createdAt, completedAt: save.createdAt, skipped: false, answers: {} }
-  return { ...save, runId, student: { name, school }, assessments: { ...save.assessments, pre } }
+  const pre = save.assessments.garden.pre ?? { world: 'garden' as const, form: 'pre' as const, startedAt: save.createdAt, completedAt: save.createdAt, skipped: false, answers: {} }
+  return { ...save, runId, student: { name, school }, assessments: { ...save.assessments, garden: { ...save.assessments.garden, pre } } }
 }
 
 export async function teacherLogin(page: Page, password = 'dashboard'): Promise<void> {

@@ -2,6 +2,11 @@ import {
   assignStudent,
   continueMissionId,
   createInitialSave,
+  currentWorld,
+  isWorldOpen,
+  refreshUnlocks,
+  storeAssessment,
+  worldStep,
   failedAttempts,
   hasProgress,
   isBetterResult,
@@ -11,7 +16,10 @@ import {
   storeProgram,
   syncMissions,
 } from '@/game/progress/progression'
-import type { AttemptInput, MissionRef } from '@/game/progress/types'
+import { MISSIONS } from '@/data/missions'
+import { missionsOfWorld } from '@/data/worlds'
+import type { AssessmentForm, AssessmentResponse, AttemptInput, MissionRef, SaveData } from '@/game/progress/types'
+import { WORLD_IDS, type WorldId } from '@/game/worlds/worldTypes'
 
 const missions: MissionRef[] = [
   { id: 'a', order: 0, world: null },
@@ -88,6 +96,7 @@ describe('progression', () => {
 
   it('continues at the first available mission not completed', () => {
     let save = recordAttempt(createInitialSave(missions, now), attempt('a', 'success'), missions)
+    save = storeAssessment(save, { world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} }, missions)
     save = recordAttempt(save, attempt('b', 'success'), missions)
     expect(continueMissionId(save, missions)).toBe('c')
   })
@@ -99,7 +108,8 @@ describe('progression', () => {
   })
 
   it('adds new missions to old saves with the right status', () => {
-    const save = recordAttempt(createInitialSave(missions.slice(0, 3), now), attempt('c', 'success'), missions.slice(0, 3))
+    const first = recordAttempt(createInitialSave(missions.slice(0, 3), now), attempt('b', 'success'), missions.slice(0, 3))
+    const save = recordAttempt(first, attempt('c', 'success'), missions.slice(0, 3))
     const synced = syncMissions(save, missions)
     expect(synced.missions.d.status).toBe('available')
   })
@@ -136,5 +146,65 @@ describe('student and tutorial', () => {
     expect(save.tutorial?.status).toBe('completed')
     save = recordTutorial(save, { status: 'skipped', step: 4, at: 't3' })
     expect(save.tutorial).toEqual({ status: 'completed', step: 15, at: 't2' })
+  })
+})
+
+describe('worlds and their tests', () => {
+  const REFS: MissionRef[] = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
+
+  function response(world: WorldId, form: AssessmentForm): AssessmentResponse {
+    return { world, form, startedAt: 's', completedAt: 'c', skipped: false, answers: {} }
+  }
+
+  function withPre(save: SaveData, world: WorldId): SaveData {
+    return storeAssessment(save, response(world, 'pre'), REFS)
+  }
+
+  function completeWorld(save: SaveData, world: WorldId): SaveData {
+    return missionsOfWorld(world, MISSIONS).reduce((current, mission) => recordAttempt(current, attempt(mission.id, 'success'), REFS), save)
+  }
+
+  it('opens the next world only after the previous post-test', () => {
+    let save = completeWorld(withPre(createInitialSave(REFS, 'now'), 'garden'), 'garden')
+    expect(isWorldOpen(save, 'cornfield', REFS)).toBe(false)
+    expect(worldStep(save, 'garden', REFS)).toEqual({ kind: 'postTest' })
+    expect(save.missions[missionsOfWorld('cornfield', MISSIONS)[0].id].status).toBe('locked')
+    save = storeAssessment(save, response('garden', 'post'), REFS)
+    expect(isWorldOpen(save, 'cornfield', REFS)).toBe(true)
+    expect(save.missions[missionsOfWorld('cornfield', MISSIONS)[0].id].status).toBe('available')
+  })
+
+  it('asks for the pre-test before the first mission of an open world', () => {
+    const save = createInitialSave(REFS, 'now')
+    expect(worldStep(save, 'garden', REFS)).toEqual({ kind: 'preTest' })
+    expect(worldStep(withPre(save, 'garden'), 'garden', REFS)).toEqual({ kind: 'mission', missionId: missionsOfWorld('garden', MISSIONS)[0].id })
+  })
+
+  it('points to the post-test when missions are done', () => {
+    const save = completeWorld(withPre(createInitialSave(REFS, 'now'), 'garden'), 'garden')
+    expect(currentWorld(save, REFS)).toBe('garden')
+    expect(worldStep(save, 'garden', REFS)).toEqual({ kind: 'postTest' })
+  })
+
+  it('moves to the next world once the post-test is stored', () => {
+    const save = storeAssessment(completeWorld(withPre(createInitialSave(REFS, 'now'), 'garden'), 'garden'), response('garden', 'post'), REFS)
+    expect(worldStep(save, 'garden', REFS)).toEqual({ kind: 'done' })
+    expect(currentWorld(save, REFS)).toBe('cornfield')
+  })
+
+  it('never relocks', () => {
+    const save = completeWorld(withPre(createInitialSave(REFS, 'now'), 'garden'), 'garden')
+    const replayed = missionsOfWorld('garden', MISSIONS)[0].id
+    const again = recordAttempt(save, attempt(replayed, 'error'), REFS)
+    expect(again.missions[replayed].status).toBe('completed')
+    expect(refreshUnlocks(again, REFS).missions[replayed].status).toBe('completed')
+  })
+
+  it('keeps the training available and starts with empty tests for every world', () => {
+    const save = createInitialSave(REFS, 'now')
+    expect(save.version).toBe(2)
+    expect(save.missions['m0-training'].status).toBe('available')
+    expect(Object.keys(save.assessments)).toEqual([...WORLD_IDS])
+    expect(save.assessments.homestead).toEqual({ pre: null, post: null })
   })
 })

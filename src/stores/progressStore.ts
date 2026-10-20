@@ -44,7 +44,7 @@ export const useProgressStore = create<ProgressState>((set, get) => {
     },
     registerHint: (missionId) => commit(registerHint(get().save, missionId)),
     storeProgram: (missionId, json) => commit(storeProgram(get().save, missionId, json)),
-    storeAssessment: (response) => commit(storeAssessment(get().save, response)),
+    storeAssessment: (response) => commit(storeAssessment(get().save, response, missionRefs)),
     resetProgress: () => commit(createInitialSave(missionRefs, new Date().toISOString())),
     startRun: (student) => commit(assignStudent(createInitialSave(missionRefs, new Date().toISOString()), student, crypto.randomUUID())),
     registerStudent: (student) => {

@@ -1,13 +1,13 @@
 import { newlyUnlocked } from '@/features/mission-select/unlocks'
 import { loadSeenUnlocks, saveSeenUnlocks } from '@/services/storage/seenUnlocks'
 import { MISSIONS } from '@/data/missions'
-import { createInitialSave, recordAttempt } from '@/game/progress/progression'
+import { createInitialSave, recordAttempt, storeAssessment } from '@/game/progress/progression'
 
 const refs = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
 const ids = MISSIONS.map((mission) => mission.id)
 
 function completed(missionId: string) {
-  return recordAttempt(
+  const done = recordAttempt(
     createInitialSave(refs, 'now'),
     {
       missionId,
@@ -22,6 +22,7 @@ function completed(missionId: string) {
     },
     refs,
   )
+  return storeAssessment(done, { world: 'garden', form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: {} }, refs)
 }
 
 describe('unlocks', () => {

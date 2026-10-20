@@ -45,6 +45,7 @@ export interface MissionProgress {
 export type AssessmentForm = 'pre' | 'post'
 
 export interface AssessmentResponse {
+  world: WorldId
   form: AssessmentForm
   startedAt: string
   completedAt: string
@@ -52,15 +53,20 @@ export interface AssessmentResponse {
   answers: Record<string, number>
 }
 
+export interface WorldAssessments {
+  pre: AssessmentResponse | null
+  post: AssessmentResponse | null
+}
+
 export interface SaveData {
-  version: 1
+  version: 2
   runId: string | null
   student: StudentInfo | null
   tutorial: TutorialRecord | null
   createdAt: string
   missions: Record<string, MissionProgress>
   attempts: AttemptRecord[]
-  assessments: { pre: AssessmentResponse | null; post: AssessmentResponse | null }
+  assessments: Record<WorldId, WorldAssessments>
 }
 
 export interface MissionRef {

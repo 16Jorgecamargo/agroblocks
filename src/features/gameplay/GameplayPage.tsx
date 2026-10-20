@@ -286,7 +286,7 @@ export function GameplayPage() {
   const { missionId = '' } = useParams()
   const mission = getMission(missionId)
   const status = useProgressStore((store) => store.save.missions[missionId]?.status)
-  const needsPreTest = useProgressStore((store) => store.save.student !== null && store.save.assessments.pre === null)
+  const needsPreTest = useProgressStore((store) => store.save.student !== null && mission?.world != null && store.save.assessments[mission.world]?.pre == null)
   if (!mission || !status || status === 'locked') return <Navigate to="/missoes" replace />
   if (needsPreTest) return <Navigate to="/avaliacao/pre" replace />
   return <GameplayScreen key={mission.id} mission={mission} />

@@ -69,13 +69,14 @@ export function AssessmentPage() {
 
   const items = itemsForForm(form);
   const title = form === "pre" ? "Avaliação inicial" : "Avaliação final";
-  const existing = save.assessments[form];
+  const existing = save.assessments.garden[form];
   const postLocked =
     form === "post" && save.missions[FINAL_MISSION]?.status !== "completed";
 
   const finish = (skipped: boolean) => {
     const now = new Date().toISOString();
     storeAssessment({
+      world: "garden",
       form,
       startedAt: startedAt || now,
       completedAt: now,
@@ -87,7 +88,7 @@ export function AssessmentPage() {
 
   const body = () => {
     if (stage === "done" || (existing && stage === "intro")) {
-      const response = save.assessments[form];
+      const response = save.assessments.garden[form];
       const nextId = continueMissionId(save, MISSIONS) ?? "m0-training";
       const next =
         form === "pre"
@@ -105,7 +106,7 @@ export function AssessmentPage() {
             <p>Suas respostas foram salvas e enviadas ao seu professor.</p>
           )}
           {form === "post" && response && (
-            <Comparison pre={save.assessments.pre} post={response} />
+            <Comparison pre={save.assessments.garden.pre} post={response} />
           )}
           <Link to={next.to} className="button button--primary">
             {next.label}

@@ -177,15 +177,15 @@ describe('GameplayPage', () => {
     expect(screen.getByTestId('tutorial-progress')).toHaveTextContent('6/15')
   })
 
-  it('sends a registered student to the pre-test before any phase', () => {
+  it('sends a registered student to the pre-test before a world mission', () => {
     useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
-    renderAt('/jogar/m0-training')
+    renderAt('/jogar/garden-04')
     expect(screen.getByText('Avaliação inicial')).toBeInTheDocument()
   })
 
   it('records a skipped tutorial on the run', () => {
     useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
-    useProgressStore.getState().storeAssessment({ form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
+    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
     renderAt('/jogar/m0-training')
     fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
     fireEvent.click(screen.getByRole('button', { name: 'Pular tutorial' }))

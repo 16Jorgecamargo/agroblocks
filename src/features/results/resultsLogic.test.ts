@@ -42,7 +42,7 @@ describe('resultsLogic', () => {
     if (!second || !last) throw new Error('missing')
     expect(nextStep(second, save)).toEqual({ label: 'Próxima fase', to: '/jogar/orchard-04' })
     expect(nextStep(last, save)).toEqual({ label: 'Fazer avaliação final', to: '/avaliacao/pos' })
-    expect(nextStep(last, { ...save, assessments: { pre: null, post: { form: 'post', startedAt: '', completedAt: '', skipped: false, answers: {} } } })).toEqual({
+    expect(nextStep(last, { ...save, assessments: { ...save.assessments, homestead: { pre: null, post: { world: 'homestead', form: 'post', startedAt: '', completedAt: '', skipped: false, answers: {} } } } })).toEqual({
       label: 'Voltar às missões',
       to: '/missoes',
     })
