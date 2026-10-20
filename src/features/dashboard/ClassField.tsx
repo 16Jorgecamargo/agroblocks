@@ -1,8 +1,8 @@
 import { useState, type CSSProperties } from 'react'
-import { tutorialLabel, type PhaseRow, type Plot, type StudentRow } from '@/features/dashboard/dashboardModel'
+import { tutorialLabel, type Plot, type StudentRow, type WorldCell, type WorldRow } from '@/features/dashboard/dashboardModel'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 
-export type SortKey = 'name' | 'school' | 'runCount' | 'tutorial' | 'completedPhases' | 'attempts' | 'hints' | 'errors' | 'pre' | 'post' | 'gain' | 'lastSeen'
+export type SortKey = 'name' | 'school' | 'runCount' | 'tutorial' | 'completedMissions' | 'worldsDone' | 'attempts' | 'hints' | 'errors' | 'lastSeen'
 
 function value(row: StudentRow, key: SortKey): string | number | null {
   if (key === 'tutorial') return tutorialLabel(row.tutorial)
@@ -66,28 +66,45 @@ export function PlotCell({ plot, title, order }: { plot: Plot; title: string; or
 }
 
 const NUMERIC: { key: SortKey; label: string; col: string }[] = [
-  { key: 'completedPhases', label: 'Fases', col: 'phases' },
+  { key: 'completedMissions', label: 'Missões', col: 'missions' },
   { key: 'attempts', label: 'Tentativas', col: 'attempts' },
   { key: 'hints', label: 'Dicas', col: 'hints' },
   { key: 'runCount', label: 'Jogadas', col: 'runs' },
   { key: 'lastSeen', label: 'Último acesso', col: 'last' },
 ]
 
+const TRAINING_ID = 'm0-training'
+
+function describeWorld(name: string, cell: WorldCell): string {
+  const tests = `prova inicial ${cell.pre === null ? 'não feita' : `${cell.pre} de 10`}, prova final ${cell.post === null ? 'não feita' : `${cell.post} de 10`}`
+  return `${name}: ${cell.completed} de ${cell.total} missões, ${tests}`
+}
+
+function WorldPlot({ name, cell, order }: { name: string; cell: WorldCell; order: number }) {
+  return (
+    <span className={`plot plot--${cell.state} plot--world`} style={{ '--plot-order': order } as CSSProperties} title={describeWorld(name, cell)}>
+      <span className="plot__count" aria-hidden="true">{`${cell.completed}/${cell.total}`}</span>
+      <span className="visually-hidden">{describeWorld(name, cell)}</span>
+    </span>
+  )
+}
+
 interface ClassFieldProps {
   rows: StudentRow[]
   missions: MissionDefinition[]
-  phases: PhaseRow[]
+  worldRows: WorldRow[]
   intro: boolean
   onOpen: (row: StudentRow) => void
 }
 
-export function ClassField({ rows, missions, phases, intro, onOpen }: ClassFieldProps) {
+export function ClassField({ rows, missions, worldRows, intro, onOpen }: ClassFieldProps) {
   const [sort, setSort] = useState<{ key: SortKey; direction: 'asc' | 'desc' }>({ key: 'lastSeen', direction: 'desc' })
   const sorted = sortStudents(rows, sort.key, sort.direction)
-  const ordered = [...missions].sort((a, b) => a.order - b.order)
+  const training = missions.find((mission) => mission.id === TRAINING_ID)
   const toggle = (key: SortKey) => setSort((current) => ({ key, direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc' }))
   const ariaSort = (key: SortKey) => (sort.key === key ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none')
   const total = Math.max(1, rows.length)
+  const trainingDone = rows.filter((row) => row.plots[TRAINING_ID]?.state === 'done').length
 
   return (
     <div className="field-wrap">
@@ -99,10 +116,13 @@ export function ClassField({ rows, missions, phases, intro, onOpen }: ClassField
                 Aluno
               </button>
             </th>
-            {ordered.map((mission) => (
-              <th key={mission.id} scope="col" className="class-field__phase">
-                <span className="class-field__phase-number">{mission.tutorial ? 'Treino' : `Fase ${mission.order}`}</span>
-                {!mission.tutorial && <span className="class-field__phase-title">{mission.title}</span>}
+            <th scope="col" className="class-field__phase">
+              <span className="class-field__phase-number">Treino</span>
+            </th>
+            {worldRows.map((world) => (
+              <th key={world.world} scope="col" className="class-field__phase">
+                <span className="class-field__phase-number">{world.name}</span>
+                <span className="class-field__phase-title">{world.conceptLabel}</span>
               </th>
             ))}
             {NUMERIC.map((column) => (
@@ -125,13 +145,16 @@ export function ClassField({ rows, missions, phases, intro, onOpen }: ClassField
                 <span className="class-field__school">{row.school}</span>
                 <span className={`class-field__tutorial class-field__tutorial--${row.tutorial?.status ?? 'none'}`}>Tutorial: {tutorialLabel(row.tutorial)}</span>
               </th>
-              {ordered.map((mission, column) => (
-                <td key={mission.id} className="class-field__plot" data-col={mission.id}>
-                  <PlotCell plot={row.plots[mission.id]} title={mission.title} order={rowIndex + column} />
+              <td className="class-field__plot" data-col={TRAINING_ID}>
+                {training && <PlotCell plot={row.plots[TRAINING_ID]} title={training.title} order={rowIndex} />}
+              </td>
+              {worldRows.map((world, column) => (
+                <td key={world.world} className="class-field__plot" data-col={world.world}>
+                  <WorldPlot name={world.name} cell={row.worlds[world.world]} order={rowIndex + column + 1} />
                 </td>
               ))}
-              <td className="class-field__num" data-col="phases">
-                {row.completedPhases}
+              <td className="class-field__num" data-col="missions">
+                {row.completedMissions}
               </td>
               <td className="class-field__num" data-col="attempts">
                 {row.attempts}
@@ -166,19 +189,16 @@ export function ClassField({ rows, missions, phases, intro, onOpen }: ClassField
             <th scope="row" className="class-field__who">
               Concluíram
             </th>
-            {ordered.map((mission) => {
-              const done = phases.find((phase) => phase.missionId === mission.id)?.completed ?? 0
-              return (
-                <td key={mission.id} className="class-field__total">
-                  <span className="class-field__total-value">
-                    {done} de {rows.length}
-                  </span>
-                  <span className="meter" aria-hidden="true">
-                    <span className="meter__fill" style={{ width: `${(done / total) * 100}%` }} />
-                  </span>
-                </td>
-              )
-            })}
+            {[{ key: TRAINING_ID, done: trainingDone }, ...worldRows.map((world) => ({ key: world.world, done: world.finished }))].map(({ key, done }) => (
+              <td key={key} className="class-field__total">
+                <span className="class-field__total-value">
+                  {done} de {rows.length}
+                </span>
+                <span className="meter" aria-hidden="true">
+                  <span className="meter__fill" style={{ width: `${(done / total) * 100}%` }} />
+                </span>
+              </td>
+            ))}
             <td colSpan={NUMERIC.length + 1} />
           </tr>
         </tfoot>

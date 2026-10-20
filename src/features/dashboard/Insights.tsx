@@ -20,7 +20,7 @@ export function ErrorList({ errors }: { errors: DashboardModel['topErrors'] }) {
   )
 }
 
-export function ScoreRanges({ rows }: { rows: DashboardModel['schoolScores'] }) {
+export function ScoreRanges({ rows }: { rows: DashboardModel['worldRows'] }) {
   return (
     <div className="scores">
       <p className="scores__legend" aria-hidden="true">
@@ -30,10 +30,10 @@ export function ScoreRanges({ rows }: { rows: DashboardModel['schoolScores'] }) 
         {rows.map((row) => {
           const low = Math.min(row.pre ?? row.post ?? 0, row.post ?? row.pre ?? 0)
           const high = Math.max(row.pre ?? row.post ?? 0, row.post ?? row.pre ?? 0)
-          const text = `${row.school}: pré ${row.pre === null ? 'sem dados' : decimal(row.pre)}, pós ${row.post === null ? 'sem dados' : decimal(row.post)}`
+          const text = `${row.name}: pré ${row.pre === null ? 'sem dados' : decimal(row.pre)}, pós ${row.post === null ? 'sem dados' : decimal(row.post)}`
           return (
-            <li key={row.school} className="scores__row">
-              <span className="scores__school">{row.school}</span>
+            <li key={row.name} className="scores__row">
+              <span className="scores__school">{row.name}</span>
               <span className="scores__track" role="img" aria-label={text}>
                 {row.pre !== null && row.post !== null && <span className="scores__span" style={{ left: `${low * 10}%`, width: `${(high - low) * 10}%` }} />}
                 {row.pre !== null && <span className="scores__dot scores__dot--pre" style={{ left: `${row.pre * 10}%` }} />}
@@ -59,13 +59,13 @@ export function ScoreRanges({ rows }: { rows: DashboardModel['schoolScores'] }) 
   )
 }
 
-export function PhaseEffort({ phases }: { phases: DashboardModel['phases'] }) {
+export function WorldEffort({ phases }: { phases: DashboardModel['worldRows'] }) {
   const max = Math.max(1, ...phases.map((phase) => Math.max(phase.attemptsPerStudent, phase.hintsPerStudent)))
   return (
     <ul className="effort">
       {phases.map((phase) => (
-        <li key={phase.missionId} className="effort__row">
-          <span className="effort__title">{phase.title}</span>
+        <li key={phase.world} className="effort__row">
+          <span className="effort__title">{phase.name}</span>
           <span className="effort__bars">
             <span className="effort__bar">
               <span className="meter meter--wide" aria-hidden="true">

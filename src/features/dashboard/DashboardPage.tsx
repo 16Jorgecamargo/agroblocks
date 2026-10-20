@@ -5,7 +5,7 @@ import { ClassField } from '@/features/dashboard/ClassField'
 import { assessmentsCsv, attemptsCsv, studentsCsv } from '@/features/dashboard/dashboardCsv'
 import { buildDashboard, EMPTY_FILTERS, type DashboardFilters, type DashboardModel, type StudentRow } from '@/features/dashboard/dashboardModel'
 import { createDemoRuns } from '@/features/dashboard/demoRuns'
-import { ErrorList, PhaseEffort, ScoreRanges } from '@/features/dashboard/Insights'
+import { ErrorList, ScoreRanges, WorldEffort } from '@/features/dashboard/Insights'
 import { StudentDetail } from '@/features/dashboard/StudentDetail'
 import { useDashboardTheme } from '@/features/dashboard/useDashboardTheme'
 import { downloadText } from '@/services/export/csv'
@@ -27,7 +27,7 @@ const plural = (count: number, one: string, many: string) => `${count} ${count =
 
 function Summary({ model }: { model: DashboardModel }) {
   const { summary } = model
-  const phaseCount = model.phases.length - 1
+  const missionCount = MISSIONS.filter((mission) => mission.world !== null).length
   const tutorialTotal = Math.max(1, summary.students)
   const segments = [
     { key: 'completed', count: summary.tutorial.completed },
@@ -43,13 +43,13 @@ function Summary({ model }: { model: DashboardModel }) {
           {plural(summary.schools, 'escola', 'escolas')}, {plural(summary.runs, 'jogada', 'jogadas')}
         </span>
       </div>
-      <div className="figure" role="group" aria-label="Fases concluídas">
-        <span className="figure__label">Fases concluídas</span>
+      <div className="figure" role="group" aria-label="Missões concluídas">
+        <span className="figure__label">Missões concluídas</span>
         <strong className="figure__value">
-          {decimal(summary.avgCompletedPhases)}
-          <span className="figure__unit"> de {phaseCount}</span>
+          {decimal(summary.avgCompletedMissions)}
+          <span className="figure__unit"> de {missionCount}</span>
         </strong>
-        <span className="figure__note">em média, por aluno</span>
+        <span className="figure__note">em média, por aluno · {decimal(summary.avgWorldsDone)} mundos</span>
       </div>
       <div className="figure" role="group" aria-label="Tutorial">
         <span className="figure__label">Tutorial</span>
@@ -64,18 +64,17 @@ function Summary({ model }: { model: DashboardModel }) {
           <span className="key key--unfinished">{summary.tutorial.unfinished} não {summary.tutorial.unfinished === 1 ? 'terminou' : 'terminaram'}</span>
         </span>
       </div>
-      <div className="figure" role="group" aria-label="Avaliação">
-        <span className="figure__label">Avaliação</span>
-        {summary.avgPre === null && summary.avgPost === null ? (
-          <span className="figure__note">Ninguém respondeu às avaliações ainda.</span>
+      <div className="figure" role="group" aria-label="Provas">
+        <span className="figure__label">Provas</span>
+        {summary.avgGain === null ? (
+          <span className="figure__note">Ninguém fez as provas inicial e final de um mundo ainda.</span>
         ) : (
           <>
             <strong className="figure__value">
-              {summary.avgPre === null ? '—' : decimal(summary.avgPre)}
-              <span className="figure__arrow"> → </span>
-              {summary.avgPost === null ? '—' : decimal(summary.avgPost)}
+              {summary.avgGain > 0 ? '+' : ''}
+              {decimal(summary.avgGain)}
             </strong>
-            <span className="figure__note">{summary.avgGain === null ? 'acertos de 10, pré e pós' : `acertos de 10, ganho médio de ${decimal(summary.avgGain)}`}</span>
+            <span className="figure__note">ganho médio de acertos por mundo, de 0 a 10</span>
           </>
         )}
       </div>
@@ -269,7 +268,7 @@ export function DashboardPage({ token, onUnauthorized, onLogout }: DashboardPage
                     </ul>
                   </div>
                   <p className="block__hint">Cada linha é um aluno. Abra um aluno para ver cada tentativa, o pseudocódigo e as respostas.</p>
-                  <ClassField rows={model.students} missions={MISSIONS} phases={model.phases} intro={intro} onOpen={(row: StudentRow) => setOpenKey(row.key)} />
+                  <ClassField rows={model.students} missions={MISSIONS} worldRows={model.worldRows} intro={intro} onOpen={(row: StudentRow) => setOpenKey(row.key)} />
                 </section>
 
                 <div className="pair">
@@ -282,19 +281,19 @@ export function DashboardPage({ token, onUnauthorized, onLogout }: DashboardPage
                   </section>
                   <section className="block" aria-labelledby="scores-title">
                     <h2 id="scores-title" className="block__title">
-                      Pré-teste e pós-teste por escola
+                      Prova inicial e prova final por mundo
                     </h2>
                     <p className="block__hint">Média de acertos, de 0 a 10.</p>
-                    <ScoreRanges rows={model.schoolScores} />
+                    <ScoreRanges rows={model.worldRows} />
                   </section>
                 </div>
 
                 <section className="block" aria-labelledby="effort-title">
                   <h2 id="effort-title" className="block__title">
-                    Tentativas e dicas por fase
+                    Tentativas e dicas por mundo
                   </h2>
-                  <p className="block__hint">Média por aluno. Muitas tentativas e dicas na mesma fase mostram onde a turma precisa de ajuda.</p>
-                  <PhaseEffort phases={model.phases} />
+                  <p className="block__hint">Média por aluno. Muitas tentativas e dicas no mesmo mundo mostram onde a turma precisa de ajuda.</p>
+                  <WorldEffort phases={model.worldRows} />
                 </section>
               </>
             )}

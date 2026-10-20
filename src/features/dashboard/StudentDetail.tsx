@@ -1,9 +1,12 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { itemsForForm } from '@/data/assessment/items'
+import { itemsFor } from '@/data/assessment/items'
 import { MISSIONS } from '@/data/missions'
+import { WORLDS } from '@/data/worlds'
 import { describePlot, formatDate, PlotCell } from '@/features/dashboard/ClassField'
 import { scoreAssessment, tutorialLabel, type Plot, type StudentRow } from '@/features/dashboard/dashboardModel'
+import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { ERROR_TEXT } from '@/game/rules/errors'
+import type { WorldId } from '@/game/worlds/worldTypes'
 import type { RunSnapshot } from '@/shared/runSnapshot'
 
 interface StudentDetailProps {
@@ -78,8 +81,40 @@ function MissionFacts({ run, missionId }: { run: RunSnapshot; missionId: string 
   )
 }
 
+function worldTouched(run: RunSnapshot, world: WorldId): boolean {
+  if (run.assessments[world]?.pre) return true
+  return MISSIONS.some((mission) => mission.world === world && (run.missions[mission.id]?.status === 'completed' || run.attempts.some((attempt) => attempt.missionId === mission.id)))
+}
+
+function PlotButton({
+  mission,
+  plot,
+  index,
+  selected,
+  label,
+  onToggle,
+}: {
+  mission: MissionDefinition
+  plot: Plot
+  index: number
+  selected: boolean
+  label: string
+  onToggle: (id: string) => void
+}) {
+  return (
+    <li>
+      <button type="button" className="run__plot" aria-pressed={selected} title={describePlot(mission.title, plot)} onClick={() => onToggle(mission.id)}>
+        <PlotCell plot={plot} title={mission.title} order={index} />
+        <span className="run__plot-label" aria-hidden="true">
+          {label}
+        </span>
+      </button>
+    </li>
+  )
+}
+
 function Answers({ response, label }: { response: RunSnapshot['assessments']['garden']['pre']; label: string }) {
-  if (!response) return <p className="run__note">{label}: não respondida.</p>
+  if (!response) return <p className="run__note">{label}: não feita.</p>
   if (response.skipped) return <p className="run__note">{label}: pulada.</p>
   return (
     <details className="run__answers">
@@ -87,7 +122,7 @@ function Answers({ response, label }: { response: RunSnapshot['assessments']['ga
         {label}: {scoreAssessment(response)} de 10
       </summary>
       <ol>
-        {itemsForForm(response.form).map((item) => {
+        {itemsFor(response.world, response.form).map((item) => {
           const answer = response.answers[item.id]
           const right = answer === item.correctIndex
           return (
@@ -109,6 +144,7 @@ function Answers({ response, label }: { response: RunSnapshot['assessments']['ga
 function RunSection({ run, demo, onDelete }: { run: RunSnapshot; demo: boolean; onDelete: () => Promise<void> }) {
   const [confirming, setConfirming] = useState(false)
   const [missionId, setMissionId] = useState<string | null>(null)
+  const toggleMission = (id: string) => setMissionId((current) => (current === id ? null : id))
   const attempts = missionId ? run.attempts.filter((attempt) => attempt.missionId === missionId) : run.attempts
   return (
     <section className="run">
@@ -119,29 +155,38 @@ function RunSection({ run, demo, onDelete }: { run: RunSnapshot; demo: boolean; 
           {run.tutorial && ` (${formatDate(run.tutorial.at)})`}
         </p>
       </header>
-      <p className="run__note">Escolha uma fase para ver os detalhes dela.</p>
-      <ul className="run__plots" aria-label="Fases">
-        {ordered.map((mission, index) => {
-          const plot = runPlot(run, mission.id)
-          const selected = missionId === mission.id
-          return (
-            <li key={mission.id}>
-              <button
-                type="button"
-                className="run__plot"
-                aria-pressed={selected}
-                title={describePlot(mission.title, plot)}
-                onClick={() => setMissionId(selected ? null : mission.id)}
-              >
-                <PlotCell plot={plot} title={mission.title} order={index} />
-                <span className="run__plot-label" aria-hidden="true">
-                  {mission.tutorial ? 'Treino' : mission.order}
-                </span>
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+      <p className="run__note">Escolha uma missão para ver os detalhes dela.</p>
+      {ordered
+        .filter((mission) => mission.world === null)
+        .map((mission, index) => (
+          <ul key={mission.id} className="run__plots" aria-label="Treinamento">
+            <PlotButton mission={mission} plot={runPlot(run, mission.id)} index={index} selected={missionId === mission.id} label="Treino" onToggle={toggleMission} />
+          </ul>
+        ))}
+      {WORLDS.filter((world) => worldTouched(run, world.id)).map((world) => {
+        const worldMissions = ordered.filter((mission) => mission.world === world.id)
+        const completed = worldMissions.filter((mission) => run.missions[mission.id]?.status === 'completed').length
+        return (
+          <section key={world.id} className="run__world">
+            <h4>{`${world.name} · ${completed} de ${worldMissions.length}`}</h4>
+            <ul className="run__plots" aria-label={`Missões de ${world.name}`}>
+              {worldMissions.map((mission, index) => (
+                <PlotButton
+                  key={mission.id}
+                  mission={mission}
+                  plot={runPlot(run, mission.id)}
+                  index={index}
+                  selected={missionId === mission.id}
+                  label={String(mission.slot)}
+                  onToggle={toggleMission}
+                />
+              ))}
+            </ul>
+            <Answers response={run.assessments[world.id]?.pre ?? null} label="Prova inicial" />
+            <Answers response={run.assessments[world.id]?.post ?? null} label="Prova final" />
+          </section>
+        )
+      })}
       {missionId && <MissionFacts run={run} missionId={missionId} />}
       <div className="run__attempts-head">
         <h4>{missionId ? `Tentativas em ${titleOf(missionId)}` : 'Todas as tentativas'}</h4>
@@ -171,9 +216,6 @@ function RunSection({ run, demo, onDelete }: { run: RunSnapshot; demo: boolean; 
           ))}
         </ol>
       )}
-      <h4>Avaliações</h4>
-      <Answers response={run.assessments.garden.pre} label="Avaliação pré" />
-      <Answers response={run.assessments.garden.post} label="Avaliação pós" />
       {!demo && !confirming && (
         <button type="button" className="dash-button dash-button--danger-quiet run__delete" onClick={() => setConfirming(true)}>
           Apagar jogada

@@ -33,12 +33,16 @@ describe('DashboardPage', () => {
     const table = await screen.findByRole('table', { name: 'Alunos' })
     expect(within(table).getAllByRole('row')).toHaveLength(9)
     expect(screen.getByRole('group', { name: 'Alunos' })).toHaveTextContent('7')
-    const ana = within(table).getByText('Ana Souza').closest('tr')
+    expect(within(table).getByRole('columnheader', { name: /Milharal/ })).toBeInTheDocument()
+    const ana = within(table).getByText('Ana Souza').closest('tr') as HTMLElement
     expect(ana).toHaveTextContent('Tutorial: Concluído')
-    expect(ana).toHaveTextContent(/Primeira colheita: concluída com \d estrelas?/)
-    const gabriela = within(table).getByText('Gabriela Nunes').closest('tr')
-    expect(gabriela).toHaveTextContent(`${[...MISSIONS].sort((a, b) => a.order - b.order)[2].title}: tentando`)
-    expect(gabriela).toHaveTextContent('Fazenda eficiente: não começou')
+    expect(ana.querySelector('[data-col="garden"]')).toHaveTextContent('10/10')
+    expect(ana.querySelector('[data-col="missions"]')).toHaveTextContent('60')
+    const gabriela = within(table).getByText('Gabriela Nunes').closest('tr') as HTMLElement
+    expect(gabriela.querySelector('[data-col="garden"]')).toHaveTextContent('1/10')
+    expect(gabriela.querySelector('[data-col="homestead"]')).toHaveTextContent('0/10')
+    expect(screen.getByRole('heading', { name: 'Prova inicial e prova final por mundo' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Tentativas e dicas por mundo' })).toBeInTheDocument()
   })
 
   it('filters by school and search', async () => {
@@ -65,10 +69,10 @@ describe('DashboardPage', () => {
     expect(within(table).getAllByRole('row')[1]).toHaveTextContent('Gabriela Nunes')
   })
 
-  it('keeps null scores last whatever the direction', () => {
+  it('sorts by completed missions in both directions', () => {
     const rows = buildDashboard(createDemoRuns(MISSIONS), MISSIONS, EMPTY_FILTERS).students
-    expect(sortStudents(rows, 'post', 'asc').at(-1)?.post).toBeNull()
-    expect(sortStudents(rows, 'post', 'desc').at(-1)?.post).toBeNull()
+    expect(sortStudents(rows, 'completedMissions', 'asc')[0].name).toBe('Gabriela Nunes')
+    expect(sortStudents(rows, 'completedMissions', 'desc')[0].name).toBe('Ana Souza')
   })
 
   it('switches to clearly labelled demo data', async () => {
