@@ -176,6 +176,7 @@ function GameplayScreen({ mission }: { mission: MissionDefinition }) {
             highlightCells={highlightCells}
             failed={snapshot.status === 'failed'}
             seedKey={mission.id}
+            theme={mission.world}
             growTicks={mission.growTicks}
             celebrating={succeeded}
           />

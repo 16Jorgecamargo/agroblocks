@@ -7,7 +7,9 @@ import { CameraRig } from '@/render/farm3d/CameraRig'
 import { CellLocatorBridge } from '@/render/farm3d/CellLocatorBridge'
 import { EffectsLayer } from '@/render/farm3d/Effects'
 import { Flat } from '@/render/farm3d/materials'
+import { resolveCrop } from '@/render/crops/cropShape'
 import { PlotTile } from '@/render/farm3d/PlotTile'
+import { WORLD_THEMES } from '@/render/world/worldThemes'
 import { RobotModel } from '@/render/farm3d/RobotModel'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
@@ -25,6 +27,7 @@ export default function FarmScene({
   highlightCells,
   failed,
   seedKey,
+  theme = null,
   celebrating,
   quarterTurns,
   zoomLevel,
@@ -35,8 +38,8 @@ export default function FarmScene({
 }: FarmSceneProps) {
   const { width, height } = state
   const world = useMemo(
-    () => buildWorld({ layout: 'farm', gridWidth: width, gridHeight: height, seed: seedKey, density: lowGraphics ? 'light' : 'full' }),
-    [width, height, seedKey, lowGraphics],
+    () => buildWorld({ layout: 'farm', gridWidth: width, gridHeight: height, seed: seedKey, density: lowGraphics ? 'light' : 'full', theme }),
+    [width, height, seedKey, lowGraphics, theme],
   )
   const goals = useMemo(() => new Set(highlightCells.map(([x, y]) => `${x},${y}`)), [highlightCells])
   const duration = reducedMotion ? 0 : stepDurationMs
@@ -92,6 +95,7 @@ export default function FarmScene({
               position={[point.x, 0, point.z]}
               isGoal={goals.has(`${x},${y}`)}
               reducedMotion={reducedMotion}
+              crop={resolveCrop(theme ? WORLD_THEMES[theme].crop : 'vegetable', x, y)}
             />
           )
         }),

@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { CylinderGeometry, IcosahedronGeometry, MeshBasicMaterial, MeshStandardMaterial, RingGeometry, SphereGeometry, type Group, type Mesh } from 'three'
-import { cropShape, type CropStage } from '@/render/crops/cropShape'
+import { cropShape, type CropKind, type CropStage } from '@/render/crops/cropShape'
 import { PALETTE } from '@/render/palette'
 
 function flat(color: string, emissive = '#000000', emissiveIntensity = 0): MeshStandardMaterial {
@@ -14,6 +14,8 @@ const MATERIALS = {
   stem: flat(PALETTE.leafDark),
   red: flat(PALETTE.fruit, PALETTE.fruit, 0.18),
   green: flat(PALETTE.fruitUnripe),
+  yellow: flat('#f2c14e', '#f2c14e', 0.15),
+  orange: flat('#f29a2e', '#f29a2e', 0.15),
   soil: flat(PALETTE.soilTilled),
   straw: flat(PALETTE.straw),
   glow: new MeshBasicMaterial({ color: PALETTE.readyGlow, transparent: true, opacity: 0.6, depthWrite: false }),
@@ -32,12 +34,13 @@ const GEOMETRIES = {
 
 interface CropPlantProps {
   stage: CropStage
+  kind?: CropKind
   seed: number
   reducedMotion: boolean
 }
 
-export function CropPlant({ stage, seed, reducedMotion }: CropPlantProps) {
-  const shape = cropShape(stage)
+export function CropPlant({ stage, kind = 'vegetable', seed, reducedMotion }: CropPlantProps) {
+  const shape = cropShape(stage, kind)
   const sway = useRef<Group>(null)
   const ring = useRef<Mesh>(null)
   const spark = useRef<Group>(null)
@@ -77,7 +80,7 @@ export function CropPlant({ stage, seed, reducedMotion }: CropPlantProps) {
           <mesh
             key={`fruit-${index}`}
             geometry={GEOMETRIES.fruit}
-            material={fruit.color === 'red' ? MATERIALS.red : MATERIALS.green}
+            material={MATERIALS[fruit.color]}
             position={[fruit.x, fruit.y, fruit.z]}
             scale={fruit.radius}
             castShadow

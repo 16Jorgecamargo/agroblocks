@@ -14,6 +14,7 @@ import { useSettingsStore } from '@/stores/settingsStore'
 import './FarmView.css'
 import { DURATIONS, PRESSABLE } from '@/motion/presets'
 import { SPRINGS } from '@/motion/springs'
+import type { WorldId } from '@/game/worlds/worldTypes'
 
 const FarmScene = lazy(() => import('@/render/farm3d/FarmScene'))
 
@@ -27,6 +28,7 @@ export interface FarmSceneProps {
   seedKey: string
   growTicks: number
   celebrating: boolean
+  theme?: WorldId | null
   quarterTurns: number
   zoomLevel: number
   lowGraphics: boolean
@@ -45,6 +47,7 @@ interface FarmViewProps {
   seedKey: string
   growTicks: number
   celebrating?: boolean
+  theme?: WorldId | null
 }
 
 const ZOOM_LEVELS = [0.7, 0.85, 1, 1.25, 1.5]

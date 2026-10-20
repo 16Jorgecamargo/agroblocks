@@ -6,7 +6,7 @@ import { Flat } from "@/render/farm3d/materials";
 import { SpringIn } from "@/render/farm3d/motion3d";
 import { Model } from "@/render/models/Model";
 import { CropPlant, HarvestedStubble } from "@/render/crops/CropPlant";
-import { cropStageFor } from "@/render/crops/cropShape";
+import { cropStageFor, type CropKind } from "@/render/crops/cropShape";
 import type { Cell } from "@/game/world/types";
 import { EASINGS } from "@/motion/easings";
 import { DURATIONS } from '@/motion/presets'
@@ -16,6 +16,7 @@ interface PlotTileProps {
   position: [number, number, number];
   isGoal: boolean;
   reducedMotion: boolean;
+  crop?: CropKind;
 }
 
 const BED_HEIGHT = 0.18;
@@ -121,6 +122,7 @@ function Soil({
   isGoal,
   reducedMotion,
   seed,
+  crop = "vegetable",
 }: Omit<PlotTileProps, "position"> & { seed: number }) {
   const prepared = cell.plot !== "untilled";
   const wet = cell.moisture === "wet";
@@ -142,7 +144,7 @@ function Soil({
         return (
           <group position={[0, BED_HEIGHT, 0]}>
             <SpringIn key={stage} enabled={!reducedMotion}>
-              <CropPlant stage={stage} seed={seed} reducedMotion={reducedMotion} />
+              <CropPlant stage={stage} kind={crop} seed={seed} reducedMotion={reducedMotion} />
             </SpringIn>
           </group>
         );
@@ -170,6 +172,7 @@ export function PlotTile({
   position,
   isGoal,
   reducedMotion,
+  crop = "vegetable",
 }: PlotTileProps) {
   const seed = Math.abs(position[0] * 12.9898 + position[2] * 78.233) % (Math.PI * 2);
   return (
@@ -180,6 +183,7 @@ export function PlotTile({
           isGoal={isGoal}
           reducedMotion={reducedMotion}
           seed={seed}
+          crop={crop}
         />
       )}
       {cell.terrain === "obstacle" && (
