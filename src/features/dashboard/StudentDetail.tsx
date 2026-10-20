@@ -13,6 +13,7 @@ interface StudentDetailProps {
   onDeleteRun: (runId: string) => Promise<void>
 }
 
+const STATUS = { completed: 'Concluída', available: 'Liberada, ainda não concluída', locked: 'Ainda bloqueada' } as const
 const OUTCOME = { success: 'Deu certo', objectiveFailed: 'Objetivo não cumprido', error: 'Parou com erro' } as const
 const ordered = [...MISSIONS].sort((a, b) => a.order - b.order)
 const titleOf = (missionId: string) => MISSIONS.find((mission) => mission.id === missionId)?.title ?? missionId
@@ -22,6 +23,59 @@ function runPlot(run: RunSnapshot, missionId: string): Plot {
   const attempts = run.attempts.filter((attempt) => attempt.missionId === missionId).length
   const state = progress?.status === 'completed' ? 'done' : attempts > 0 ? 'trying' : 'empty'
   return { state, attempts, stars: progress?.bestResult?.efficiencyStars ?? 0, hints: progress?.hintsUsed ?? 0 }
+}
+
+const errorText = (code: string) => ERROR_TEXT[code as keyof typeof ERROR_TEXT]?.message ?? code
+
+function MissionFacts({ run, missionId }: { run: RunSnapshot; missionId: string }) {
+  const progress = run.missions[missionId]
+  const best = progress?.bestResult ?? null
+  const counts = new Map<string, number>()
+  for (const attempt of run.attempts) if (attempt.missionId === missionId && attempt.errorCode) counts.set(attempt.errorCode, (counts.get(attempt.errorCode) ?? 0) + 1)
+  const errors = [...counts.entries()].sort((a, b) => b[1] - a[1])
+  return (
+    <div className="mission-facts" role="region" aria-label={`Detalhes de ${titleOf(missionId)}`}>
+      <h4 className="mission-facts__title">{titleOf(missionId)}</h4>
+      <dl className="mission-facts__grid">
+        <div>
+          <dt>Situação</dt>
+          <dd>{progress ? STATUS[progress.status] : 'Ainda bloqueada'}</dd>
+        </div>
+        <div>
+          <dt>Tentativas</dt>
+          <dd>{progress?.attempts ?? 0}</dd>
+        </div>
+        <div>
+          <dt>Dicas usadas</dt>
+          <dd>{progress?.hintsUsed ?? 0} de 4</dd>
+        </div>
+        <div>
+          <dt>Estrelas</dt>
+          <dd>{best ? `${'★'.repeat(best.efficiencyStars)} (${best.efficiencyStars} de 3)` : '—'}</dd>
+        </div>
+        <div>
+          <dt>Melhor solução</dt>
+          <dd>{best ? `${best.actions} comandos, ${best.blocks} blocos` : '—'}</dd>
+        </div>
+        <div>
+          <dt>Recursos na melhor solução</dt>
+          <dd>{best ? `${best.usage.seeds} sementes, ${best.usage.water} de água, ${best.usage.energy} de energia` : '—'}</dd>
+        </div>
+      </dl>
+      {errors.length > 0 && (
+        <>
+          <h5 className="mission-facts__sub">Erros nesta fase</h5>
+          <ul className="mission-facts__errors">
+            {errors.map(([code, count]) => (
+              <li key={code}>
+                <span>{errorText(code)}</span> <strong>{count}×</strong>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  )
 }
 
 function Answers({ response, label }: { response: RunSnapshot['assessments']['pre']; label: string }) {
@@ -54,6 +108,8 @@ function Answers({ response, label }: { response: RunSnapshot['assessments']['pr
 
 function RunSection({ run, demo, onDelete }: { run: RunSnapshot; demo: boolean; onDelete: () => Promise<void> }) {
   const [confirming, setConfirming] = useState(false)
+  const [missionId, setMissionId] = useState<string | null>(null)
+  const attempts = missionId ? run.attempts.filter((attempt) => attempt.missionId === missionId) : run.attempts
   return (
     <section className="run">
       <header className="run__head">
@@ -63,31 +119,49 @@ function RunSection({ run, demo, onDelete }: { run: RunSnapshot; demo: boolean; 
           {run.tutorial && ` (${formatDate(run.tutorial.at)})`}
         </p>
       </header>
-      <ul className="run__plots">
+      <p className="run__note">Escolha uma fase para ver os detalhes dela.</p>
+      <ul className="run__plots" aria-label="Fases">
         {ordered.map((mission, index) => {
           const plot = runPlot(run, mission.id)
+          const selected = missionId === mission.id
           return (
-            <li key={mission.id} className="run__plot" title={describePlot(mission.title, plot)}>
-              <PlotCell plot={plot} title={mission.title} order={index} />
-              <span className="run__plot-label" aria-hidden="true">
-                {mission.tutorial ? 'Treino' : mission.order}
-              </span>
+            <li key={mission.id}>
+              <button
+                type="button"
+                className="run__plot"
+                aria-pressed={selected}
+                title={describePlot(mission.title, plot)}
+                onClick={() => setMissionId(selected ? null : mission.id)}
+              >
+                <PlotCell plot={plot} title={mission.title} order={index} />
+                <span className="run__plot-label" aria-hidden="true">
+                  {mission.tutorial ? 'Treino' : mission.order}
+                </span>
+              </button>
             </li>
           )
         })}
       </ul>
-      <h4>Tentativas</h4>
-      {run.attempts.length === 0 ? (
+      {missionId && <MissionFacts run={run} missionId={missionId} />}
+      <div className="run__attempts-head">
+        <h4>{missionId ? `Tentativas em ${titleOf(missionId)}` : 'Todas as tentativas'}</h4>
+        {missionId && (
+          <button type="button" className="dash-button dash-button--quiet" onClick={() => setMissionId(null)}>
+            Ver todas as fases
+          </button>
+        )}
+      </div>
+      {attempts.length === 0 ? (
         <p className="run__note">Nenhuma tentativa ainda.</p>
       ) : (
         <ol className="attempts">
-          {run.attempts.map((attempt) => (
+          {attempts.map((attempt) => (
             <li key={attempt.id} className={`attempt attempt--${attempt.outcome}`}>
               <span className="attempt__when">{formatDate(attempt.timestamp)}</span>
               <span className="attempt__what">
                 <strong>{titleOf(attempt.missionId)}</strong>
                 <span className="attempt__outcome">{OUTCOME[attempt.outcome]}</span>
-                {attempt.errorCode && <span className="attempt__error">{ERROR_TEXT[attempt.errorCode as keyof typeof ERROR_TEXT]?.message ?? attempt.errorCode}</span>}
+                {attempt.errorCode && <span className="attempt__error">{errorText(attempt.errorCode)}</span>}
               </span>
               <details className="attempt__code">
                 <summary>Pseudocódigo</summary>

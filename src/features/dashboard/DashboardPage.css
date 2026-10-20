@@ -929,7 +929,6 @@ th[aria-sort='descending'] .sort::after {
 }
 
 .run h4 {
-  margin-top: var(--space-2);
   font-size: 0.875rem;
   font-weight: 700;
 }
@@ -952,6 +951,85 @@ th[aria-sort='descending'] .sort::after {
   display: grid;
   justify-items: center;
   gap: 2px;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.run__plot:hover {
+  border-color: var(--d-line-strong);
+}
+
+.run__plot[aria-pressed='true'] {
+  border-color: var(--d-ink);
+}
+
+.run__plots li {
+  display: contents;
+}
+
+.run__attempts-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.mission-facts {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: 12px;
+  background: var(--d-bg);
+}
+
+.run .mission-facts__title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.mission-facts__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  margin: 0;
+}
+
+.mission-facts__grid dt {
+  color: var(--d-muted);
+  font-size: 0.8125rem;
+}
+
+.mission-facts__grid dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.mission-facts__sub {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.mission-facts__errors {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.mission-facts__errors li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
 }
 
 .run__plot-label {

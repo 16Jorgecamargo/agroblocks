@@ -20,6 +20,19 @@ describe('StudentDetail', () => {
     expect(within(dialog).getAllByText('✓').length).toBeGreaterThan(0)
   })
 
+  it('shows the details of one phase when its plot is chosen', () => {
+    if (!bruno) throw new Error('demo student missing')
+    render(<StudentDetail student={bruno} demo={false} onClose={vi.fn()} onDeleteRun={vi.fn(async () => undefined)} />)
+    const dialog = screen.getByRole('dialog', { name: 'Bruno Lima' })
+    fireEvent.click(within(dialog).getAllByRole('button', { name: /^Primeira colheita:/ })[0])
+    const facts = within(dialog).getByRole('region', { name: 'Detalhes de Primeira colheita' })
+    expect(facts).toHaveTextContent('Concluída')
+    expect(facts).toHaveTextContent(/\d+ comandos, \d+ blocos/)
+    expect(within(dialog).getByRole('heading', { name: 'Tentativas em Primeira colheita' })).toBeInTheDocument()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Ver todas as fases' }))
+    expect(within(dialog).queryByRole('region', { name: 'Detalhes de Primeira colheita' })).not.toBeInTheDocument()
+  })
+
   it('closes with Escape and with the close button', () => {
     if (!bruno) throw new Error('demo student missing')
     const onClose = vi.fn()
