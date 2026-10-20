@@ -5,14 +5,13 @@ import { GameButton } from "@/components/game/GameButton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { itemsFor } from "@/data/assessment/items";
 import { MISSIONS } from "@/data/missions";
+import { getWorld, missionsOfWorld, WORLDS } from "@/data/worlds";
 import { MiniGrid } from "@/features/assessment/MiniGrid";
 import { percent, scoreBySkill } from "@/game/assessment/scoring";
-import {
-  ASSESSMENT_SKILLS,
-  SKILL_LABELS,
-} from "@/game/assessment/types";
-import { continueMissionId } from "@/game/progress/progression";
+import { ASSESSMENT_SKILLS, SKILL_LABELS } from "@/game/assessment/types";
+import { isWorldOpen, worldStep } from "@/game/progress/progression";
 import type { AssessmentForm, AssessmentResponse } from "@/game/progress/types";
+import { WORLD_IDS, type WorldId } from "@/game/worlds/worldTypes";
 import { BADGE_POP, pageVariants } from "@/motion/presets";
 import { useProgressStore } from "@/stores/progressStore";
 import "./AssessmentPage.css";
@@ -21,12 +20,19 @@ const FORM_BY_SLUG: Record<string, AssessmentForm> = {
   pre: "pre",
   pos: "post",
 };
-const FINAL_MISSION = "homestead-10";
+
+const REFS = MISSIONS.map(({ id, order, world }) => ({ id, order, world }));
+
+function isWorldId(value: string): value is WorldId {
+  return (WORLD_IDS as readonly string[]).includes(value);
+}
 
 function Comparison({
+  worldName,
   pre,
   post,
 }: {
+  worldName: string;
   pre: AssessmentResponse | null;
   post: AssessmentResponse;
 }) {
@@ -34,20 +40,20 @@ function Comparison({
   const postScores = scoreBySkill(post);
   return (
     <table className="assessment__table">
-      <caption>Acertos por conceito</caption>
+      <caption>Acertos por habilidade · {worldName}</caption>
       <thead>
         <tr>
-          <th scope="col">Conceito</th>
-          <th scope="col">Pré-teste</th>
-          <th scope="col">Pós-teste</th>
+          <th scope="col">Habilidade</th>
+          <th scope="col">Prova inicial</th>
+          <th scope="col">Prova final</th>
         </tr>
       </thead>
       <tbody>
-        {ASSESSMENT_SKILLS.map((concept) => (
-          <tr key={concept}>
-            <th scope="row">{SKILL_LABELS[concept]}</th>
-            <td>{preScores ? `${percent(preScores[concept])}%` : "—"}</td>
-            <td>{postScores ? `${percent(postScores[concept])}%` : "—"}</td>
+        {ASSESSMENT_SKILLS.map((skill) => (
+          <tr key={skill}>
+            <th scope="row">{SKILL_LABELS[skill]}</th>
+            <td>{preScores ? `${percent(preScores[skill])}%` : "—"}</td>
+            <td>{postScores ? `${percent(postScores[skill])}%` : "—"}</td>
           </tr>
         ))}
       </tbody>
@@ -56,7 +62,7 @@ function Comparison({
 }
 
 export function AssessmentPage() {
-  const { form: slug = "" } = useParams();
+  const { world: worldSlug = "", form: slug = "" } = useParams();
   const form = FORM_BY_SLUG[slug];
   const save = useProgressStore((store) => store.save);
   const storeAssessment = useProgressStore((store) => store.storeAssessment);
@@ -65,49 +71,48 @@ export function AssessmentPage() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [startedAt, setStartedAt] = useState("");
 
-  if (!form) return <Navigate to="/" replace />;
+  if (!form || !isWorldId(worldSlug)) return <Navigate to="/missoes" replace />;
+  const worldId = worldSlug;
+  if (!isWorldOpen(save, worldId, REFS)) return <Navigate to="/missoes" replace />;
 
-  const items = itemsFor("garden", form);
-  const title = form === "pre" ? "Avaliação inicial" : "Avaliação final";
-  const existing = save.assessments.garden[form];
-  const postLocked =
-    form === "post" && save.missions[FINAL_MISSION]?.status !== "completed";
+  const world = getWorld(worldId);
+  const items = itemsFor(worldId, form);
+  const title = form === "pre" ? `Prova inicial · ${world.name}` : `Prova final · ${world.name}`;
+  const tests = save.assessments[worldId];
+  const existing = tests?.[form] ?? null;
+  const missionsDone = tests?.pre != null && worldStep(save, worldId, REFS).kind !== "mission";
+  const postLocked = form === "post" && !missionsDone;
 
-  const finish = (skipped: boolean) => {
+  const finish = () => {
     const now = new Date().toISOString();
     storeAssessment({
-      world: "garden",
+      world: worldId,
       form,
       startedAt: startedAt || now,
       completedAt: now,
-      skipped,
-      answers: skipped ? {} : answers,
+      skipped: false,
+      answers,
     });
     setStage("done");
   };
 
+  const nextLink = () => {
+    if (form === "pre") {
+      const first = missionsOfWorld(worldId, MISSIONS)[0];
+      return { to: `/jogar/${first.id}`, label: `Começar ${world.name}` };
+    }
+    const next = WORLDS.find((candidate) => candidate.order === world.order + 1);
+    return next ? { to: "/missoes", label: `Ir para ${next.name}` } : { to: "/missoes", label: "Ver missões" };
+  };
+
   const body = () => {
     if (stage === "done" || (existing && stage === "intro")) {
-      const response = save.assessments.garden[form];
-      const nextId = continueMissionId(save, MISSIONS) ?? "m0-training";
-      const next =
-        form === "pre"
-          ? {
-              to: `/jogar/${nextId}`,
-              label: save.missions["m0-training"]?.status === "completed" ? "Continuar jogando" : "Começar o treinamento",
-            }
-          : { to: "/missoes", label: "Ir para as missões" };
+      const next = nextLink();
       return (
         <section className="card assessment__card">
           <h2>Obrigado!</h2>
-          {response?.skipped ? (
-            <p>A avaliação inicial foi pulada. Você pode jogar normalmente.</p>
-          ) : (
-            <p>Suas respostas foram salvas e enviadas ao seu professor.</p>
-          )}
-          {form === "post" && response && (
-            <Comparison pre={save.assessments.garden.pre} post={response} />
-          )}
+          <p>Suas respostas foram salvas e enviadas ao seu professor.</p>
+          {form === "post" && existing && <Comparison worldName={world.name} pre={tests?.pre ?? null} post={existing} />}
           <Link to={next.to} className="button button--primary">
             {next.label}
           </Link>
@@ -118,9 +123,7 @@ export function AssessmentPage() {
       return (
         <section className="card assessment__card">
           <h2>Ainda não disponível</h2>
-          <p>
-            Conclua a Fase 6 (Fazenda eficiente) para liberar a avaliação final.
-          </p>
+          <p>{`Conclua as 10 missões de ${world.name} para fazer a prova final.`}</p>
           <Link to="/missoes" className="button">
             Ver missões
           </Link>
@@ -131,24 +134,15 @@ export function AssessmentPage() {
       return (
         <section className="card assessment__card">
           <h2>{title}</h2>
-          <p>
-            São 10 questões curtas sobre sequência, repetição, condições, erros
-            e leitura de algoritmos.
-          </p>
+          <p>{`São 10 questões curtas sobre ${world.conceptLabel.toLowerCase()}: montar, prever e consertar programas.`}</p>
           <ul>
             {form === "pre" ? (
-              <li>
-                Você faz esta prova antes de jogar. É normal não saber várias
-                respostas: marque a que achar mais certa.
-              </li>
+              <li>É normal não saber várias respostas: marque a que achar mais certa.</li>
             ) : (
-              <li>
-                Você faz esta prova depois de concluir todas as fases, para ver
-                o quanto aprendeu.
-              </li>
+              <li>Você terminou as 10 missões deste mundo. Vamos ver o quanto aprendeu.</li>
             )}
             <li>Não vale nota e não há tempo limite.</li>
-            <li>Você não verá se acertou durante a avaliação.</li>
+            <li>Você não verá se acertou durante a prova.</li>
             <li>Suas respostas vão para o seu professor, junto com o seu nome.</li>
           </ul>
           <div className="assessment__actions">
@@ -195,9 +189,7 @@ export function AssessmentPage() {
               <motion.label
                 key={option}
                 className={`assessment__option${selected === optionIndex ? " is-selected" : ""}`}
-                animate={
-                  selected === optionIndex ? BADGE_POP.keyframes : { scale: 1 }
-                }
+                animate={selected === optionIndex ? BADGE_POP.keyframes : { scale: 1 }}
                 transition={BADGE_POP.options}
               >
                 <input
@@ -216,18 +208,10 @@ export function AssessmentPage() {
             ))}
           </fieldset>
           <div className="assessment__actions">
-            <GameButton
-              tone="secondary"
-              disabled={index === 0}
-              onClick={() => setIndex(index - 1)}
-            >
+            <GameButton tone="secondary" disabled={index === 0} onClick={() => setIndex(index - 1)}>
               Anterior
             </GameButton>
-            <GameButton
-              tone="primary"
-              disabled={selected === undefined}
-              onClick={() => (last ? finish(false) : setIndex(index + 1))}
-            >
+            <GameButton tone="primary" disabled={selected === undefined} onClick={() => (last ? finish() : setIndex(index + 1))}>
               {last ? "Concluir" : "Próxima"}
             </GameButton>
           </div>
@@ -238,11 +222,7 @@ export function AssessmentPage() {
 
   return (
     <div className="chrome-page">
-      <PageHeader
-        title={title}
-        subtitle="Instrumento diagnóstico do projeto AgroBlocks."
-        backTo="/"
-      />
+      <PageHeader title={title} subtitle={`${world.name} · ${world.conceptLabel}`} backTo="/missoes" />
       <main className="assessment">{body()}</main>
     </div>
   );

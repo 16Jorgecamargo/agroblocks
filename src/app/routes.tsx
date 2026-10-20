@@ -14,7 +14,8 @@ export const appRoutes: RouteObject[] = [
   { path: '/jogar/:missionId', element: <GameplayPage /> },
   { path: '/resultado/:missionId', element: <ResultsPage /> },
   { path: '/como-jogar', element: <HowToPlayPage /> },
-  { path: '/avaliacao/:form', element: <AssessmentPage /> },
+  { path: '/avaliacao/:world/:form', element: <AssessmentPage /> },
+  { path: '/avaliacao/:form', element: <Navigate to="/missoes" replace /> },
   { path: '/painel', element: <TeacherGate /> },
   { path: '*', element: <Navigate to="/" replace /> },
 ]
