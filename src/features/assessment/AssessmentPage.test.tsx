@@ -41,10 +41,14 @@ describe('AssessmentPage', () => {
     expect(Object.keys(stored?.answers ?? {})).toHaveLength(10)
   })
 
-  it('allows skipping the pre-test and records it', () => {
+  it('requires the pre-test and then sends the student to the training', async () => {
     renderAt('/avaliacao/pre')
-    fireEvent.click(screen.getByRole('button', { name: 'Pular por enquanto' }))
-    expect(useProgressStore.getState().save.assessments.pre?.skipped).toBe(true)
+    expect(screen.queryByRole('button', { name: 'Pular por enquanto' })).not.toBeInTheDocument()
+    expect(screen.getByText(/É normal não saber várias respostas/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
+    await answerAll('pre', false)
+    expect(await screen.findByRole('link', { name: 'Começar o treinamento' })).toHaveAttribute('href', '/jogar/m0-training')
+    expect(screen.getByText('Suas respostas foram salvas e enviadas ao seu professor.')).toBeInTheDocument()
   })
 
   it('locks the post-test until phase 6 is completed', () => {

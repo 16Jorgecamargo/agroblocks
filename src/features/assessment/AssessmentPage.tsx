@@ -4,12 +4,14 @@ import { AnimatePresence, motion } from "motion/react";
 import { GameButton } from "@/components/game/GameButton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { itemsForForm } from "@/data/assessment/items";
+import { MISSIONS } from "@/data/missions";
 import { MiniGrid } from "@/features/assessment/MiniGrid";
 import { percent, scoreResponse } from "@/game/assessment/scoring";
 import {
   ASSESSMENT_CONCEPT_LABELS,
   ASSESSMENT_CONCEPTS,
 } from "@/game/assessment/types";
+import { continueMissionId } from "@/game/progress/progression";
 import type { AssessmentForm, AssessmentResponse } from "@/game/progress/types";
 import { BADGE_POP, pageVariants } from "@/motion/presets";
 import { useProgressStore } from "@/stores/progressStore";
@@ -32,7 +34,7 @@ function Comparison({
   const postScores = scoreResponse(post);
   return (
     <table className="assessment__table">
-      <caption>Acertos por conceito (dados deste navegador)</caption>
+      <caption>Acertos por conceito</caption>
       <thead>
         <tr>
           <th scope="col">Conceito</th>
@@ -86,22 +88,27 @@ export function AssessmentPage() {
   const body = () => {
     if (stage === "done" || (existing && stage === "intro")) {
       const response = save.assessments[form];
+      const nextId = continueMissionId(save, MISSIONS) ?? "m0-training";
+      const next =
+        form === "pre"
+          ? {
+              to: `/jogar/${nextId}`,
+              label: save.missions["m0-training"]?.status === "completed" ? "Continuar jogando" : "Começar o treinamento",
+            }
+          : { to: "/missoes", label: "Ir para as missões" };
       return (
         <section className="card assessment__card">
           <h2>Obrigado!</h2>
           {response?.skipped ? (
             <p>A avaliação inicial foi pulada. Você pode jogar normalmente.</p>
           ) : (
-            <p>
-              Suas respostas foram salvas neste navegador, sem nome nem dados
-              pessoais.
-            </p>
+            <p>Suas respostas foram salvas e enviadas ao seu professor.</p>
           )}
           {form === "post" && response && (
             <Comparison pre={save.assessments.pre} post={response} />
           )}
-          <Link to="/missoes" className="button button--primary">
-            Ir para as missões
+          <Link to={next.to} className="button button--primary">
+            {next.label}
           </Link>
         </section>
       );
@@ -128,22 +135,22 @@ export function AssessmentPage() {
             e leitura de algoritmos.
           </p>
           <ul>
+            {form === "pre" ? (
+              <li>
+                Você faz esta prova antes de jogar. É normal não saber várias
+                respostas: marque a que achar mais certa.
+              </li>
+            ) : (
+              <li>
+                Você faz esta prova depois de concluir todas as fases, para ver
+                o quanto aprendeu.
+              </li>
+            )}
             <li>Não vale nota e não há tempo limite.</li>
             <li>Você não verá se acertou durante a avaliação.</li>
-            <li>
-              As respostas ficam salvas só neste navegador, sem dados pessoais.
-            </li>
+            <li>Suas respostas vão para o seu professor, junto com o seu nome.</li>
           </ul>
           <div className="assessment__actions">
-            {form === "pre" && (
-              <button
-                type="button"
-                className="button"
-                onClick={() => finish(true)}
-              >
-                Pular por enquanto
-              </button>
-            )}
             <button
               type="button"
               className="button button--primary"

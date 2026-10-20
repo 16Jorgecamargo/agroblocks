@@ -32,6 +32,7 @@ function renderAt(path: string) {
         <Route path="/jogar/:missionId" element={<GameplayPage />} />
         <Route path="/resultado/:missionId" element={<p>Tela de resultado</p>} />
         <Route path="/missoes" element={<p>Mapa de missões</p>} />
+        <Route path="/avaliacao/pre" element={<p>Avaliação inicial</p>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -176,8 +177,15 @@ describe('GameplayPage', () => {
     expect(screen.getByTestId('tutorial-progress')).toHaveTextContent('6/15')
   })
 
+  it('sends a registered student to the pre-test before any phase', () => {
+    useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
+    renderAt('/jogar/m0-training')
+    expect(screen.getByText('Avaliação inicial')).toBeInTheDocument()
+  })
+
   it('records a skipped tutorial on the run', () => {
     useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
+    useProgressStore.getState().storeAssessment({ form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
     renderAt('/jogar/m0-training')
     fireEvent.click(screen.getByRole('button', { name: 'Começar treinamento' }))
     fireEvent.click(screen.getByRole('button', { name: 'Pular tutorial' }))

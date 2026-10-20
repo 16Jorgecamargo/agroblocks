@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { getMission } from '@/data/missions'
-import { openMission, registerStudent, saveWithProgram, seedStorage, teacherLogin, withStudent } from './helpers'
+import { openMission, registerStudent, takePreTest, saveWithProgram, seedStorage, teacherLogin, withStudent } from './helpers'
 
 const firstHarvest = getMission('m1-first-harvest')
 if (!firstHarvest) throw new Error('mission missing')
@@ -10,6 +10,7 @@ test('a skipped tutorial reaches the dashboard behind the teacher password', asy
   await page.goto('/')
   await page.getByRole('button', { name: 'Iniciar nova fazenda' }).click()
   await registerStudent(page, 'Carlos Pulador', 'Escola Estadual Teste')
+  await takePreTest(page)
   await page.getByRole('button', { name: 'Começar treinamento' }).click()
   await page.getByRole('button', { name: 'Próximo' }).click()
   await page.getByRole('button', { name: 'Pular tutorial' }).click()
@@ -36,6 +37,7 @@ test('a completed phase and a new farm show up as two runs of the same student',
   await page.getByRole('button', { name: 'Iniciar nova fazenda' }).click()
   await page.getByRole('button', { name: 'Apagar e começar' }).click()
   await registerStudent(page, 'dora  repetente', 'escola municipal teste')
+  await takePreTest(page)
   await expect(page).toHaveURL(/#\/jogar\/m0-training$/)
   await page.waitForTimeout(2600)
   await page.goto('/#/painel')

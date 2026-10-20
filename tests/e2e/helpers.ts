@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
 import type { Program } from '@/blocks/interpreter/ast'
 import { programToWorkspaceJson } from '@/blocks/serializer/programToWorkspaceJson'
 import { MISSIONS } from '@/data/missions'
@@ -96,8 +96,21 @@ export async function registerStudent(page: Page, name = 'Ana Souza', school = '
   await dialog.getByRole('button', { name: 'Começar' }).click()
 }
 
+export async function takePreTest(page: Page): Promise<void> {
+  await expect(page).toHaveURL(/#\/avaliacao\/pre$/)
+  await page.getByRole('button', { name: 'Começar' }).click()
+  for (let question = 0; question < 10; question += 1) {
+    await expect(page.getByText(`Questão ${question + 1} de 10`)).toBeVisible()
+    await expect(page.getByRole('radio')).toHaveCount(4)
+    await page.getByRole('radio').first().check()
+    await page.getByRole('button', { name: /Próxima|Concluir/ }).click()
+  }
+  await page.getByRole('link', { name: /Começar o treinamento|Continuar jogando/ }).click()
+}
+
 export function withStudent(save: SaveData, name: string, school: string, runId: string): SaveData {
-  return { ...save, runId, student: { name, school } }
+  const pre = save.assessments.pre ?? { form: 'pre' as const, startedAt: save.createdAt, completedAt: save.createdAt, skipped: false, answers: {} }
+  return { ...save, runId, student: { name, school }, assessments: { ...save.assessments, pre } }
 }
 
 export async function teacherLogin(page: Page, password = 'dashboard'): Promise<void> {

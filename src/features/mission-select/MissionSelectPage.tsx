@@ -1,5 +1,6 @@
 import { lazy, useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { GameLink } from '@/components/game/GameButton'
 import { Icon } from '@/components/icons/Icon'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { MISSIONS } from '@/data/missions'
@@ -58,6 +59,7 @@ export function MissionSelectPage() {
   const statuses = Object.fromEntries(MISSIONS.map((mission) => [mission.id, save.missions[mission.id]?.status ?? 'locked'])) as Record<string, MissionStatus>
   const selected = MISSIONS.find((mission) => mission.id === selectedId) ?? MISSIONS[0]
   const show3d = webgl
+  const postTestDue = statuses['m6-efficient-farm'] === 'completed' && save.assessments.post === null
 
   useEffect(() => {
     if (show3d) void import('@/render/models/Model').then((module) => module.preloadModels())
@@ -70,7 +72,18 @@ export function MissionSelectPage() {
 
   return (
     <div className="chrome-page mission-select">
-      <PageHeader title="Seus desafios" subtitle="Complete as missões e aprenda novos conceitos de programação." backTo="/" />
+      <PageHeader
+        title="Seus desafios"
+        subtitle="Complete as missões e aprenda novos conceitos de programação."
+        backTo="/"
+        actions={
+          postTestDue && (
+            <GameLink to="/avaliacao/pos" tone="primary" icon="flag">
+              Fazer avaliação final
+            </GameLink>
+          )
+        }
+      />
       <div className={`mission-select__body${show3d ? '' : ' mission-select__body--flat'}`}>
         {show3d && (
           <div className="mission-select__map">
