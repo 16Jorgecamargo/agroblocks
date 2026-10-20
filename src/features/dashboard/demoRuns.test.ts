@@ -14,5 +14,7 @@ describe('demo runs', () => {
     expect(model.summary.tutorial.completed).toBeGreaterThan(0)
     expect(model.summary.tutorial.skipped).toBeGreaterThan(0)
     expect(model.summary.avgGain).not.toBeNull()
+    expect(model.worldRows.every((row) => row.finished > 0 || row.world === 'homestead')).toBe(true)
+    expect(model.worldRows.find((row) => row.world === 'homestead')?.finished).toBe(1)
   })
 })

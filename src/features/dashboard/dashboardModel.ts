@@ -1,6 +1,8 @@
-import { itemsForForm } from '@/data/assessment/items'
+import { itemsFor } from '@/data/assessment/items'
+import { WORLDS } from '@/data/worlds'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { ERROR_TEXT } from '@/game/rules/errors'
+import { WORLD_IDS, type WorldId } from '@/game/worlds/worldTypes'
 import type { RunSnapshot } from '@/shared/runSnapshot'
 import { cleanText, normalizeKey, studentKeyOf, type TutorialRecord } from '@/shared/student'
 
@@ -22,6 +24,15 @@ export interface Plot {
   hints: number
 }
 
+export interface WorldCell {
+  completed: number
+  total: number
+  state: PlotState
+  attempts: number
+  pre: number | null
+  post: number | null
+}
+
 export interface StudentRow {
   key: string
   name: string
@@ -29,24 +40,25 @@ export interface StudentRow {
   runs: RunSnapshot[]
   runCount: number
   tutorial: TutorialRecord | null
-  completedPhases: number
+  completedMissions: number
+  worldsDone: number
   attempts: number
   hints: number
   errors: number
-  pre: number | null
-  post: number | null
-  gain: number | null
   lastSeen: string
   plots: Record<string, Plot>
+  worlds: Record<WorldId, WorldCell>
 }
 
-export interface PhaseRow {
-  missionId: string
-  title: string
-  completed: number
+export interface WorldRow {
+  world: WorldId
+  name: string
+  conceptLabel: string
+  finished: number
   attemptsPerStudent: number
   hintsPerStudent: number
-  stars: [number, number, number]
+  pre: number | null
+  post: number | null
 }
 
 export interface DashboardModel {
@@ -56,22 +68,22 @@ export interface DashboardModel {
     students: number
     schools: number
     runs: number
-    avgCompletedPhases: number
+    avgCompletedMissions: number
+    avgWorldsDone: number
     attempts: number
     hints: number
     tutorial: { completed: number; skipped: number; unfinished: number }
-    avgPre: number | null
-    avgPost: number | null
     avgGain: number | null
   }
-  phases: PhaseRow[]
+  worldRows: WorldRow[]
   topErrors: { code: string; label: string; count: number }[]
-  schoolScores: { school: string; pre: number | null; post: number | null }[]
 }
 
-export function scoreAssessment(response: RunSnapshot['assessments']['garden']['pre']): number | null {
+export type SnapshotAssessment = RunSnapshot['assessments']['garden']['pre']
+
+export function scoreAssessment(response: SnapshotAssessment): number | null {
   if (!response || response.skipped) return null
-  return itemsForForm(response.form).filter((item) => response.answers[item.id] === item.correctIndex).length
+  return itemsFor(response.world, response.form).filter((item) => response.answers[item.id] === item.correctIndex).length
 }
 
 export function tutorialLabel(record: TutorialRecord | null, total = 15): string {
@@ -114,12 +126,22 @@ function plotOf(runs: RunSnapshot[], missionId: string): Plot {
   return { state, attempts, stars, hints }
 }
 
-function studentRow(key: string, runs: RunSnapshot[], phaseIds: Set<string>, missionIds: string[]): StudentRow {
+function worldCell(runs: RunSnapshot[], world: WorldId, missions: MissionDefinition[], plots: Record<string, Plot>): WorldCell {
+  const ids = missions.filter((mission) => mission.world === world).map((mission) => mission.id)
+  const completed = ids.filter((id) => plots[id]?.state === 'done').length
+  const attempts = ids.reduce((sum, id) => sum + (plots[id]?.attempts ?? 0), 0)
+  const pre = firstWith(runs, (run) => scoreAssessment(run.assessments[world]?.pre ?? null))
+  const post = firstWith(runs, (run) => scoreAssessment(run.assessments[world]?.post ?? null))
+  const state: PlotState = ids.length > 0 && completed === ids.length ? 'done' : completed > 0 || attempts > 0 || pre !== null ? 'trying' : 'empty'
+  return { completed, total: ids.length, state, attempts, pre, post }
+}
+
+function studentRow(key: string, runs: RunSnapshot[], missions: MissionDefinition[]): StudentRow {
   const ordered = [...runs].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const newest = ordered[0]
   const attempts = ordered.flatMap((run) => run.attempts)
-  const pre = firstWith(ordered, (run) => scoreAssessment(run.assessments.garden.pre))
-  const post = firstWith(ordered, (run) => scoreAssessment(run.assessments.garden.post))
+  const plots = Object.fromEntries(missions.map((mission) => [mission.id, plotOf(ordered, mission.id)]))
+  const worlds = Object.fromEntries(WORLD_IDS.map((world) => [world, worldCell(ordered, world, missions, plots)])) as Record<WorldId, WorldCell>
   return {
     key,
     name: cleanText(newest.student.name),
@@ -127,15 +149,14 @@ function studentRow(key: string, runs: RunSnapshot[], phaseIds: Set<string>, mis
     runs: ordered,
     runCount: ordered.length,
     tutorial: firstWith(ordered, (run) => run.tutorial),
-    completedPhases: Math.max(...ordered.map((run) => Object.entries(run.missions).filter(([id, progress]) => phaseIds.has(id) && progress.status === 'completed').length)),
+    completedMissions: missions.filter((mission) => mission.world !== null && plots[mission.id]?.state === 'done').length,
+    worldsDone: WORLD_IDS.filter((world) => worlds[world].state === 'done').length,
     attempts: attempts.length,
     hints: ordered.reduce((sum, run) => sum + Object.values(run.missions).reduce((inner, progress) => inner + progress.hintsUsed, 0), 0),
     errors: attempts.filter((attempt) => attempt.outcome !== 'success').length,
-    pre,
-    post,
-    gain: pre !== null && post !== null ? post - pre : null,
     lastSeen: newest.updatedAt,
-    plots: Object.fromEntries(missionIds.map((id) => [id, plotOf(ordered, id)])),
+    plots,
+    worlds,
   }
 }
 
@@ -147,28 +168,24 @@ export function buildDashboard(runs: RunSnapshot[], missions: MissionDefinition[
     const key = studentKeyOf(run.student)
     groups.set(key, [...(groups.get(key) ?? []), run])
   }
-  const missionIds = missions.map((mission) => mission.id)
-  const phaseIds = new Set(missions.filter((mission) => !mission.tutorial).map((mission) => mission.id))
-  const students = [...groups.entries()].map(([key, group]) => studentRow(key, group, phaseIds, missionIds)).sort((a, b) => b.lastSeen.localeCompare(a.lastSeen))
+  const students = [...groups.entries()].map(([key, group]) => studentRow(key, group, missions)).sort((a, b) => b.lastSeen.localeCompare(a.lastSeen))
   const count = Math.max(1, students.length)
 
-  const phases: PhaseRow[] = [...missions]
-    .sort((a, b) => a.order - b.order)
-    .map((mission) => {
-      const stars: [number, number, number] = [0, 0, 0]
-      let completed = 0
-      let attempts = 0
-      let hints = 0
-      for (const student of students) {
-        const progress = student.runs.map((run) => run.missions[mission.id]).filter((item) => item !== undefined)
-        if (progress.some((item) => item.status === 'completed')) completed += 1
-        attempts += student.runs.reduce((sum, run) => sum + run.attempts.filter((attempt) => attempt.missionId === mission.id).length, 0)
-        hints += progress.reduce((sum, item) => sum + item.hintsUsed, 0)
-        const best = Math.max(0, ...progress.map((item) => item.bestResult?.efficiencyStars ?? 0))
-        if (best > 0) stars[best - 1] += 1
-      }
-      return { missionId: mission.id, title: mission.title, completed, attemptsPerStudent: round(attempts / count), hintsPerStudent: round(hints / count), stars }
-    })
+  const worldRows: WorldRow[] = WORLDS.map((world) => {
+    const ids = missions.filter((mission) => mission.world === world.id).map((mission) => mission.id)
+    const attempts = students.reduce((sum, student) => sum + student.worlds[world.id].attempts, 0)
+    const hints = students.reduce((sum, student) => sum + ids.reduce((inner, id) => inner + (student.plots[id]?.hints ?? 0), 0), 0)
+    return {
+      world: world.id,
+      name: world.name,
+      conceptLabel: world.conceptLabel,
+      finished: students.filter((student) => student.worlds[world.id].state === 'done').length,
+      attemptsPerStudent: round(attempts / count),
+      hintsPerStudent: round(hints / count),
+      pre: average(students.map((student) => student.worlds[world.id].pre)),
+      post: average(students.map((student) => student.worlds[world.id].post)),
+    }
+  })
 
   const errorCounts = new Map<string, number>()
   for (const run of filtered) for (const attempt of run.attempts) if (attempt.errorCode) errorCounts.set(attempt.errorCode, (errorCounts.get(attempt.errorCode) ?? 0) + 1)
@@ -177,17 +194,22 @@ export function buildDashboard(runs: RunSnapshot[], missions: MissionDefinition[
     .slice(0, 6)
     .map(([code, total]) => ({ code, label: ERROR_TEXT[code as keyof typeof ERROR_TEXT]?.message ?? code, count: total }))
 
-  const bySchool = new Map<string, StudentRow[]>()
-  for (const student of students) bySchool.set(student.school, [...(bySchool.get(student.school) ?? []), student])
+  const gains = students.flatMap((student) =>
+    WORLD_IDS.map((world) => {
+      const cell = student.worlds[world]
+      return cell.pre !== null && cell.post !== null ? cell.post - cell.pre : null
+    }),
+  )
 
   return {
     students,
     schools,
     summary: {
       students: students.length,
-      schools: bySchool.size,
+      schools: new Set(students.map((student) => student.school)).size,
       runs: filtered.length,
-      avgCompletedPhases: round(students.reduce((sum, student) => sum + student.completedPhases, 0) / count),
+      avgCompletedMissions: round(students.reduce((sum, student) => sum + student.completedMissions, 0) / count),
+      avgWorldsDone: round(students.reduce((sum, student) => sum + student.worldsDone, 0) / count),
       attempts: students.reduce((sum, student) => sum + student.attempts, 0),
       hints: students.reduce((sum, student) => sum + student.hints, 0),
       tutorial: {
@@ -195,14 +217,9 @@ export function buildDashboard(runs: RunSnapshot[], missions: MissionDefinition[
         skipped: students.filter((student) => student.tutorial?.status === 'skipped').length,
         unfinished: students.filter((student) => student.tutorial === null).length,
       },
-      avgPre: average(students.map((student) => student.pre)),
-      avgPost: average(students.map((student) => student.post)),
-      avgGain: average(students.map((student) => student.gain)),
+      avgGain: average(gains),
     },
-    phases,
+    worldRows,
     topErrors,
-    schoolScores: [...bySchool.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0], 'pt-BR'))
-      .map(([school, group]) => ({ school, pre: average(group.map((student) => student.pre)), post: average(group.map((student) => student.post)) })),
   }
 }

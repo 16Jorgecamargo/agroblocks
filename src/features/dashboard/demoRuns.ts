@@ -1,5 +1,7 @@
-import { itemsForForm } from '@/data/assessment/items'
+import { itemsFor } from '@/data/assessment/items'
+import { WORLDS } from '@/data/worlds'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
+import type { WorldId } from '@/game/worlds/worldTypes'
 import type { RunSnapshot } from '@/shared/runSnapshot'
 import { studentKeyOf } from '@/shared/student'
 
@@ -13,25 +15,25 @@ interface DemoPerson {
 }
 
 const PEOPLE: readonly DemoPerson[] = [
-  { name: 'Ana Souza', school: 'E.E. Monteiro Lobato', reached: 6, pre: 4, post: 8, tutorial: 'completed' },
-  { name: 'Bruno Lima', school: 'E.E. Monteiro Lobato', reached: 4, pre: 3, post: 6, tutorial: 'completed' },
-  { name: 'Carla Mendes', school: 'E.E. Monteiro Lobato', reached: 2, pre: 5, post: null, tutorial: 'skipped' },
-  { name: 'Diego Rocha', school: 'Colégio Estadual Rio Verde', reached: 5, pre: 2, post: 7, tutorial: 'completed' },
-  { name: 'Eduarda Alves', school: 'Colégio Estadual Rio Verde', reached: 3, pre: 6, post: 7, tutorial: null },
-  { name: 'Felipe Costa', school: 'Escola Técnica Agrícola', reached: 6, pre: 7, post: 10, tutorial: 'completed' },
+  { name: 'Ana Souza', school: 'E.E. Monteiro Lobato', reached: 60, pre: 4, post: 8, tutorial: 'completed' },
+  { name: 'Bruno Lima', school: 'E.E. Monteiro Lobato', reached: 44, pre: 3, post: 6, tutorial: 'completed' },
+  { name: 'Carla Mendes', school: 'E.E. Monteiro Lobato', reached: 6, pre: 5, post: 7, tutorial: 'skipped' },
+  { name: 'Diego Rocha', school: 'Colégio Estadual Rio Verde', reached: 37, pre: 2, post: 7, tutorial: 'completed' },
+  { name: 'Eduarda Alves', school: 'Colégio Estadual Rio Verde', reached: 13, pre: 6, post: 7, tutorial: null },
+  { name: 'Felipe Costa', school: 'Escola Técnica Agrícola', reached: 29, pre: 7, post: 10, tutorial: 'completed' },
   { name: 'Gabriela Nunes', school: 'Escola Técnica Agrícola', reached: 1, pre: null, post: null, tutorial: 'skipped' },
 ]
 
 const ERRORS = ['HIT_OBSTACLE', 'PLOT_OCCUPIED', 'WATER_WASTED', 'PLANT_NOT_MATURE', 'NO_WATER']
 
-function answers(form: 'pre' | 'post', correct: number): Record<string, number> {
-  return Object.fromEntries(itemsForForm(form).map((item, index) => [item.id, index < correct ? item.correctIndex : (item.correctIndex + 1) % item.options.length]))
+function answers(world: WorldId, form: 'pre' | 'post', correct: number): Record<string, number> {
+  return Object.fromEntries(itemsFor(world, form).map((item, index) => [item.id, index < correct ? item.correctIndex : (item.correctIndex + 1) % item.options.length]))
 }
 
 function demoRun(person: DemoPerson, index: number, missions: MissionDefinition[], runIndex: number): RunSnapshot {
   const ordered = [...missions].sort((a, b) => a.order - b.order)
-  const day = String(10 + index).padStart(2, '0')
-  const at = (hour: number) => `2026-09-${day}T${String(8 + hour).padStart(2, '0')}:00:00.000Z`
+  const start = Date.UTC(2026, 8, 10 + index, 8, 0, 0)
+  const at = (step: number) => new Date(start + step * 10 * 60 * 1000).toISOString()
   const attempts: RunSnapshot['attempts'] = []
   const progress: RunSnapshot['missions'] = {}
   ordered.forEach((mission, position) => {
@@ -78,25 +80,27 @@ function demoRun(person: DemoPerson, index: number, missions: MissionDefinition[
       errorCounts: {},
     }
   })
-  const response = (form: 'pre' | 'post', correct: number | null) =>
-    correct === null ? null : { world: 'garden' as const, form, startedAt: at(0), completedAt: at(0), skipped: false, answers: answers(form, correct) }
+  const response = (world: WorldId, form: 'pre' | 'post', correct: number | null) =>
+    correct === null ? null : { world, form, startedAt: at(0), completedAt: at(0), skipped: false, answers: answers(world, form, correct) }
+  const assessments = Object.fromEntries(
+    WORLDS.map((world) => {
+      const entered = person.reached >= (world.order - 1) * 10
+      const finished = person.reached >= world.order * 10
+      const pre = person.pre === null ? null : Math.min(10, person.pre + ((world.order + index) % 3))
+      const post = person.post === null || pre === null ? null : Math.min(10, Math.max(pre, person.post + ((world.order + index) % 2)))
+      return [world.id, { pre: entered ? response(world.id, 'pre', pre) : null, post: finished ? response(world.id, 'post', post) : null }]
+    }),
+  ) as RunSnapshot['assessments']
   return {
     runId: `demo-run-${index}-${runIndex}`,
     student: { name: person.name, school: person.school },
     studentKey: studentKeyOf(person),
     createdAt: at(0),
-    updatedAt: at(9 + runIndex),
+    updatedAt: at(70 + runIndex),
     tutorial: person.tutorial ? { status: person.tutorial, step: person.tutorial === 'completed' ? 15 : 3 + index, at: at(1) } : null,
     missions: progress,
     attempts,
-    assessments: {
-      garden: { pre: response('pre', person.pre), post: response('post', person.post) },
-      cornfield: { pre: null, post: null },
-      orchard: { pre: null, post: null },
-      greenhouse: { pre: null, post: null },
-      barnyard: { pre: null, post: null },
-      homestead: { pre: null, post: null },
-    },
+    assessments,
   }
 }
 

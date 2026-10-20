@@ -1,11 +1,12 @@
-import { itemsForForm } from '@/data/assessment/items'
+import { itemsFor } from '@/data/assessment/items'
 import { MISSIONS } from '@/data/missions'
+import { missionsOfWorld } from '@/data/worlds'
 import { buildDashboard, EMPTY_FILTERS, scoreAssessment, tutorialLabel } from '@/features/dashboard/dashboardModel'
 import type { RunSnapshot } from '@/shared/runSnapshot'
 import { validSnapshot } from '@/shared/snapshotFixture'
 
 function answers(form: 'pre' | 'post', correct: number) {
-  return Object.fromEntries(itemsForForm(form).map((item, index) => [item.id, index < correct ? item.correctIndex : item.correctIndex + 1]))
+  return Object.fromEntries(itemsFor('garden', form).map((item, index) => [item.id, index < correct ? item.correctIndex : (item.correctIndex + 1) % item.options.length]))
 }
 
 function run(overrides: Partial<RunSnapshot>): RunSnapshot {
@@ -51,7 +52,8 @@ describe('dashboard model', () => {
     const model = buildDashboard(runs, MISSIONS, EMPTY_FILTERS)
     expect(model.students).toHaveLength(2)
     const jose = model.students.find((row) => row.runCount === 2)
-    expect(jose).toMatchObject({ name: 'jose da SILVA', school: 'escola azul', completedPhases: 1, attempts: 2, errors: 1, hints: 1, pre: 4, post: 9, gain: 5 })
+    expect(jose).toMatchObject({ name: 'jose da SILVA', school: 'escola azul', completedMissions: 1, attempts: 2, errors: 1, hints: 1 })
+    expect(jose?.worlds.garden).toMatchObject({ pre: 4, post: 9 })
     expect(jose?.tutorial?.status).toBe('completed')
     expect(jose?.runs.map((item) => item.runId)).toEqual(['run-a2', 'run-a1'])
   })
@@ -78,10 +80,29 @@ describe('dashboard model', () => {
     expect(trying.students[0].plots['garden-04']).toEqual({ state: 'trying', attempts: 1, stars: 0, hints: 0 })
   })
 
-  it('computes phases, stars and the most common errors', () => {
+  it('scores the tests of each world', () => {
     const model = buildDashboard(runs, MISSIONS, EMPTY_FILTERS)
-    const first = model.phases.find((row) => row.missionId === 'garden-04')
-    expect(first).toMatchObject({ completed: 1, stars: [0, 1, 0] })
+    const garden = model.worldRows.find((row) => row.world === 'garden')
+    expect(garden).toMatchObject({ name: 'Horta', pre: 4, post: 9 })
+    expect(model.summary.avgGain).toBe(5)
+  })
+
+  it('counts missions per world and marks finished worlds', () => {
+    const gardenIds = missionsOfWorld('garden', MISSIONS).map((mission) => mission.id)
+    const cornIds = missionsOfWorld('cornfield', MISSIONS).slice(0, 3).map((mission) => mission.id)
+    const completed = { status: 'completed' as const, attempts: 1, bestResult: { actions: 1, blocks: 1, usage: { seeds: 0, water: 0, energy: 1 }, efficiencyStars: 3 as const }, hintsUsed: 0, errorCounts: {} }
+    const missions = Object.fromEntries([...gardenIds, ...cornIds].map((id) => [id, completed]))
+    const model = buildDashboard([run({ runId: 'run-d1', student: { name: 'Dani Reis', school: 'Escola Azul' }, missions })], MISSIONS, EMPTY_FILTERS)
+    const dani = model.students[0]
+    expect(dani.worlds.garden).toMatchObject({ completed: 10, state: 'done' })
+    expect(dani.worlds.cornfield).toMatchObject({ completed: 3, state: 'trying' })
+    expect(dani.worlds.orchard).toMatchObject({ completed: 0, state: 'empty' })
+    expect(dani).toMatchObject({ worldsDone: 1, completedMissions: 13 })
+    expect(model.worldRows.find((row) => row.world === 'garden')?.finished).toBe(1)
+  })
+
+  it('lists the most common errors', () => {
+    const model = buildDashboard(runs, MISSIONS, EMPTY_FILTERS)
     expect(model.topErrors[0]).toMatchObject({ code: 'HIT_OBSTACLE', count: 1 })
     expect(model.topErrors[0].label).toMatch(/obstáculo|pedra|bateu/i)
   })
