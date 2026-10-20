@@ -3,6 +3,7 @@ import { addButterflies, addClutter, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import { HOME_HILLS, hillScatter, hillSurfaceY } from '@/render/world/hillScatter'
 import { WorldDraft } from '@/render/world/worldDraft'
+import { themePalette } from '@/render/world/worldThemes'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
 export const HOME_BEDS: Rect = { minX: -1.6, maxX: 2.8, minZ: 0, maxZ: 3.2 }
@@ -52,5 +53,7 @@ export function homeLayout(input: WorldInput, random: () => number): World {
     pasture,
     animals: spawnHerd(random, pasture, [['cow', 2], ['sheep', 2]], 'home'),
     butterflies: addButterflies(random, { minX: -2, maxX: 4, minZ: -0.5, maxZ: 4 }, 5),
+    features: draft.features,
+    palette: themePalette(input.theme),
   }
 }

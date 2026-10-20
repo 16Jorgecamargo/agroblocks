@@ -12,6 +12,7 @@ import { RobotModel } from '@/render/farm3d/RobotModel'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
 import { Herd } from '@/render/world/Herd'
+import { WorldFeatures } from '@/render/world/WorldFeatures'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import { CANVAS_RESIZE } from '@/render/canvasResize'
@@ -78,6 +79,7 @@ export default function FarmScene({
       </mesh>
       <WorldTerrain world={world} />
       <WorldProps world={world} shadows={!lowGraphics} ambient={!reducedMotion && !lowGraphics} />
+      <WorldFeatures features={world.features} ambient={!reducedMotion && !lowGraphics} />
       <Herd animals={world.animals} active={!reducedMotion && !lowGraphics} />
       <Butterflies points={world.butterflies} active={!reducedMotion && !lowGraphics} />
       {state.cells.map((row, y) =>

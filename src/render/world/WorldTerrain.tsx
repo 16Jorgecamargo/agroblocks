@@ -25,7 +25,7 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
       {withGround && (
         <mesh position={[centerX, -0.05, centerZ]} receiveShadow>
           <boxGeometry args={[width, 0.1, depth]} />
-          <meshStandardMaterial color={WORLD_COLORS.grass} roughness={0.95} flatShading />
+          <meshStandardMaterial color={world.palette.grass} roughness={0.95} flatShading />
         </mesh>
       )}
       {world.island && (
@@ -42,7 +42,7 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
       )}
       {paths.map((geometry, index) => (
         <mesh key={index} geometry={geometry} position={[0, PATH_HEIGHT, 0]} receiveShadow>
-          <meshStandardMaterial color={WORLD_COLORS.path} roughness={1} side={DoubleSide} />
+          <meshStandardMaterial color={world.palette.path} roughness={1} side={DoubleSide} />
         </mesh>
       ))}
       {bank && (

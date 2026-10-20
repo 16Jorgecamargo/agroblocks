@@ -1,4 +1,5 @@
 import type { ModelId } from '@/render/models/manifest'
+import type { FeatureKind } from '@/render/world/worldTypes'
 
 export const CLUTTER_MODELS = ['grass-short', 'grass-tall', 'clover', 'flower-patch', 'flower-red', 'flower-yellow', 'flower-purple', 'fern', 'mushrooms', 'pebble'] as const satisfies readonly ModelId[]
 
@@ -51,6 +52,15 @@ export function footprint(model: ModelId): number {
   if (CLUTTER_SET.has(model)) return 0.15
   if ((TREE_MODELS as readonly ModelId[]).includes(model)) return 0.8
   return FOOTPRINTS[model] ?? 0.4
+}
+
+export const FEATURE_FOOTPRINTS: Record<FeatureKind, number> = {
+  cornStalk: 0.22,
+  fruitTree: 0.9,
+  greenhouse: 2.2,
+  vegetableBed: 0.8,
+  hayBale: 0.55,
+  trough: 0.6,
 }
 
 export const GRID_CLEARANCE = 1.2

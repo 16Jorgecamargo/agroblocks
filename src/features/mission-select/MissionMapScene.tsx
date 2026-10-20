@@ -13,6 +13,7 @@ import { PALETTE } from '@/render/palette'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
 import { Herd } from '@/render/world/Herd'
+import { WorldFeatures } from '@/render/world/WorldFeatures'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import type { Vec2 } from '@/render/world/worldTypes'
@@ -71,6 +72,7 @@ export default function MissionMapScene({ missions, statuses, selectedId, onSele
         <directionalLight position={[10, 18, 8]} intensity={1.5} castShadow={!lowGraphics} shadow-mapSize={[2048, 2048]} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={14} shadow-camera-bottom={-14} />
         <WorldTerrain world={world} />
         <WorldProps world={world} shadows={!lowGraphics} ambient={alive} />
+      <WorldFeatures features={world.features} ambient={alive} />
         <Herd animals={world.animals} active={alive} />
         <Butterflies points={world.butterflies} active={alive} />
         {missions.map((mission) => {

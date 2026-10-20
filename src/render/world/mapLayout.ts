@@ -3,6 +3,7 @@ import { crossings, rectPolygon } from '@/render/world/geometry'
 import { addButterflies, addClutter, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS } from '@/render/world/worldCatalog'
 import { WorldDraft } from '@/render/world/worldDraft'
+import { themePalette } from '@/render/world/worldThemes'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
 const MAP_ANIMAL_SCALE = 0.55
@@ -66,5 +67,7 @@ export function mapLayout(input: WorldInput, random: () => number): World {
     pasture,
     animals: spawnHerd(random, pasture, [['sheep', 3], ['cow', 2]], 'map', MAP_ANIMAL_SCALE),
     butterflies: addButterflies(random, MAP_ISLAND, 6),
+    features: draft.features,
+    palette: themePalette(input.theme),
   }
 }

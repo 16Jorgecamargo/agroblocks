@@ -1,3 +1,4 @@
+import type { WorldId } from '@/game/worlds/worldTypes'
 import type { ModelId } from '@/render/models/manifest'
 
 export interface Vec2 {
@@ -47,6 +48,24 @@ export interface WorldInput {
   gridHeight: number
   seed: string
   density: WorldDensity
+  theme?: WorldId | null
+}
+
+export type FeatureKind = 'cornStalk' | 'fruitTree' | 'greenhouse' | 'vegetableBed' | 'hayBale' | 'trough'
+
+export interface WorldFeature {
+  kind: FeatureKind
+  x: number
+  z: number
+  rotation: number
+  scale: number
+  tint?: string
+}
+
+export interface WorldPaletteColors {
+  grass: string
+  grassDeep: string
+  path: string
 }
 
 export interface World {
@@ -59,4 +78,6 @@ export interface World {
   pasture: Vec2[] | null
   animals: AnimalSpawn[]
   butterflies: Vec2[]
+  features: WorldFeature[]
+  palette: WorldPaletteColors
 }

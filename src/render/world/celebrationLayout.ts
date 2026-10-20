@@ -2,6 +2,7 @@ import { rectDistance, rectPolygon } from '@/render/world/geometry'
 import { addButterflies, addClutter, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import { WorldDraft } from '@/render/world/worldDraft'
+import { themePalette } from '@/render/world/worldThemes'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
 export const CELEBRATION_ROBOT: Vec2 = { x: -2.4, z: 2.4 }
@@ -53,5 +54,7 @@ export function celebrationLayout(input: WorldInput, random: () => number): Worl
     pasture,
     animals: spawnHerd(random, pasture, [['cow', 2], ['sheep', 2], ['pig', 1]], 'celebration'),
     butterflies: addButterflies(random, { minX: -5, maxX: -0.5, minZ: -0.5, maxZ: 4 }, 6),
+    features: draft.features,
+    palette: themePalette(input.theme),
   }
 }

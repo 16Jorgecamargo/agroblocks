@@ -7,3 +7,5 @@ export const WORLD_COLORS = {
   cliff: '#8a7560',
   cliffDark: '#6f5c4a',
 } as const
+
+export const DEFAULT_PALETTE = { grass: WORLD_COLORS.grass, grassDeep: WORLD_COLORS.grassDeep, path: WORLD_COLORS.path }

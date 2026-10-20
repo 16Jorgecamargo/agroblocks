@@ -1,7 +1,7 @@
 import type { ModelId } from '@/render/models/manifest'
 import { distanceToPolyline, pointInPolygon, rectDistance } from '@/render/world/geometry'
-import { EXEMPT_MODELS, footprint, FRONT_CLEARANCE, GRID_CLEARANCE, isClutter, RIVER_BANK, TALL_MODELS } from '@/render/world/worldCatalog'
-import type { Polyline, PropItem, Rect, Vec2 } from '@/render/world/worldTypes'
+import { EXEMPT_MODELS, FEATURE_FOOTPRINTS, footprint, FRONT_CLEARANCE, GRID_CLEARANCE, isClutter, RIVER_BANK, TALL_MODELS } from '@/render/world/worldCatalog'
+import type { FeatureKind, Polyline, PropItem, Rect, Vec2, WorldFeature } from '@/render/world/worldTypes'
 
 export interface DraftRules {
   grid: Rect | null
@@ -19,6 +19,7 @@ const SCATTER_TRIES = 14
 
 export class WorldDraft {
   readonly props: PropItem[] = []
+  readonly features: WorldFeature[] = []
 
   constructor(
     private readonly random: () => number,
@@ -26,14 +27,24 @@ export class WorldDraft {
   ) {}
 
   isFree(model: ModelId, point: Vec2, scale = 1): boolean {
-    const radius = footprint(model) * scale
+    return this.fits(point, footprint(model) * scale, TALL_MODELS.has(model), isClutter(model))
+  }
+
+  placeFeature(kind: FeatureKind, point: Vec2, rotation: number, scale = 1, tint?: string): boolean {
+    if (!this.fits(point, FEATURE_FOOTPRINTS[kind] * scale, kind === 'greenhouse' || kind === 'fruitTree', false)) return false
+    this.features.push(tint === undefined ? { kind, x: point.x, z: point.z, rotation, scale } : { kind, x: point.x, z: point.z, rotation, scale, tint })
+    return true
+  }
+
+  private fits(point: Vec2, radius: number, tall: boolean, clutter: boolean): boolean {
     const { grid, paths, river, keepOut, frontGuard, bounds } = this.rules
     if (bounds && (point.x < bounds.minX || point.x > bounds.maxX || point.z < bounds.minZ || point.z > bounds.maxZ)) return false
     if (grid && rectDistance(point, grid) < GRID_CLEARANCE + radius) return false
-    if (frontGuard && TALL_MODELS.has(model) && point.x + point.z > 0 && rectDistance(point, frontGuard) < FRONT_CLEARANCE) return false
+    if (frontGuard && tall && point.x + point.z > 0 && rectDistance(point, frontGuard) < FRONT_CLEARANCE) return false
     for (const path of paths) if (distanceToPolyline(point, path.points) < path.width / 2 + radius) return false
     if (river && distanceToPolyline(point, river.points) < river.width / 2 + radius + RIVER_BANK) return false
-    if (!isClutter(model) && keepOut.some((zone) => pointInPolygon(point, zone))) return false
+    if (!clutter && keepOut.some((zone) => pointInPolygon(point, zone))) return false
+    if (!this.features.every((feature) => Math.hypot(feature.x - point.x, feature.z - point.z) >= FEATURE_FOOTPRINTS[feature.kind] * feature.scale + radius)) return false
     return this.props.every((prop) => EXEMPT_MODELS.has(prop.model) || Math.hypot(prop.x - point.x, prop.z - point.z) >= footprint(prop.model) * prop.scale + radius)
   }
 

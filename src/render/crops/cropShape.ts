@@ -2,6 +2,8 @@ import type { PlotState } from '@/game/world/types'
 
 export type CropStage = 'planted' | 'growing' | 'ready'
 
+export type CropKind = 'vegetable' | 'corn' | 'fruit' | 'seedling' | 'grain' | 'mixed'
+
 export interface CropLeaf {
   x: number
   y: number
