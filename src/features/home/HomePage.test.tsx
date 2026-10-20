@@ -1,3 +1,4 @@
+import { MISSIONS } from '@/data/missions'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { HomePage } from '@/features/home/HomePage'
@@ -40,21 +41,18 @@ describe('HomePage', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'AgroBlocks' })).toBeInTheDocument()
     expect(screen.getByText('Automatize. Programe. Cultive.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Continuar missão/ })).toBeDisabled()
-    expect(screen.getByText('0 de 6 fases concluídas')).toBeInTheDocument()
+    expect(screen.getByText(`0 de ${MISSIONS.length - 1} fases concluídas`)).toBeInTheDocument()
   })
 
   it('continues at the next mission and shows its name', () => {
     useProgressStore.getState().recordAttempt(success('m0-training'))
-    useProgressStore.getState().recordAttempt(success('garden-04'))
-    for (const world of ['garden', 'cornfield'] as const) {
-      useProgressStore.getState().storeAssessment({ world, form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
-    }
-    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
+    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
+    useProgressStore.getState().recordAttempt(success('garden-01'))
     renderHome()
     const continueButton = screen.getByRole('button', { name: /Continuar missão/ })
     expect(continueButton).toBeEnabled()
-    expect(continueButton).toHaveTextContent('Fase 12 - Plantação em série')
-    expect(screen.getByText('1 de 6 fases concluídas')).toBeInTheDocument()
+    expect(continueButton).toHaveTextContent('Fase 2 - Hora de plantar')
+    expect(screen.getByText(`1 de ${MISSIONS.length - 1} fases concluídas`)).toBeInTheDocument()
   })
 
   it('asks who is playing before starting a new farm', () => {
@@ -68,11 +66,8 @@ describe('HomePage', () => {
   })
 
   it('asks before wiping progress, then asks who is playing', () => {
-    useProgressStore.getState().recordAttempt(success('garden-04'))
-    for (const world of ['garden', 'cornfield'] as const) {
-      useProgressStore.getState().storeAssessment({ world, form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
-    }
-    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
+    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
+    useProgressStore.getState().recordAttempt(success('garden-01'))
     renderHome()
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova fazenda' }))
     fireEvent.click(screen.getByRole('button', { name: 'Apagar e começar' }))
@@ -84,11 +79,8 @@ describe('HomePage', () => {
   })
 
   it('keeps everything when the student cancels the registration', () => {
-    useProgressStore.getState().recordAttempt(success('garden-04'))
-    for (const world of ['garden', 'cornfield'] as const) {
-      useProgressStore.getState().storeAssessment({ world, form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
-    }
-    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
+    useProgressStore.getState().storeAssessment({ world: 'garden', form: 'pre', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
+    useProgressStore.getState().recordAttempt(success('garden-01'))
     renderHome()
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova fazenda' }))
     fireEvent.click(screen.getByRole('button', { name: 'Apagar e começar' }))

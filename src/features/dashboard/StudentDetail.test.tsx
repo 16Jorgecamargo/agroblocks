@@ -24,7 +24,7 @@ describe('StudentDetail', () => {
     if (!bruno) throw new Error('demo student missing')
     render(<StudentDetail student={bruno} demo={false} onClose={vi.fn()} onDeleteRun={vi.fn(async () => undefined)} />)
     const dialog = screen.getByRole('dialog', { name: 'Bruno Lima' })
-    fireEvent.click(within(dialog).getAllByRole('button', { name: /^Primeira colheita:/ })[0])
+    fireEvent.click(within(dialog).getAllByRole('button', { name: /^Primeira colheita:/ }).at(-1) as HTMLElement)
     const facts = within(dialog).getByRole('region', { name: 'Detalhes de Primeira colheita' })
     expect(facts).toHaveTextContent('Concluída')
     expect(facts).toHaveTextContent(/\d+ comandos, \d+ blocos/)

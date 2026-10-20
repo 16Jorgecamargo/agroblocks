@@ -1,19 +1,12 @@
 import { MISSIONS, getMission } from '@/data/missions'
+import { playMission } from '@/game/testing/playMission'
 import { getWorld } from '@/data/worlds'
 import type { WorldId } from '@/game/worlds/worldTypes'
 import { programBlockTypes } from '@/blocks/analysis/programBlockTypes'
-import { runProgram } from '@/blocks/interpreter/runProgram'
 import { act, program, repeat, ifThen, sensor } from '@/blocks/interpreter/programBuilder'
-import type { Program } from '@/blocks/interpreter/ast'
-import { toControllerMission } from '@/game/missions/toControllerMission'
-import { validateMission } from '@/game/missions/validateMission'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 
-function play(mission: MissionDefinition, code: Program) {
-  const controllerMission = toControllerMission(mission)
-  const result = runProgram(code, controllerMission.initialState, controllerMission.rules, controllerMission.stepLimit)
-  return { ...result, validation: validateMission(result.state, controllerMission.goals) }
-}
+const play = playMission
 
 function mission(id: string): MissionDefinition {
   const found = getMission(id)

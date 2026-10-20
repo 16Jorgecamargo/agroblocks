@@ -37,7 +37,7 @@ describe('DashboardPage', () => {
     expect(ana).toHaveTextContent('Tutorial: Concluído')
     expect(ana).toHaveTextContent(/Primeira colheita: concluída com \d estrelas?/)
     const gabriela = within(table).getByText('Gabriela Nunes').closest('tr')
-    expect(gabriela).toHaveTextContent('Plantação em série: tentando')
+    expect(gabriela).toHaveTextContent(`${[...MISSIONS].sort((a, b) => a.order - b.order)[2].title}: tentando`)
     expect(gabriela).toHaveTextContent('Fazenda eficiente: não começou')
   })
 

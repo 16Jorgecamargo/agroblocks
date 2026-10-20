@@ -1,7 +1,7 @@
 import { newlyUnlocked } from '@/features/mission-select/unlocks'
 import { loadSeenUnlocks, saveSeenUnlocks } from '@/services/storage/seenUnlocks'
 import { MISSIONS } from '@/data/missions'
-import { createInitialSave, recordAttempt, storeAssessment } from '@/game/progress/progression'
+import { createInitialSave, recordAttempt } from '@/game/progress/progression'
 
 const refs = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
 const ids = MISSIONS.map((mission) => mission.id)
@@ -22,7 +22,7 @@ function completed(missionId: string) {
     },
     refs,
   )
-  return storeAssessment(done, { world: 'garden', form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: {} }, refs)
+  return done
 }
 
 describe('unlocks', () => {
@@ -31,11 +31,11 @@ describe('unlocks', () => {
   })
 
   it('reports a mission unlocked since the last visit', () => {
-    expect(newlyUnlocked(completed('garden-04'), ids, [])).toEqual(['cornfield-02'])
+    expect(newlyUnlocked(completed('garden-01'), ids, [])).toEqual(['garden-02'])
   })
 
   it('does not repeat missions already celebrated', () => {
-    expect(newlyUnlocked(completed('garden-04'), ids, ['cornfield-02'])).toEqual([])
+    expect(newlyUnlocked(completed('garden-01'), ids, ['garden-02'])).toEqual([])
   })
 
   it('persists seen unlocks', () => {

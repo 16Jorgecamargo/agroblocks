@@ -32,6 +32,12 @@ vi.mock('@/blocks/editor/BlocklyEditor', async () => {
   }
 })
 
+function openMission(id: string) {
+  useProgressStore.setState((state) => ({
+    save: { ...state.save, missions: { ...state.save.missions, [id]: { ...state.save.missions[id], status: 'available' } } },
+  }))
+}
+
 function renderAt(path: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
@@ -50,6 +56,7 @@ describe('GameplayPage', () => {
     vi.useFakeTimers()
     useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, motion: 'reduced' } })
     useProgressStore.getState().resetProgress()
+    openMission('garden-04')
   })
 
   afterEach(() => {
@@ -205,7 +212,7 @@ describe('GameplayPage', () => {
 
   it('sends a registered student to the pre-test before a world mission', () => {
     useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
-    renderAt('/jogar/garden-04')
+    renderAt('/jogar/garden-01')
     expect(screen.getByText('Avaliação inicial')).toBeInTheDocument()
   })
 

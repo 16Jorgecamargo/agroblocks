@@ -52,7 +52,7 @@ describe('ResultsPage', () => {
     expect(screen.getByText('Solução correta')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Eficiência 1 de 3' })).toBeInTheDocument()
     expect(screen.getByText('Sequenciamento')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Próxima fase' })).toHaveAttribute('href', '/jogar/cornfield-02')
+    expect(screen.getByRole('link', { name: 'Próxima fase' })).toHaveAttribute('href', '/jogar/garden-05')
     expect(screen.getByRole('link', { name: 'Tentar novamente' })).toHaveAttribute('href', '/jogar/garden-04')
     const actions = screen.getByRole('group', { name: 'Próximos passos' })
     expect([...actions.querySelectorAll('button, a')].map((item) => item.textContent?.trim())).toEqual(['Ver solução', 'Tentar novamente', 'Próxima fase'])

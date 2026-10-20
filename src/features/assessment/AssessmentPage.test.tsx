@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { AssessmentPage } from '@/features/assessment/AssessmentPage'
-import { itemsForForm } from '@/data/assessment/items'
+import { itemsFor } from '@/data/assessment/items'
 import { useProgressStore } from '@/stores/progressStore'
 
 function renderAt(path: string) {
@@ -16,7 +16,7 @@ function renderAt(path: string) {
 }
 
 async function answerAll(form: 'pre' | 'post', correct: boolean) {
-  const items = itemsForForm(form)
+  const items = itemsFor('garden', form)
   for (const [position, item] of items.entries()) {
     await screen.findByText(`Questão ${position + 1} de ${items.length}`)
     const index = correct ? item.correctIndex : (item.correctIndex + 1) % item.options.length

@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { GameButton } from "@/components/game/GameButton";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { itemsForForm } from "@/data/assessment/items";
+import { itemsFor } from "@/data/assessment/items";
 import { MISSIONS } from "@/data/missions";
 import { MiniGrid } from "@/features/assessment/MiniGrid";
 import { percent, scoreBySkill } from "@/game/assessment/scoring";
@@ -67,7 +67,7 @@ export function AssessmentPage() {
 
   if (!form) return <Navigate to="/" replace />;
 
-  const items = itemsForForm(form);
+  const items = itemsFor("garden", form);
   const title = form === "pre" ? "Avaliação inicial" : "Avaliação final";
   const existing = save.assessments.garden[form];
   const postLocked =

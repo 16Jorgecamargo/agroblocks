@@ -1,3 +1,4 @@
+import { MISSIONS } from '@/data/missions'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { MissionSelectPage } from '@/features/mission-select/MissionSelectPage'
@@ -20,15 +21,15 @@ describe('MissionSelectPage', () => {
   it('lists every mission with a textual status', () => {
     renderPage()
     const list = screen.getByRole('list', { name: 'Lista de fases' })
-    expect(within(list).getAllByRole('listitem')).toHaveLength(7)
-    expect(within(list).getByRole('button', { name: /Fase 4 · Primeira colheita · Disponível/ })).toBeInTheDocument()
-    expect(within(list).getByRole('button', { name: /Fase 12 · Plantação em série · Bloqueada/ })).toBeInTheDocument()
+    expect(within(list).getAllByRole('listitem')).toHaveLength(MISSIONS.length)
+    expect(within(list).getByRole('button', { name: /Fase 1 · Primeiros passos · Disponível/ })).toBeInTheDocument()
+    expect(within(list).getByRole('button', { name: /Fase 2 · Hora de plantar · Bloqueada/ })).toBeInTheDocument()
   })
 
   it('shows details and starts an available mission', async () => {
     renderPage()
-    fireEvent.click(screen.getByRole('button', { name: /Fase 4 · Primeira colheita/ }))
-    const card = await screen.findByRole('region', { name: 'Fase 4 - Primeira colheita' })
+    fireEvent.click(screen.getByRole('button', { name: /Fase 1 · Primeiros passos/ }))
+    const card = await screen.findByRole('region', { name: 'Fase 1 - Primeiros passos' })
     expect(within(card).getByText('Sequenciamento')).toBeInTheDocument()
     fireEvent.click(within(card).getByRole('button', { name: 'Iniciar fase' }))
     expect(screen.getByText('jogando')).toBeInTheDocument()
@@ -36,9 +37,9 @@ describe('MissionSelectPage', () => {
 
   it('explains locked missions and disables the start button', async () => {
     renderPage()
-    fireEvent.click(screen.getByRole('button', { name: /Fase 24 · Irrigação inteligente/ }))
-    const card = await screen.findByRole('region', { name: 'Fase 24 - Irrigação inteligente' })
+    fireEvent.click(screen.getByRole('button', { name: /Fase 2 · Hora de plantar/ }))
+    const card = await screen.findByRole('region', { name: 'Fase 2 - Hora de plantar' })
     expect(within(card).getByRole('button', { name: 'Iniciar fase' })).toBeDisabled()
-    expect(within(card).getByText('Conclua a fase 23 para desbloquear.')).toBeInTheDocument()
+    expect(within(card).getByText('Conclua a fase 1 para desbloquear.')).toBeInTheDocument()
   })
 })
