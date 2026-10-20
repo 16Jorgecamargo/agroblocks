@@ -6,10 +6,10 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { itemsForForm } from "@/data/assessment/items";
 import { MISSIONS } from "@/data/missions";
 import { MiniGrid } from "@/features/assessment/MiniGrid";
-import { percent, scoreResponse } from "@/game/assessment/scoring";
+import { percent, scoreBySkill } from "@/game/assessment/scoring";
 import {
-  ASSESSMENT_CONCEPT_LABELS,
-  ASSESSMENT_CONCEPTS,
+  ASSESSMENT_SKILLS,
+  SKILL_LABELS,
 } from "@/game/assessment/types";
 import { continueMissionId } from "@/game/progress/progression";
 import type { AssessmentForm, AssessmentResponse } from "@/game/progress/types";
@@ -30,8 +30,8 @@ function Comparison({
   pre: AssessmentResponse | null;
   post: AssessmentResponse;
 }) {
-  const preScores = pre ? scoreResponse(pre) : null;
-  const postScores = scoreResponse(post);
+  const preScores = pre ? scoreBySkill(pre) : null;
+  const postScores = scoreBySkill(post);
   return (
     <table className="assessment__table">
       <caption>Acertos por conceito</caption>
@@ -43,9 +43,9 @@ function Comparison({
         </tr>
       </thead>
       <tbody>
-        {ASSESSMENT_CONCEPTS.map((concept) => (
+        {ASSESSMENT_SKILLS.map((concept) => (
           <tr key={concept}>
-            <th scope="row">{ASSESSMENT_CONCEPT_LABELS[concept]}</th>
+            <th scope="row">{SKILL_LABELS[concept]}</th>
             <td>{preScores ? `${percent(preScores[concept])}%` : "—"}</td>
             <td>{postScores ? `${percent(postScores[concept])}%` : "—"}</td>
           </tr>

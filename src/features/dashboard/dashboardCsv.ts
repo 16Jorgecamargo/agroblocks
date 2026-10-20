@@ -1,5 +1,5 @@
 import { itemsForForm } from '@/data/assessment/items'
-import { ASSESSMENT_CONCEPT_LABELS } from '@/game/assessment/types'
+import { SKILL_LABELS } from '@/game/assessment/types'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { tutorialLabel, type StudentRow } from '@/features/dashboard/dashboardModel'
 import { toCsv } from '@/services/export/csv'
@@ -52,7 +52,7 @@ export function assessmentsCsv(rows: StudentRow[]): string {
         }
         for (const item of itemsForForm(response.form)) {
           const answer = response.answers[item.id]
-          lines.push([row.name, row.school, run.runId, response.form, item.id, ASSESSMENT_CONCEPT_LABELS[item.concept], answer ?? null, answer === item.correctIndex ? 'sim' : 'nao'])
+          lines.push([row.name, row.school, run.runId, response.form, item.id, SKILL_LABELS[item.skill], answer ?? null, answer === item.correctIndex ? 'sim' : 'nao'])
         }
       }
     }

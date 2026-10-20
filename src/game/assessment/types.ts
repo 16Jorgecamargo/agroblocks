@@ -1,16 +1,11 @@
 import type { Facing } from '@/game/world/types'
+import type { WorldId } from '@/game/worlds/worldTypes'
 
-export type AssessmentConcept = 'sequencing' | 'repetition' | 'conditionals' | 'debugging' | 'interpretation'
+export type AssessmentSkill = 'build' | 'predict' | 'debug'
 
-export const ASSESSMENT_CONCEPTS: AssessmentConcept[] = ['sequencing', 'repetition', 'conditionals', 'debugging', 'interpretation']
+export const ASSESSMENT_SKILLS: AssessmentSkill[] = ['build', 'predict', 'debug']
 
-export const ASSESSMENT_CONCEPT_LABELS: Record<AssessmentConcept, string> = {
-  sequencing: 'Sequenciamento',
-  repetition: 'Repetição',
-  conditionals: 'Condicionais',
-  debugging: 'Identificação de erros',
-  interpretation: 'Interpretação de algoritmos',
-}
+export const SKILL_LABELS: Record<AssessmentSkill, string> = { build: 'Montar', predict: 'Prever', debug: 'Consertar' }
 
 export type ItemKind = 'choice' | 'ordering' | 'findError' | 'predictPosition'
 
@@ -18,7 +13,8 @@ export interface AssessmentItem {
   id: string
   pairId: string
   variant: 'A' | 'B'
-  concept: AssessmentConcept
+  world: WorldId
+  skill: AssessmentSkill
   kind: ItemKind
   prompt: string
   code?: string

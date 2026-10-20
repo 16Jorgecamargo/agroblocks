@@ -57,7 +57,7 @@ describe('AssessmentPage', () => {
     expect(screen.queryByRole('button', { name: 'Começar' })).not.toBeInTheDocument()
   })
 
-  it('compares pre and post by concept after the post-test', async () => {
+  it('compares pre and post by skill after the post-test', async () => {
     useProgressStore.getState().storeAssessment({ world: 'garden', form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
     useProgressStore.getState().recordAttempt({
       missionId: 'homestead-10',
@@ -73,7 +73,7 @@ describe('AssessmentPage', () => {
     renderAt('/avaliacao/pos')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     await answerAll('post', true)
-    const row = await screen.findByRole('row', { name: /Sequenciamento/ })
+    const row = await screen.findByRole('row', { name: /Montar/ })
     expect(row).toHaveTextContent('0%')
     expect(row).toHaveTextContent('100%')
   })
