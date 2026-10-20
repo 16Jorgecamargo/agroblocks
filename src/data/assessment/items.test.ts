@@ -4,7 +4,7 @@ import { runProgram } from '@/blocks/interpreter/runProgram'
 import { act, program } from '@/blocks/interpreter/programBuilder'
 import { makeState } from '@/game/testing/makeState'
 
-const READY_WORLDS: WorldId[] = ['garden', 'cornfield', 'orchard', 'greenhouse', 'barnyard']
+const READY_WORLDS: WorldId[] = ['garden', 'cornfield', 'orchard', 'greenhouse', 'barnyard', 'homestead']
 
 describe('assessment items', () => {
   it.each(READY_WORLDS.length > 0 ? READY_WORLDS : (['none'] as const))('%s has ten paired items per form, 4 build, 3 predict, 3 debug', (world) => {
