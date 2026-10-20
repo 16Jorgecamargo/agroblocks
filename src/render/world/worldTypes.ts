@@ -80,4 +80,10 @@ export interface World {
   butterflies: Vec2[]
   features: WorldFeature[]
   palette: WorldPaletteColors
+  patches?: GroundPatch[]
+}
+
+export interface GroundPatch {
+  rect: Rect
+  color: string
 }

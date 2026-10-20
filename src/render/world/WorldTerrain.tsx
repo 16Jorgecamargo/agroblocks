@@ -4,7 +4,8 @@ import { ribbonGeometry } from '@/render/world/ribbon'
 import { WORLD_COLORS } from '@/render/world/worldPalette'
 import type { World } from '@/render/world/worldTypes'
 
-const PATH_HEIGHT = 0.012
+const PATH_HEIGHT = 0.04
+const PATCH_HEIGHT = 0.006
 const BANK_HEIGHT = 0.008
 const WATER_HEIGHT = 0.02
 const BANK_EXTRA = 0.6
@@ -40,6 +41,16 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
           </mesh>
         </>
       )}
+      {(world.patches ?? []).map((patch, index) => (
+        <mesh
+          key={`patch-${index}`}
+          position={[(patch.rect.minX + patch.rect.maxX) / 2, PATCH_HEIGHT, (patch.rect.minZ + patch.rect.maxZ) / 2]}
+          receiveShadow
+        >
+          <boxGeometry args={[patch.rect.maxX - patch.rect.minX, 0.02, patch.rect.maxZ - patch.rect.minZ]} />
+          <meshStandardMaterial color={patch.color} roughness={1} flatShading />
+        </mesh>
+      ))}
       {paths.map((geometry, index) => (
         <mesh key={index} geometry={geometry} position={[0, PATH_HEIGHT, 0]} receiveShadow>
           <meshStandardMaterial color={world.palette.path} roughness={1} side={DoubleSide} />

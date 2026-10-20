@@ -1,5 +1,6 @@
 import { WORLD_IDS } from '@/game/worlds/worldTypes'
 import { buildWorld } from '@/render/world/buildWorld'
+import { TREE_MODELS } from '@/render/world/worldCatalog'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'
 
 describe('world trails', () => {
@@ -21,5 +22,43 @@ describe('world trails', () => {
     expect(world.trail).toEqual(WORLD_TRAILS[theme])
     expect(world.features.length).toBeGreaterThan(0)
     for (const node of world.trail) for (const feature of world.features) expect(Math.hypot(feature.x - node.x, feature.z - node.z)).toBeGreaterThan(1.2)
+  })
+})
+
+describe('world map landscapes', () => {
+  const map = (theme: (typeof WORLD_IDS)[number]) => buildWorld({ layout: 'worldMap', gridWidth: 0, gridHeight: 0, seed: theme, density: 'full', theme })
+  const count = (theme: (typeof WORLD_IDS)[number], kind: string) => map(theme).features.filter((feature) => feature.kind === kind).length
+
+  it('keeps the forest on the edges of the island', () => {
+    for (const theme of WORLD_IDS) {
+      const trees = map(theme).props.filter((prop) => (TREE_MODELS as readonly string[]).includes(prop.model))
+      const inner = trees.filter((tree) => Math.abs(tree.x) < 10 && Math.abs(tree.z) < 10)
+      expect(inner.length).toBeLessThanOrEqual(Math.ceil(trees.length * 0.15))
+    }
+  })
+
+  it('gives every world its own organised zones', () => {
+    expect(count('garden', 'vegetableBed')).toBeGreaterThanOrEqual(16)
+    expect(count('cornfield', 'cornStalk')).toBeGreaterThanOrEqual(80)
+    expect(count('orchard', 'fruitTree')).toBeGreaterThanOrEqual(16)
+    expect(count('greenhouse', 'greenhouse')).toBeGreaterThanOrEqual(3)
+    expect(map('barnyard').animals.length).toBeGreaterThanOrEqual(6)
+    expect(new Set(map('homestead').features.map((feature) => feature.kind)).size).toBeGreaterThanOrEqual(4)
+  })
+
+  it('fences the zones without crossing the trail', () => {
+    for (const theme of WORLD_IDS) {
+      const world = map(theme)
+      const fences = world.props.filter((prop) => prop.model === 'fence')
+      if (theme !== 'cornfield') expect(fences.length).toBeGreaterThan(0)
+      for (const fence of fences) {
+        for (let index = 1; index < world.trail.length; index += 1) {
+          const a = world.trail[index - 1]
+          const b = world.trail[index]
+          const t = Math.max(0, Math.min(1, ((fence.x - a.x) * (b.x - a.x) + (fence.z - a.z) * (b.z - a.z)) / ((b.x - a.x) ** 2 + (b.z - a.z) ** 2)))
+          expect(Math.hypot(fence.x - (a.x + t * (b.x - a.x)), fence.z - (a.z + t * (b.z - a.z)))).toBeGreaterThan(0.6)
+        }
+      }
+    }
   })
 })
