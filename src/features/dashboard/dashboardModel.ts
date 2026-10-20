@@ -13,6 +13,15 @@ export interface DashboardFilters {
 
 export const EMPTY_FILTERS: DashboardFilters = { school: null, search: '', from: null, to: null }
 
+export type PlotState = 'empty' | 'trying' | 'done'
+
+export interface Plot {
+  state: PlotState
+  attempts: number
+  stars: number
+  hints: number
+}
+
 export interface StudentRow {
   key: string
   name: string
@@ -28,6 +37,7 @@ export interface StudentRow {
   post: number | null
   gain: number | null
   lastSeen: string
+  plots: Record<string, Plot>
 }
 
 export interface PhaseRow {
@@ -95,7 +105,16 @@ function firstWith<T>(runs: RunSnapshot[], pick: (run: RunSnapshot) => T | null)
   return null
 }
 
-function studentRow(key: string, runs: RunSnapshot[], phaseIds: Set<string>): StudentRow {
+function plotOf(runs: RunSnapshot[], missionId: string): Plot {
+  const progress = runs.map((run) => run.missions[missionId]).filter((item) => item !== undefined)
+  const attempts = runs.reduce((sum, run) => sum + run.attempts.filter((attempt) => attempt.missionId === missionId).length, 0)
+  const stars = Math.max(0, ...progress.map((item) => item.bestResult?.efficiencyStars ?? 0))
+  const hints = progress.reduce((sum, item) => sum + item.hintsUsed, 0)
+  const state: PlotState = progress.some((item) => item.status === 'completed') ? 'done' : attempts > 0 ? 'trying' : 'empty'
+  return { state, attempts, stars, hints }
+}
+
+function studentRow(key: string, runs: RunSnapshot[], phaseIds: Set<string>, missionIds: string[]): StudentRow {
   const ordered = [...runs].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const newest = ordered[0]
   const attempts = ordered.flatMap((run) => run.attempts)
@@ -116,6 +135,7 @@ function studentRow(key: string, runs: RunSnapshot[], phaseIds: Set<string>): St
     post,
     gain: pre !== null && post !== null ? post - pre : null,
     lastSeen: newest.updatedAt,
+    plots: Object.fromEntries(missionIds.map((id) => [id, plotOf(ordered, id)])),
   }
 }
 
@@ -127,8 +147,9 @@ export function buildDashboard(runs: RunSnapshot[], missions: MissionDefinition[
     const key = studentKeyOf(run.student)
     groups.set(key, [...(groups.get(key) ?? []), run])
   }
+  const missionIds = missions.map((mission) => mission.id)
   const phaseIds = new Set(missions.filter((mission) => !mission.tutorial).map((mission) => mission.id))
-  const students = [...groups.entries()].map(([key, group]) => studentRow(key, group, phaseIds)).sort((a, b) => b.lastSeen.localeCompare(a.lastSeen))
+  const students = [...groups.entries()].map(([key, group]) => studentRow(key, group, phaseIds, missionIds)).sort((a, b) => b.lastSeen.localeCompare(a.lastSeen))
   const count = Math.max(1, students.length)
 
   const phases: PhaseRow[] = [...missions]

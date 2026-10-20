@@ -36,7 +36,7 @@ function demoRun(person: DemoPerson, index: number, missions: MissionDefinition[
   const progress: RunSnapshot['missions'] = {}
   ordered.forEach((mission, position) => {
     const done = position <= person.reached
-    const failures = done ? (index + position) % 3 : 1
+    const failures = done ? (index + position) % 3 : position === person.reached + 1 ? 1 + (index % 3) : 0
     for (let attempt = 0; attempt < failures; attempt += 1) {
       attempts.push({
         id: `demo-${index}-${runIndex}-${mission.id}-${attempt}`,

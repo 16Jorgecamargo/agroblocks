@@ -20,12 +20,23 @@ describe('StudentDetail', () => {
     expect(within(dialog).getAllByText('✓').length).toBeGreaterThan(0)
   })
 
+  it('closes with Escape and with the close button', () => {
+    if (!bruno) throw new Error('demo student missing')
+    const onClose = vi.fn()
+    render(<StudentDetail student={bruno} demo={false} onClose={onClose} onDeleteRun={vi.fn(async () => undefined)} />)
+    expect(screen.getByRole('button', { name: 'Fechar' })).toHaveFocus()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar' }))
+    expect(onClose).toHaveBeenCalledTimes(2)
+  })
+
   it('confirms before deleting a run', async () => {
     if (!bruno) throw new Error('demo student missing')
     const onDeleteRun = vi.fn(async () => undefined)
     render(<StudentDetail student={bruno} demo={false} onClose={vi.fn()} onDeleteRun={onDeleteRun} />)
     fireEvent.click(screen.getAllByRole('button', { name: 'Apagar jogada' })[0])
     expect(screen.getByText('Apagar esta jogada? Esta ação não pode ser desfeita.')).toBeInTheDocument()
+    expect(onDeleteRun).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Apagar' }))
     await vi.waitFor(() => expect(onDeleteRun).toHaveBeenCalledWith(bruno.runs[0].runId))
   })

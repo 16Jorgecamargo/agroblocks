@@ -4,7 +4,7 @@ import { MISSIONS } from '@/data/missions'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { buildDashboard, EMPTY_FILTERS } from '@/features/dashboard/dashboardModel'
 import { createDemoRuns } from '@/features/dashboard/demoRuns'
-import { sortStudents } from '@/features/dashboard/StudentTable'
+import { sortStudents } from '@/features/dashboard/ClassField'
 
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
 
@@ -31,9 +31,14 @@ describe('DashboardPage', () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(200, { runs: createDemoRuns(MISSIONS) })))
     renderPage()
     const table = await screen.findByRole('table', { name: 'Alunos' })
-    expect(within(table).getAllByRole('row')).toHaveLength(8)
+    expect(within(table).getAllByRole('row')).toHaveLength(9)
     expect(screen.getByRole('group', { name: 'Alunos' })).toHaveTextContent('7')
-    expect(within(table).getByText('Ana Souza').closest('tr')).toHaveTextContent('Concluído')
+    const ana = within(table).getByText('Ana Souza').closest('tr')
+    expect(ana).toHaveTextContent('Tutorial: Concluído')
+    expect(ana).toHaveTextContent(/Primeira colheita: concluída com \d estrelas?/)
+    const gabriela = within(table).getByText('Gabriela Nunes').closest('tr')
+    expect(gabriela).toHaveTextContent('Plantação em série: tentando')
+    expect(gabriela).toHaveTextContent('Fazenda eficiente: não começou')
   })
 
   it('filters by school and search', async () => {
@@ -41,20 +46,22 @@ describe('DashboardPage', () => {
     renderPage()
     await screen.findByRole('table', { name: 'Alunos' })
     fireEvent.change(screen.getByLabelText('Escola'), { target: { value: 'Escola Técnica Agrícola' } })
-    expect(within(screen.getByRole('table', { name: 'Alunos' })).getAllByRole('row')).toHaveLength(3)
+    expect(within(screen.getByRole('table', { name: 'Alunos' })).getAllByRole('row')).toHaveLength(4)
     fireEvent.change(screen.getByLabelText('Buscar aluno'), { target: { value: 'felipe' } })
-    expect(within(screen.getByRole('table', { name: 'Alunos' })).getAllByRole('row')).toHaveLength(2)
+    expect(within(screen.getByRole('table', { name: 'Alunos' })).getAllByRole('row')).toHaveLength(3)
     fireEvent.click(screen.getByRole('button', { name: 'Limpar filtros' }))
-    expect(within(screen.getByRole('table', { name: 'Alunos' })).getAllByRole('row')).toHaveLength(8)
+    expect(within(screen.getByRole('table', { name: 'Alunos' })).getAllByRole('row')).toHaveLength(9)
+    fireEvent.change(screen.getByLabelText('Buscar aluno'), { target: { value: 'ninguém' } })
+    expect(screen.getByText('Nenhum aluno nesses filtros.')).toBeInTheDocument()
   })
 
   it('sorts by a column when its header is clicked', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(200, { runs: createDemoRuns(MISSIONS) })))
     renderPage()
     const table = await screen.findByRole('table', { name: 'Alunos' })
-    fireEvent.click(within(table).getByRole('button', { name: 'Nome' }))
+    fireEvent.click(within(table).getByRole('button', { name: 'Aluno' }))
     expect(within(table).getAllByRole('row')[1]).toHaveTextContent('Ana Souza')
-    fireEvent.click(within(table).getByRole('button', { name: 'Nome' }))
+    fireEvent.click(within(table).getByRole('button', { name: 'Aluno' }))
     expect(within(table).getAllByRole('row')[1]).toHaveTextContent('Gabriela Nunes')
   })
 
@@ -68,9 +75,29 @@ describe('DashboardPage', () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(200, { runs: [] })))
     renderPage()
     await screen.findByText('Nenhum aluno enviou dados ainda.')
-    fireEvent.click(screen.getByRole('button', { name: 'Demonstração' }))
-    expect(screen.getByText('DADOS DE DEMONSTRAÇÃO — fictícios, não usar como resultado')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Dados de exemplo' }))
+    expect(screen.getByText('Você está vendo dados de exemplo, inventados. Eles não são resultado de nenhuma turma.')).toBeInTheDocument()
     expect(screen.getByRole('table', { name: 'Alunos' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Apagar jogada' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar aos dados reais' }))
+    expect(screen.getByText('Nenhum aluno enviou dados ainda.')).toBeInTheDocument()
+  })
+
+  it('switches between light and dark themes and remembers the choice', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json(200, { runs: [] })))
+    window.localStorage.removeItem('agroblocks:dashboard-theme:v1')
+    const { container } = render(
+      <MemoryRouter>
+        <DashboardPage token="t" onUnauthorized={vi.fn()} onLogout={vi.fn()} />
+      </MemoryRouter>,
+    )
+    const root = container.querySelector('.dash')
+    expect(root).toHaveAttribute('data-theme', 'light')
+    fireEvent.click(screen.getByRole('button', { name: 'Tema escuro' }))
+    expect(root).toHaveAttribute('data-theme', 'dark')
+    expect(window.localStorage.getItem('agroblocks:dashboard-theme:v1')).toBe('dark')
+    fireEvent.click(screen.getByRole('button', { name: 'Tema claro' }))
+    expect(root).toHaveAttribute('data-theme', 'light')
   })
 
   it('asks for the password again when the token is refused', async () => {

@@ -66,6 +66,18 @@ describe('dashboard model', () => {
     expect(buildDashboard(runs, MISSIONS, { ...EMPTY_FILTERS, from: '2026-10-11', to: '2026-10-11' }).summary.runs).toBe(1)
   })
 
+  it('tells, per phase, whether each student has not started, is trying or finished', () => {
+    const model = buildDashboard(runs, MISSIONS, EMPTY_FILTERS)
+    const jose = model.students.find((row) => row.runCount === 2)
+    const bia = model.students.find((row) => row.name === 'Bia Lima')
+    expect(jose?.plots['m1-first-harvest']).toEqual({ state: 'done', attempts: 1, stars: 2, hints: 1 })
+    expect(jose?.plots['m0-training']).toMatchObject({ state: 'done', stars: 3 })
+    expect(jose?.plots['m2-row-planting']).toEqual({ state: 'empty', attempts: 0, stars: 0, hints: 0 })
+    expect(bia?.plots['m1-first-harvest'].state).toBe('empty')
+    const trying = buildDashboard([run({ runId: 'run-c1', student: { name: 'Caio Prado', school: 'Escola Azul' }, attempts: [failed] })], MISSIONS, EMPTY_FILTERS)
+    expect(trying.students[0].plots['m1-first-harvest']).toEqual({ state: 'trying', attempts: 1, stars: 0, hints: 0 })
+  })
+
   it('computes phases, stars and the most common errors', () => {
     const model = buildDashboard(runs, MISSIONS, EMPTY_FILTERS)
     const first = model.phases.find((row) => row.missionId === 'm1-first-harvest')
