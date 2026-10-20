@@ -5,6 +5,13 @@ import { useProgressStore } from '@/stores/progressStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { DEFAULT_SETTINGS } from '@/services/storage/settingsStorage'
 import { useFlightStore } from '@/stores/flightStore'
+import { getMission as findMission } from '@/data/missions'
+
+function getMissionForTest(id: string) {
+  const mission = findMission(id)
+  if (!mission) throw new Error(`missing ${id}`)
+  return mission
+}
 
 vi.mock('@/blocks/editor/BlocklyEditor', async () => {
   const { useEffect } = await import('react')
@@ -66,6 +73,25 @@ describe('GameplayPage', () => {
     expect(body).toHaveAttribute('data-running', 'true')
     fireEvent.click(screen.getByRole('button', { name: 'Parar' }))
     expect(body).toHaveAttribute('data-running', 'false')
+  })
+
+  it('blocks running over the block limit without recording an attempt', () => {
+    const mission = getMissionForTest('garden-04')
+    const original = mission.rules
+    mission.rules = { ...original, maxBlocks: 2 }
+    try {
+      renderAt('/jogar/garden-04')
+      expect(screen.getAllByText('Limite: 2 blocos').length).toBeGreaterThan(0)
+      fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
+      act(() => {
+        vi.advanceTimersByTime(10000)
+      })
+      expect(screen.getByRole('log')).toHaveTextContent('Use no máximo 2 blocos. Seu programa tem 8.')
+      expect(useProgressStore.getState().save.attempts).toHaveLength(0)
+    } finally {
+      mission.rules = original
+    }
   })
 
   it('redirects locked missions to the mission map', () => {

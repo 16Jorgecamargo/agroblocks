@@ -69,12 +69,19 @@ export function useGameplaySession(mission: MissionDefinition) {
 
   const readyProgram = useCallback((): Program | null => {
     if (!serialized) return null
-    if (serialized.ok) return serialized.program
+    if (serialized.ok) {
+      const limit = mission.rules.maxBlocks
+      if (limit !== undefined && serialized.blockCount > limit) {
+        controller.addLog('error', `Use no máximo ${limit} blocos. Seu programa tem ${serialized.blockCount}.`)
+        return null
+      }
+      return serialized.program
+    }
     for (const error of serialized.errors) controller.addLog('error', error.message)
     const located = serialized.errors.find((error) => error.blockId !== null)
     setValidationError(located?.blockId ? { id: located.blockId, message: located.message } : null)
     return null
-  }, [serialized, controller])
+  }, [serialized, controller, mission.rules.maxBlocks])
 
   const logWarnings = useCallback(() => {
     if (!serialized?.ok) return

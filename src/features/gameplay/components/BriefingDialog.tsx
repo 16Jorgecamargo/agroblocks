@@ -30,6 +30,8 @@ export function BriefingDialog({ open, mission, onStart, onDemo }: BriefingDialo
   const title = mission.tutorial ? mission.title : `Fase ${mission.order} - ${mission.title}`
   const resources = visibleResources(mission).filter((resource): resource is Exclude<HudResource, 'harvest'> => resource !== 'harvest')
   const constraints = mission.constraints ?? []
+  const blockLimit = mission.rules.maxBlocks
+  const hasLimits = constraints.length > 0 || blockLimit !== undefined
 
   return (
     <GameDialog open={open} title={title} icon="flag" tone="success" onClose={onStart}>
@@ -44,7 +46,7 @@ export function BriefingDialog({ open, mission, onStart, onDemo }: BriefingDialo
           </div>
         </div>
       </DialogSection>
-      {(constraints.length > 0 || resources.length > 0) && (
+      {(hasLimits || resources.length > 0) && (
         <DialogSection>
           <div className="briefing__chips">
             {resources.length > 0 && (
@@ -57,8 +59,13 @@ export function BriefingDialog({ open, mission, onStart, onDemo }: BriefingDialo
                 ))}
               </motion.ul>
             )}
-            {constraints.length > 0 && (
+            {hasLimits && (
               <ul className="briefing__chip-list" aria-label="Limites">
+                {blockLimit !== undefined && (
+                  <li className="briefing__chip briefing__chip--limit">
+                    <Icon name="lock" size={16} /> Limite: {blockLimit} blocos
+                  </li>
+                )}
                 {constraints.map((constraint, index) => (
                   <li key={index} className="briefing__chip briefing__chip--limit">
                     <Icon name="lock" size={16} /> {describeConstraint(constraint)}

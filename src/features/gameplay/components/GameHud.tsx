@@ -92,7 +92,10 @@ export function GameHud({ mission, resources, onHelp, onSettings, onExit }: Game
       <Logo />
       <div className="game-hud__mission" data-tutorial="hud-goal">
         <h1 className="game-hud__title">{mission.tutorial ? mission.title : `Fase ${mission.order} - ${mission.title}`}</h1>
-        <p className="game-hud__goal">{mission.briefing.goalText}</p>
+        <p className="game-hud__goal">
+          {mission.briefing.goalText}
+          {mission.rules.maxBlocks !== undefined && <span className="game-hud__limit"> Limite: {mission.rules.maxBlocks} blocos</span>}
+        </p>
       </div>
       <div className="game-hud__resources" aria-label="Recursos" data-tutorial="hud-harvest">
         {visible.has('seeds') && <ResourceChip icon="seed" label="Sementes" value={resources.seeds} max={maxima.seeds} tone="seed" />}
