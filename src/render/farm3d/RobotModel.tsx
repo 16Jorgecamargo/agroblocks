@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type MutableRefObject } from 'react'
 import { animate } from 'motion'
 import type { Group } from 'three'
 import { BASE_STEP_DELAY_MS } from '@/game/execution/types'
@@ -6,14 +6,14 @@ import { ERROR_SHAKE } from '@/motion/presets'
 import { scaleSpring, SPRINGS } from '@/motion/springs'
 import { PALETTE } from '@/render/palette'
 import { shakeTrack } from '@/render/farm3d/robotMotion'
-import { AnimatedRobot } from '@/render/robot/AnimatedRobot'
+import { AnimatedRobot, type Gaze } from '@/render/robot/AnimatedRobot'
 import { clipForStep } from '@/render/robot/clipForStep'
 import { clipSecondsFor, type RobotClip, type RobotTool } from '@/render/robot/robotPoses'
 import { cellToWorld, FACING_YAW } from '@/render/sceneLayout'
 import type { GameEvent, Robot } from '@/game/world/types'
 
-export function RobotShowcase({ clip, tool, reducedMotion = false }: { clip: RobotClip; tool?: RobotTool; reducedMotion?: boolean }) {
-  return <AnimatedRobot clip={clip} reducedMotion={reducedMotion} tool={tool} />
+export function RobotShowcase({ clip, tool, reducedMotion = false, gaze }: { clip: RobotClip; tool?: RobotTool; reducedMotion?: boolean; gaze?: MutableRefObject<Gaze | null> }) {
+  return <AnimatedRobot clip={clip} reducedMotion={reducedMotion} tool={tool} gaze={gaze} />
 }
 
 function shortestAngle(from: number, to: number): number {
