@@ -4,7 +4,7 @@ import { getWorld, missionsOfWorld, WORLDS } from '@/data/worlds'
 import { playMission } from '@/game/testing/playMission'
 import type { WorldId } from '@/game/worlds/worldTypes'
 
-const READY_WORLDS: WorldId[] = ['garden', 'cornfield', 'orchard', 'greenhouse']
+const READY_WORLDS: WorldId[] = ['garden', 'cornfield', 'orchard', 'greenhouse', 'barnyard']
 const MOVED = new Set(['garden-04', 'cornfield-02', 'orchard-04', 'greenhouse-03', 'barnyard-05', 'homestead-10'])
 
 describe('world missions', () => {
