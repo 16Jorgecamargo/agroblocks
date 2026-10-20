@@ -3,7 +3,7 @@ import { act, program } from '@/blocks/interpreter/programBuilder'
 import { getMission } from '@/data/missions'
 import { openMission, registerStudent, takePreTest, saveWithProgram, seedStorage } from './helpers'
 
-const firstHarvest = getMission('m1-first-harvest')
+const firstHarvest = getMission('garden-04')
 if (!firstHarvest) throw new Error('mission missing')
 
 test('starts a new farm from the home screen at the guided training', async ({ page }) => {
@@ -22,8 +22,8 @@ test('starts a new farm from the home screen at the guided training', async ({ p
 
 test('explains an error and highlights the failing state', async ({ page }) => {
   const wrong = program([act('moveForward'), act('moveForward'), act('moveForward'), act('harvest')])
-  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', wrong) })
-  await openMission(page, 'm1-first-harvest')
+  await seedStorage(page, { save: saveWithProgram('garden-04', wrong) })
+  await openMission(page, 'garden-04')
   await page.getByRole('button', { name: 'Executar' }).click()
   await expect(page.getByRole('log')).toContainText('Não há planta para colher neste canteiro.')
   await expect(page.getByRole('log')).toContainText('O robô colheu no lugar errado')
@@ -32,8 +32,8 @@ test('explains an error and highlights the failing state', async ({ page }) => {
 })
 
 test('step mode executes one instruction per click', async ({ page }) => {
-  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
-  await openMission(page, 'm1-first-harvest')
+  await seedStorage(page, { save: saveWithProgram('garden-04', firstHarvest.referenceSolution) })
+  await openMission(page, 'garden-04')
   await page.getByRole('switch', { name: 'Passo a passo' }).click()
   await page.getByRole('button', { name: 'Executar' }).click()
   await page.getByRole('button', { name: 'Próximo' }).click()
@@ -43,28 +43,28 @@ test('step mode executes one instruction per click', async ({ page }) => {
 })
 
 test('completes a phase, shows the result and advances to the next phase', async ({ page }) => {
-  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
-  await openMission(page, 'm1-first-harvest')
+  await seedStorage(page, { save: saveWithProgram('garden-04', firstHarvest.referenceSolution) })
+  await openMission(page, 'garden-04')
   await page.getByRole('button', { name: 'Executar' }).click()
   await expect(page.getByRole('log')).toContainText('Missão cumprida!')
-  await expect(page).toHaveURL(/#\/resultado\/m1-first-harvest$/)
+  await expect(page).toHaveURL(/#\/resultado\/garden-04$/)
   await expect(page.getByRole('heading', { name: 'Missão concluída!' })).toBeVisible()
   await expect(page.getByRole('group', { name: 'Comandos executados' })).toContainText('8')
   await page.getByRole('link', { name: 'Próxima fase' }).click()
-  await expect(page).toHaveURL(/#\/jogar\/m2-row-planting$/)
+  await expect(page).toHaveURL(/#\/jogar\/cornfield-02$/)
 })
 
 test('reloading the page keeps progress and the saved program', async ({ page }) => {
-  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution, ['m0-training']) })
-  await openMission(page, 'm1-first-harvest')
+  await seedStorage(page, { save: saveWithProgram('garden-04', firstHarvest.referenceSolution, ['m0-training']) })
+  await openMission(page, 'garden-04')
   await page.getByRole('button', { name: 'Executar' }).click()
-  await expect(page).toHaveURL(/#\/resultado\/m1-first-harvest$/)
+  await expect(page).toHaveURL(/#\/resultado\/garden-04$/)
   await page.goto('/')
   await page.reload()
   const continueButton = page.getByRole('button', { name: /Continuar missão/ })
   await expect(continueButton).toBeEnabled()
   await expect(continueButton).toContainText('Fase 2 - Plantação em série')
-  await page.goto('/#/jogar/m1-first-harvest')
+  await page.goto('/#/jogar/garden-04')
   await page.getByRole('button', { name: 'Começar' }).click()
   await page.getByRole('tab', { name: 'Pseudocódigo' }).click()
   await expect(page.locator('.pseudocode-panel__code')).toContainText('virar à direita')
@@ -74,7 +74,7 @@ test('renders the 3D farm without runtime errors', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   await seedStorage(page, { settings: { motion: 'full' } })
-  await openMission(page, 'm1-first-harvest')
+  await openMission(page, 'garden-04')
   await expect(page.locator('.farm-view canvas')).toBeVisible()
   await page.waitForTimeout(1500)
   expect(errors).toEqual([])
@@ -82,8 +82,8 @@ test('renders the 3D farm without runtime errors', async ({ page }) => {
 
 test('the workspace cannot be edited while the program runs', async ({ page }) => {
   test.setTimeout(120_000)
-  await seedStorage(page, { settings: { defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
-  await openMission(page, 'm1-first-harvest')
+  await seedStorage(page, { settings: { defaultSpeed: 0.5 }, save: saveWithProgram('garden-04', firstHarvest.referenceSolution) })
+  await openMission(page, 'garden-04')
   await page.locator('.blocklyBlockCanvas .blocklyDraggable').filter({ hasText: 'colher planta' }).last().click()
   await page.keyboard.press('Control+Enter')
   await expect(page.getByRole('button', { name: 'Parar' })).toBeVisible()
@@ -98,8 +98,8 @@ test('the workspace cannot be edited while the program runs', async ({ page }) =
 })
 
 test('blocks in the category list keep their size when the workspace zooms', async ({ page }) => {
-  await seedStorage(page, { save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
-  await openMission(page, 'm1-first-harvest')
+  await seedStorage(page, { save: saveWithProgram('garden-04', firstHarvest.referenceSolution) })
+  await openMission(page, 'garden-04')
   const category = page.getByRole('treeitem', { name: 'Movimento' })
   const flyoutBlockWidth = async () => {
     await category.click()
@@ -124,9 +124,9 @@ test('blocks in the category list keep their size when the workspace zooms', asy
 })
 
 test('the program view follows the block being executed', async ({ page }) => {
-  const mission = getMission('m6-efficient-farm')
+  const mission = getMission('homestead-10')
   if (!mission) throw new Error('mission missing')
-  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 1 }, save: saveWithProgram(mission.id, mission.referenceSolution, ['m0-training', 'm1-first-harvest', 'm2-row-planting', 'm3-smart-irrigation', 'm4-auto-harvest', 'm5-limited-resources']) })
+  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 1 }, save: saveWithProgram(mission.id, mission.referenceSolution, ['m0-training', 'garden-04', 'cornfield-02', 'orchard-04', 'greenhouse-03', 'barnyard-05']) })
   await openMission(page, mission.id)
   for (let index = 0; index < 6; index += 1) {
     await page.locator('.blocklyZoomIn').dispatchEvent('pointerdown', { isPrimary: true, button: 0, pointerType: 'mouse' })
@@ -151,8 +151,8 @@ test('the program view follows the block being executed', async ({ page }) => {
 
 test('the farm panel opens and closes over a fixed, centered 3D view', async ({ page }) => {
   const short = program([act('moveForward'), act('moveForward')])
-  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', short) })
-  await openMission(page, 'm1-first-harvest')
+  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 0.5 }, save: saveWithProgram('garden-04', short) })
+  await openMission(page, 'garden-04')
   await expect(page.locator('.farm-view canvas')).toBeVisible()
   const measure = () =>
     page.evaluate(() => {
@@ -180,9 +180,9 @@ test('the farm panel opens and closes over a fixed, centered 3D view', async ({ 
 })
 
 test('the program view returns to where it was when the run stops', async ({ page }) => {
-  const mission = getMission('m6-efficient-farm')
+  const mission = getMission('homestead-10')
   if (!mission) throw new Error('mission missing')
-  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 1 }, save: saveWithProgram(mission.id, mission.referenceSolution, ['m0-training', 'm1-first-harvest', 'm2-row-planting', 'm3-smart-irrigation', 'm4-auto-harvest', 'm5-limited-resources']) })
+  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 1 }, save: saveWithProgram(mission.id, mission.referenceSolution, ['m0-training', 'garden-04', 'cornfield-02', 'orchard-04', 'greenhouse-03', 'barnyard-05']) })
   await openMission(page, mission.id)
   const firstBlock = page.locator('.injectionDiv > .blocklySvg .blocklyBlockCanvas .blocklyDraggable').first()
   await page.waitForTimeout(800)

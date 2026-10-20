@@ -24,9 +24,11 @@ function farmProgram(secondTurn: 'turnLeft' | 'turnRight'): Program {
   )
 }
 
-export const mission06EfficientFarm: MissionDefinition = {
-  id: 'm6-efficient-farm',
-  order: 6,
+export const homestead10: MissionDefinition = {
+  id: 'homestead-10',
+  order: 60,
+  world: 'homestead',
+  slot: 10,
   title: 'Fazenda eficiente',
   concept: 'efficiency',
   difficulty: 3,

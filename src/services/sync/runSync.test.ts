@@ -2,7 +2,7 @@ import { assignStudent, createInitialSave, registerHint, storeProgram } from '@/
 import type { RunSnapshot } from '@/shared/runSnapshot'
 import { createRunSync, PENDING_KEY } from '@/services/sync/runSync'
 
-const refs = [{ id: 'm0-training', order: 0 }]
+const refs = [{ id: 'm0-training', order: 0, world: null }]
 const registered = assignStudent(createInitialSave(refs, 'c'), { name: 'Ana Souza', school: 'Escola Azul' }, 'run-0001')
 
 describe('createRunSync', () => {

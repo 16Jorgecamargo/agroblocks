@@ -28,28 +28,28 @@ function finishedSnapshot(item: MissionDefinition, useReference: boolean) {
 
 describe('gameplayLogic', () => {
   it('builds a successful attempt with efficiency stars', () => {
-    const item = mission('m1-first-harvest')
+    const item = mission('garden-04')
     const input = buildAttemptInput(finishedSnapshot(item, true), item, 8, 'quando executar:', '2026-10-14T12:00:00.000Z')
-    expect(input).toMatchObject({ missionId: 'm1-first-harvest', outcome: 'success', errorCode: null, actions: 8, blocks: 8, efficiencyStars: 3 })
+    expect(input).toMatchObject({ missionId: 'garden-04', outcome: 'success', errorCode: null, actions: 8, blocks: 8, efficiencyStars: 3 })
     expect(input.usage).toEqual({ seeds: 0, water: 0, energy: 7 })
   })
 
   it('builds an objective failure without stars', () => {
-    const item = mission('m1-first-harvest')
+    const item = mission('garden-04')
     const input = buildAttemptInput(finishedSnapshot(item, false), item, 0, '', 'now')
     expect(input).toMatchObject({ outcome: 'objectiveFailed', efficiencyStars: null })
   })
 
   it('loads a saved workspace, falls back to the mission initial program, else null', () => {
     const saved = JSON.stringify({ blocks: { languageVersion: 0, blocks: [] } })
-    expect(loadInitialWorkspace(saved, mission('m1-first-harvest'))).toEqual({ blocks: { languageVersion: 0, blocks: [] } })
-    expect(loadInitialWorkspace('{broken', mission('m1-first-harvest'))).toBeNull()
-    expect(loadInitialWorkspace(null, mission('m6-efficient-farm'))?.blocks?.blocks.length).toBeGreaterThan(1)
+    expect(loadInitialWorkspace(saved, mission('garden-04'))).toEqual({ blocks: { languageVersion: 0, blocks: [] } })
+    expect(loadInitialWorkspace('{broken', mission('garden-04'))).toBeNull()
+    expect(loadInitialWorkspace(null, mission('homestead-10'))?.blocks?.blocks.length).toBeGreaterThan(1)
   })
 
   it('collects objective cells from cell based objectives', () => {
-    expect(objectiveCells(mission('m2-row-planting'))).toHaveLength(6)
-    expect(objectiveCells(mission('m1-first-harvest'))).toEqual([])
+    expect(objectiveCells(mission('cornfield-02'))).toHaveLength(6)
+    expect(objectiveCells(mission('garden-04'))).toEqual([])
   })
 
   it('locks the fourth hint until two failed attempts', () => {

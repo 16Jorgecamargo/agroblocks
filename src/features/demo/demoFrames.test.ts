@@ -9,7 +9,7 @@ function mission(id: string) {
 
 describe('demoFrames', () => {
   it('plays the reference solution from the initial farm up to the harvest', () => {
-    const harvest = mission('m1-first-harvest')
+    const harvest = mission('garden-04')
     const frames = demoFrames(harvest)
     expect(frames[0].events).toEqual([])
     expect(frames[0].state.robot).toEqual({ x: 0, y: 4, facing: 'N' })
@@ -19,13 +19,13 @@ describe('demoFrames', () => {
   })
 
   it('follows the sensor branch so only real actions become frames', () => {
-    const frames = demoFrames(mission('m3-smart-irrigation'))
+    const frames = demoFrames(mission('orchard-04'))
     expect(frames.length).toBeGreaterThanOrEqual(2)
     expect(frames.every((frame) => frame.state.width === frames[0].state.width)).toBe(true)
   })
 
   it('has no frames when the mission has no demonstration', () => {
-    expect(demoFrames(mission('m4-auto-harvest'))).toEqual([])
+    expect(demoFrames(mission('greenhouse-03'))).toEqual([])
   })
 })
 

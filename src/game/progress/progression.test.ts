@@ -11,13 +11,13 @@ import {
   storeProgram,
   syncMissions,
 } from '@/game/progress/progression'
-import type { AttemptInput } from '@/game/progress/types'
+import type { AttemptInput, MissionRef } from '@/game/progress/types'
 
-const missions = [
-  { id: 'a', order: 0 },
-  { id: 'b', order: 1 },
-  { id: 'c', order: 2 },
-  { id: 'd', order: 3 },
+const missions: MissionRef[] = [
+  { id: 'a', order: 0, world: null },
+  { id: 'b', order: 1, world: 'garden' },
+  { id: 'c', order: 2, world: 'garden' },
+  { id: 'd', order: 3, world: 'garden' },
 ]
 const now = '2026-10-14T12:00:00.000Z'
 
@@ -114,7 +114,7 @@ describe('progression', () => {
 })
 
 describe('student and tutorial', () => {
-  const refs = [{ id: 'm0-training', order: 0 }, { id: 'm1-first-harvest', order: 1 }]
+  const refs: MissionRef[] = [{ id: 'm0-training', order: 0, world: null }, { id: 'garden-04', order: 1, world: 'garden' }]
 
   it('starts with no run, student or tutorial outcome', () => {
     const save = createInitialSave(refs, '2026-10-16T10:00:00.000Z')

@@ -1,9 +1,10 @@
 import { CORRUPT_KEY, loadSave, SAVE_KEY, writeSave } from '@/services/storage/saveStorage'
 import { createInitialSave, recordAttempt } from '@/game/progress/progression'
+import type { MissionRef } from '@/game/progress/types'
 
-const missions = [
-  { id: 'a', order: 0 },
-  { id: 'b', order: 1 },
+const missions: MissionRef[] = [
+  { id: 'a', order: 0, world: null },
+  { id: 'b', order: 1, world: 'garden' },
 ]
 const now = '2026-10-14T12:00:00.000Z'
 
@@ -65,7 +66,7 @@ describe('legacy saves', () => {
       assessments: { pre: null, post: null },
     }
     window.localStorage.setItem(SAVE_KEY, JSON.stringify(legacy))
-    const save = loadSave(window.localStorage, [{ id: 'm0-training', order: 0 }], 'now')
+    const save = loadSave(window.localStorage, [{ id: 'm0-training', order: 0, world: null }], 'now')
     expect(save.createdAt).toBe('2026-10-14T12:00:00.000Z')
     expect(save).toMatchObject({ runId: null, student: null, tutorial: null })
     expect(save).not.toHaveProperty('participantCode')

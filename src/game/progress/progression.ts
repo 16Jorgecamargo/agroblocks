@@ -19,9 +19,10 @@ function sorted(missions: MissionRef[]): MissionRef[] {
 }
 
 function initialStatus(mission: MissionRef, missions: MissionRef[], save: SaveData | null): MissionProgress['status'] {
-  if (mission.order <= 1) return 'available'
-  const previous = missions.find((candidate) => candidate.order === mission.order - 1)
-  return previous && save?.missions[previous.id]?.status === 'completed' ? 'available' : 'locked'
+  const index = missions.findIndex((candidate) => candidate.id === mission.id)
+  if (index <= 1) return 'available'
+  const previous = missions[index - 1]
+  return save?.missions[previous.id]?.status === 'completed' ? 'available' : 'locked'
 }
 
 export function createInitialSave(missions: MissionRef[], now: string): SaveData {
@@ -77,8 +78,9 @@ export function recordAttempt(save: SaveData, input: AttemptInput, missions: Mis
   }
   const missionsState = { ...save.missions, [input.missionId]: updated }
   if (succeeded) {
-    const current = missions.find((mission) => mission.id === input.missionId)
-    const next = current ? missions.find((mission) => mission.order === current.order + 1) : undefined
+    const ordered = sorted(missions)
+    const index = ordered.findIndex((mission) => mission.id === input.missionId)
+    const next = index >= 0 ? ordered[index + 1] : undefined
     if (next && missionsState[next.id]?.status === 'locked') {
       missionsState[next.id] = { ...missionsState[next.id], status: 'available' }
     }

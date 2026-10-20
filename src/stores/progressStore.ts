@@ -14,7 +14,7 @@ import { safeStorage } from '@/services/storage/jsonStorage'
 import type { StudentInfo } from '@/shared/student'
 import { loadSave, writeSave } from '@/services/storage/saveStorage'
 
-const missionRefs = MISSIONS.map(({ id, order }) => ({ id, order }))
+const missionRefs = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
 
 interface ProgressState {
   save: SaveData

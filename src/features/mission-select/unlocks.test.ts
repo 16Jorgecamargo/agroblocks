@@ -3,7 +3,7 @@ import { loadSeenUnlocks, saveSeenUnlocks } from '@/services/storage/seenUnlocks
 import { MISSIONS } from '@/data/missions'
 import { createInitialSave, recordAttempt } from '@/game/progress/progression'
 
-const refs = MISSIONS.map(({ id, order }) => ({ id, order }))
+const refs = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
 const ids = MISSIONS.map((mission) => mission.id)
 
 function completed(missionId: string) {
@@ -30,16 +30,16 @@ describe('unlocks', () => {
   })
 
   it('reports a mission unlocked since the last visit', () => {
-    expect(newlyUnlocked(completed('m1-first-harvest'), ids, [])).toEqual(['m2-row-planting'])
+    expect(newlyUnlocked(completed('garden-04'), ids, [])).toEqual(['cornfield-02'])
   })
 
   it('does not repeat missions already celebrated', () => {
-    expect(newlyUnlocked(completed('m1-first-harvest'), ids, ['m2-row-planting'])).toEqual([])
+    expect(newlyUnlocked(completed('garden-04'), ids, ['cornfield-02'])).toEqual([])
   })
 
   it('persists seen unlocks', () => {
-    saveSeenUnlocks(window.localStorage, ['m2-row-planting'])
-    expect(loadSeenUnlocks(window.localStorage)).toEqual(['m2-row-planting'])
+    saveSeenUnlocks(window.localStorage, ['cornfield-02'])
+    expect(loadSeenUnlocks(window.localStorage)).toEqual(['cornfield-02'])
     window.localStorage.setItem('agroblocks:seen-unlocks:v1', '{bad')
     expect(loadSeenUnlocks(window.localStorage)).toEqual([])
   })

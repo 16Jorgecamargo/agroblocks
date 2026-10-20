@@ -2,9 +2,11 @@ import { act, program, repeat } from '@/blocks/interpreter/programBuilder'
 import { rowCells } from '@/data/missions/helpers'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 
-export const mission02RowPlanting: MissionDefinition = {
-  id: 'm2-row-planting',
-  order: 2,
+export const cornfield02: MissionDefinition = {
+  id: 'cornfield-02',
+  order: 12,
+  world: 'cornfield',
+  slot: 2,
   title: 'Plantação em série',
   concept: 'repetition',
   difficulty: 1,

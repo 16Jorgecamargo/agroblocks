@@ -5,7 +5,7 @@ import { ConsolePanel } from '@/features/gameplay/components/ConsolePanel'
 import { HintsPanel } from '@/features/gameplay/components/HintsPanel'
 import { getMission } from '@/data/missions'
 
-const mission = getMission('m2-row-planting')
+const mission = getMission('cornfield-02')
 if (!mission) throw new Error('mission missing')
 
 const panelProps = {
@@ -29,7 +29,7 @@ describe('gameplay components', () => {
         onExit={vi.fn()}
       />,
     )
-    expect(screen.getByRole('heading', { name: 'Fase 2 - Plantação em série' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Fase 12 - Plantação em série' })).toBeInTheDocument()
     expect(screen.getByLabelText('Sementes: 5')).toBeInTheDocument()
     expect(screen.queryByLabelText(/^Água/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument()

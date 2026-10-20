@@ -21,7 +21,7 @@ const FORM_BY_SLUG: Record<string, AssessmentForm> = {
   pre: "pre",
   pos: "post",
 };
-const FINAL_MISSION = "m6-efficient-farm";
+const FINAL_MISSION = "homestead-10";
 
 function Comparison({
   pre,

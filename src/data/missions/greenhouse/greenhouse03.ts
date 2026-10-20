@@ -5,9 +5,11 @@ import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 const harvestRow = () =>
   whileDo(not(sensor('isObstacleAhead')), [act('moveForward'), ifThen(sensor('isPlantMature'), [act('harvest')])])
 
-export const mission04AutoHarvest: MissionDefinition = {
-  id: 'm4-auto-harvest',
-  order: 4,
+export const greenhouse03: MissionDefinition = {
+  id: 'greenhouse-03',
+  order: 33,
+  world: 'greenhouse',
+  slot: 3,
   title: 'Colheita automatizada',
   concept: 'sensors',
   difficulty: 2,

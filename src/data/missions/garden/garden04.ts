@@ -2,9 +2,11 @@ import { act, program } from '@/blocks/interpreter/programBuilder'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
-export const mission01FirstHarvest: MissionDefinition = {
-  id: 'm1-first-harvest',
-  order: 1,
+export const garden04: MissionDefinition = {
+  id: 'garden-04',
+  order: 4,
+  world: 'garden',
+  slot: 4,
   title: 'Primeira colheita',
   concept: 'sequencing',
   difficulty: 1,

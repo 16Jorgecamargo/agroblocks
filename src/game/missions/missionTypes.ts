@@ -3,6 +3,7 @@ import type { BlockType } from '@/blocks/blockTypes'
 import type { EfficiencyReference } from '@/game/missions/efficiency'
 import type { Constraint, Objective } from '@/game/missions/goals'
 import type { ErrorCode, Robot, WorldResources } from '@/game/world/types'
+import type { WorldId } from '@/game/worlds/worldTypes'
 
 export type MissionConcept =
   | 'interface'
@@ -26,6 +27,8 @@ export const CONCEPT_LABELS: Record<MissionConcept, string> = {
 export interface MissionDefinition {
   id: string
   order: number
+  world: WorldId | null
+  slot: number | null
   title: string
   concept: MissionConcept
   difficulty: 1 | 2 | 3
@@ -35,7 +38,7 @@ export interface MissionDefinition {
   robot: Robot
   resources: WorldResources
   growTicks: number
-  rules: { forbidWaterWet?: boolean; stepLimit?: number }
+  rules: { forbidWaterWet?: boolean; stepLimit?: number; maxBlocks?: number }
   allowedBlocks: BlockType[]
   initialProgram?: Program
   objectives: Objective[]

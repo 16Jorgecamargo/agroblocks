@@ -1,5 +1,6 @@
 import type { EfficiencyStars } from '@/game/missions/efficiency'
 import type { ErrorCode, ResourceUsage } from '@/game/world/types'
+import type { WorldId } from '@/game/worlds/worldTypes'
 import type { StudentInfo, TutorialRecord } from '@/shared/student'
 
 export const MAX_HINTS = 4
@@ -65,4 +66,5 @@ export interface SaveData {
 export interface MissionRef {
   id: string
   order: number
+  world: WorldId | null
 }

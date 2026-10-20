@@ -1,7 +1,7 @@
 import { assignStudent, createInitialSave, storeProgram } from '@/game/progress/progression'
 import { toSnapshot } from '@/services/sync/toSnapshot'
 
-const refs = [{ id: 'm0-training', order: 0 }]
+const refs = [{ id: 'm0-training', order: 0, world: null }]
 
 describe('toSnapshot', () => {
   it('needs a run and a student', () => {

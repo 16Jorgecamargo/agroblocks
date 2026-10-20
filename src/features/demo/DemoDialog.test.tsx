@@ -4,7 +4,7 @@ import { DemoDialog } from '@/features/demo/DemoDialog'
 import { DEMO_TIMING, demoFrames } from '@/features/demo/demoFrames'
 
 function mission() {
-  const found = getMission('m1-first-harvest')
+  const found = getMission('garden-04')
   if (!found) throw new Error('missing')
   return found
 }

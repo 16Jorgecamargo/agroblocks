@@ -5,6 +5,8 @@ import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 export const mission00Training: MissionDefinition = {
   id: 'm0-training',
   order: 0,
+  world: null,
+  slot: null,
   title: 'Treinamento',
   concept: 'interface',
   difficulty: 1,

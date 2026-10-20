@@ -12,7 +12,7 @@ function run(overrides: Partial<RunSnapshot>): RunSnapshot {
   return { ...validSnapshot, ...overrides }
 }
 
-const failed = { ...validSnapshot.attempts[0], id: 'f', missionId: 'm1-first-harvest', outcome: 'error' as const, errorCode: 'HIT_OBSTACLE', efficiencyStars: null }
+const failed = { ...validSnapshot.attempts[0], id: 'f', missionId: 'garden-04', outcome: 'error' as const, errorCode: 'HIT_OBSTACLE', efficiencyStars: null }
 
 const runs: RunSnapshot[] = [
   run({
@@ -30,7 +30,7 @@ const runs: RunSnapshot[] = [
     tutorial: { status: 'completed', step: 15, at: 't' },
     missions: {
       ...validSnapshot.missions,
-      'm1-first-harvest': { status: 'completed', attempts: 2, bestResult: { actions: 8, blocks: 8, usage: { seeds: 0, water: 0, energy: 8 }, efficiencyStars: 2 }, hintsUsed: 1, errorCounts: { HIT_OBSTACLE: 1 } },
+      'garden-04': { status: 'completed', attempts: 2, bestResult: { actions: 8, blocks: 8, usage: { seeds: 0, water: 0, energy: 8 }, efficiencyStars: 2 }, hintsUsed: 1, errorCounts: { HIT_OBSTACLE: 1 } },
     },
     assessments: { pre: null, post: { form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: answers('post', 9) } },
   }),
@@ -70,17 +70,17 @@ describe('dashboard model', () => {
     const model = buildDashboard(runs, MISSIONS, EMPTY_FILTERS)
     const jose = model.students.find((row) => row.runCount === 2)
     const bia = model.students.find((row) => row.name === 'Bia Lima')
-    expect(jose?.plots['m1-first-harvest']).toEqual({ state: 'done', attempts: 1, stars: 2, hints: 1 })
+    expect(jose?.plots['garden-04']).toEqual({ state: 'done', attempts: 1, stars: 2, hints: 1 })
     expect(jose?.plots['m0-training']).toMatchObject({ state: 'done', stars: 3 })
-    expect(jose?.plots['m2-row-planting']).toEqual({ state: 'empty', attempts: 0, stars: 0, hints: 0 })
-    expect(bia?.plots['m1-first-harvest'].state).toBe('empty')
+    expect(jose?.plots['cornfield-02']).toEqual({ state: 'empty', attempts: 0, stars: 0, hints: 0 })
+    expect(bia?.plots['garden-04'].state).toBe('empty')
     const trying = buildDashboard([run({ runId: 'run-c1', student: { name: 'Caio Prado', school: 'Escola Azul' }, attempts: [failed] })], MISSIONS, EMPTY_FILTERS)
-    expect(trying.students[0].plots['m1-first-harvest']).toEqual({ state: 'trying', attempts: 1, stars: 0, hints: 0 })
+    expect(trying.students[0].plots['garden-04']).toEqual({ state: 'trying', attempts: 1, stars: 0, hints: 0 })
   })
 
   it('computes phases, stars and the most common errors', () => {
     const model = buildDashboard(runs, MISSIONS, EMPTY_FILTERS)
-    const first = model.phases.find((row) => row.missionId === 'm1-first-harvest')
+    const first = model.phases.find((row) => row.missionId === 'garden-04')
     expect(first).toMatchObject({ completed: 1, stars: [0, 1, 0] })
     expect(model.topErrors[0]).toMatchObject({ code: 'HIT_OBSTACLE', count: 1 })
     expect(model.topErrors[0].label).toMatch(/obstáculo|pedra|bateu/i)

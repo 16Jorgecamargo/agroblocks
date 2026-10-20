@@ -7,7 +7,7 @@ import type { SaveData } from '@/game/progress/types'
 import { SAVE_KEY } from '@/services/storage/saveStorage'
 import { DEFAULT_SETTINGS, SETTINGS_KEY, type Settings } from '@/services/storage/settingsStorage'
 
-const refs = MISSIONS.map(({ id, order }) => ({ id, order }))
+const refs = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
 
 export function saveWithProgram(missionId: string, program: Program, completed: string[] = []): SaveData {
   let save = createInitialSave(refs, '2026-10-14T12:00:00.000Z')

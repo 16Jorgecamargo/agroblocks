@@ -17,7 +17,7 @@ describe('animated HUD', () => {
   })
 
   it('marks low and empty resources', () => {
-    const efficient = getMission('m6-efficient-farm')
+    const efficient = getMission('homestead-10')
     if (!efficient) throw new Error('missing')
     render(<GameHud mission={efficient} resources={{ seeds: 1, water: 0, energy: 70, harvested: 0 }} onHelp={vi.fn()} onSettings={vi.fn()} onExit={vi.fn()} />)
     expect(screen.getByLabelText('Sementes: 1')).toHaveAttribute('data-level', 'low')
@@ -27,7 +27,7 @@ describe('animated HUD', () => {
   })
 
   it('shows only the harvest chip in a harvest-only mission', () => {
-    const harvest = getMission('m4-auto-harvest')
+    const harvest = getMission('greenhouse-03')
     if (!harvest) throw new Error('missing')
     render(<GameHud mission={harvest} resources={{ seeds: null, water: null, energy: null, harvested: 2 }} onHelp={vi.fn()} onSettings={vi.fn()} onExit={vi.fn()} />)
     expect(screen.getByLabelText('Colheita: 2')).toHaveAttribute('data-flight-target', 'harvest')

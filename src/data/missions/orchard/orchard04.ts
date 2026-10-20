@@ -2,9 +2,11 @@ import { act, ifThen, program, repeat, sensor } from '@/blocks/interpreter/progr
 import { rowCells } from '@/data/missions/helpers'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 
-export const mission03SmartIrrigation: MissionDefinition = {
-  id: 'm3-smart-irrigation',
-  order: 3,
+export const orchard04: MissionDefinition = {
+  id: 'orchard-04',
+  order: 24,
+  world: 'orchard',
+  slot: 4,
   title: 'Irrigação inteligente',
   concept: 'conditionals',
   difficulty: 2,

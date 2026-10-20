@@ -45,11 +45,11 @@ describe('HomePage', () => {
 
   it('continues at the next mission and shows its name', () => {
     useProgressStore.getState().recordAttempt(success('m0-training'))
-    useProgressStore.getState().recordAttempt(success('m1-first-harvest'))
+    useProgressStore.getState().recordAttempt(success('garden-04'))
     renderHome()
     const continueButton = screen.getByRole('button', { name: /Continuar missão/ })
     expect(continueButton).toBeEnabled()
-    expect(continueButton).toHaveTextContent('Fase 2 - Plantação em série')
+    expect(continueButton).toHaveTextContent('Fase 12 - Plantação em série')
     expect(screen.getByText('1 de 6 fases concluídas')).toBeInTheDocument()
   })
 
@@ -64,7 +64,7 @@ describe('HomePage', () => {
   })
 
   it('asks before wiping progress, then asks who is playing', () => {
-    useProgressStore.getState().recordAttempt(success('m1-first-harvest'))
+    useProgressStore.getState().recordAttempt(success('garden-04'))
     renderHome()
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova fazenda' }))
     fireEvent.click(screen.getByRole('button', { name: 'Apagar e começar' }))
@@ -76,7 +76,7 @@ describe('HomePage', () => {
   })
 
   it('keeps everything when the student cancels the registration', () => {
-    useProgressStore.getState().recordAttempt(success('m1-first-harvest'))
+    useProgressStore.getState().recordAttempt(success('garden-04'))
     renderHome()
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova fazenda' }))
     fireEvent.click(screen.getByRole('button', { name: 'Apagar e começar' }))

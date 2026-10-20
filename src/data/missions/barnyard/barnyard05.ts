@@ -2,9 +2,11 @@ import { act, changeVar, compare, ifThen, program, repeat, setVar, variable } fr
 import { rowCells } from '@/data/missions/helpers'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 
-export const mission05LimitedResources: MissionDefinition = {
-  id: 'm5-limited-resources',
-  order: 5,
+export const barnyard05: MissionDefinition = {
+  id: 'barnyard-05',
+  order: 45,
+  world: 'barnyard',
+  slot: 5,
   title: 'Recursos limitados',
   concept: 'variables',
   difficulty: 3,

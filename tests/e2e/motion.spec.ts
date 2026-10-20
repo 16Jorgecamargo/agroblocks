@@ -4,7 +4,7 @@ import { getMission } from '@/data/missions'
 import { openMission, saveWithProgram, seedStorage } from './helpers'
 
 const generated = JSON.parse(readFileSync('src/render/models/manifest.generated.json', 'utf8')) as { models: unknown[] }
-const firstHarvest = getMission('m1-first-harvest')
+const firstHarvest = getMission('garden-04')
 if (!firstHarvest) throw new Error('mission missing')
 
 test('a game dialog closes, leaves the DOM and returns focus to its opener', async ({ page }) => {
@@ -33,7 +33,7 @@ test('the 3D farm loads only local assets, including any GLB models, without err
     if (!local && !font) external.push(url)
   })
   await seedStorage(page, { settings: { motion: 'full' } })
-  await openMission(page, 'm1-first-harvest')
+  await openMission(page, 'garden-04')
   await expect(page.locator('.farm-view canvas')).toBeVisible()
   await page.waitForTimeout(2500)
   expect(errors).toEqual([])
@@ -42,19 +42,19 @@ test('the 3D farm loads only local assets, including any GLB models, without err
 })
 
 test('reduced motion starts screens without transform animations and without confetti', async ({ page }) => {
-  await seedStorage(page, { settings: { motion: 'reduced' }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
+  await seedStorage(page, { settings: { motion: 'reduced' }, save: saveWithProgram('garden-04', firstHarvest.referenceSolution) })
   await page.goto('/')
   const transform = await page.locator('.home__tagline').evaluate((element) => getComputedStyle(element).transform)
   expect(transform === 'none' || transform === 'matrix(1, 0, 0, 1, 0, 0)').toBe(true)
-  await openMission(page, 'm1-first-harvest')
+  await openMission(page, 'garden-04')
   await page.getByRole('button', { name: 'Executar' }).click()
-  await expect(page).toHaveURL(/#\/resultado\/m1-first-harvest$/)
+  await expect(page).toHaveURL(/#\/resultado\/garden-04$/)
   await expect(page.locator('.confetti__piece')).toHaveCount(0)
 })
 
 test('the running block glows and the harvest flies to the counter in full motion', async ({ page }) => {
-  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 0.5 }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution) })
-  await openMission(page, 'm1-first-harvest')
+  await seedStorage(page, { settings: { motion: 'full', defaultSpeed: 0.5 }, save: saveWithProgram('garden-04', firstHarvest.referenceSolution) })
+  await openMission(page, 'garden-04')
   await page.getByRole('button', { name: 'Executar' }).click()
   await expect
     .poll(async () => page.locator('.blocklyBlockCanvas .blocklyPath').evaluateAll((paths) => paths.some((path) => (path as SVGElement).style.filter.includes('drop-shadow'))))
@@ -86,7 +86,7 @@ test('the legend opens as a paged dialog with one 3D preview and closes', async 
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   await seedStorage(page, { settings: { motion: 'full' } })
-  await openMission(page, 'm1-first-harvest')
+  await openMission(page, 'garden-04')
   await page.getByRole('button', { name: 'Legenda' }).click()
   const dialog = page.getByRole('dialog', { name: 'Legenda' })
   await expect(dialog).toBeVisible()
@@ -102,8 +102,8 @@ test('the legend opens as a paged dialog with one 3D preview and closes', async 
 test('the success screen renders a full 3D celebration without errors', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await seedStorage(page, { settings: { motion: 'full' }, save: saveWithProgram('m1-first-harvest', firstHarvest.referenceSolution, ['m1-first-harvest']) })
-  await page.goto('/#/resultado/m1-first-harvest')
+  await seedStorage(page, { settings: { motion: 'full' }, save: saveWithProgram('garden-04', firstHarvest.referenceSolution, ['garden-04']) })
+  await page.goto('/#/resultado/garden-04')
   await expect(page.getByRole('heading', { name: 'Missão concluída!' })).toBeVisible()
   await expect(page.locator('.results__scene canvas')).toBeVisible()
   await expect(page.locator('.results__scene .scene-splash')).toHaveCount(0, { timeout: 30_000 })
@@ -112,7 +112,7 @@ test('the success screen renders a full 3D celebration without errors', async ({
 
 test('screens fill the window without page scroll or overscroll bounce', async ({ page }) => {
   await seedStorage(page, { settings: { motion: 'reduced' } })
-  for (const route of ['/', '/#/missoes', '/#/jogar/m1-first-harvest']) {
+  for (const route of ['/', '/#/missoes', '/#/jogar/garden-04']) {
     await page.goto(route)
     await page.mouse.move(700, 450)
     await page.mouse.wheel(0, 800)
@@ -128,7 +128,7 @@ test('screens fill the window without page scroll or overscroll bounce', async (
 
 test('farm view tool buttons animate, and the rotate arrows spin with the camera', async ({ page }) => {
   await seedStorage(page, { settings: { motion: 'full' } })
-  await openMission(page, 'm1-first-harvest')
+  await openMission(page, 'garden-04')
   const right = page.getByRole('button', { name: 'Girar câmera para a direita' })
   await right.click()
   await expect(right.locator('[data-turns]')).toHaveAttribute('data-turns', '1')

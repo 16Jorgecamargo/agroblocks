@@ -60,7 +60,7 @@ describe('AssessmentPage', () => {
   it('compares pre and post by concept after the post-test', async () => {
     useProgressStore.getState().storeAssessment({ form: 'pre', startedAt: 'a', completedAt: 'b', skipped: false, answers: {} })
     useProgressStore.getState().recordAttempt({
-      missionId: 'm6-efficient-farm',
+      missionId: 'homestead-10',
       timestamp: 'now',
       outcome: 'success',
       errorCode: null,

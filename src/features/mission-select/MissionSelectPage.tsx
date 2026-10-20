@@ -59,7 +59,7 @@ export function MissionSelectPage() {
   const statuses = Object.fromEntries(MISSIONS.map((mission) => [mission.id, save.missions[mission.id]?.status ?? 'locked'])) as Record<string, MissionStatus>
   const selected = MISSIONS.find((mission) => mission.id === selectedId) ?? MISSIONS[0]
   const show3d = webgl
-  const postTestDue = statuses['m6-efficient-farm'] === 'completed' && save.assessments.post === null
+  const postTestDue = statuses['homestead-10'] === 'completed' && save.assessments.post === null
 
   useEffect(() => {
     if (show3d) void import('@/render/models/Model').then((module) => module.preloadModels())

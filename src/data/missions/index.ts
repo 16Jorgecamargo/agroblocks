@@ -1,20 +1,20 @@
+import { BARNYARD_MISSIONS } from '@/data/missions/barnyard'
+import { CORNFIELD_MISSIONS } from '@/data/missions/cornfield'
+import { GARDEN_MISSIONS } from '@/data/missions/garden'
+import { GREENHOUSE_MISSIONS } from '@/data/missions/greenhouse'
+import { HOMESTEAD_MISSIONS } from '@/data/missions/homestead'
 import { mission00Training } from '@/data/missions/mission00Training'
-import { mission01FirstHarvest } from '@/data/missions/mission01FirstHarvest'
-import { mission02RowPlanting } from '@/data/missions/mission02RowPlanting'
-import { mission03SmartIrrigation } from '@/data/missions/mission03SmartIrrigation'
-import { mission04AutoHarvest } from '@/data/missions/mission04AutoHarvest'
-import { mission05LimitedResources } from '@/data/missions/mission05LimitedResources'
-import { mission06EfficientFarm } from '@/data/missions/mission06EfficientFarm'
+import { ORCHARD_MISSIONS } from '@/data/missions/orchard'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 
 export const MISSIONS: MissionDefinition[] = [
   mission00Training,
-  mission01FirstHarvest,
-  mission02RowPlanting,
-  mission03SmartIrrigation,
-  mission04AutoHarvest,
-  mission05LimitedResources,
-  mission06EfficientFarm,
+  ...GARDEN_MISSIONS,
+  ...CORNFIELD_MISSIONS,
+  ...ORCHARD_MISSIONS,
+  ...GREENHOUSE_MISSIONS,
+  ...BARNYARD_MISSIONS,
+  ...HOMESTEAD_MISSIONS,
 ].sort((a, b) => a.order - b.order)
 
 export function getMission(id: string): MissionDefinition | undefined {
@@ -22,6 +22,6 @@ export function getMission(id: string): MissionDefinition | undefined {
 }
 
 export function getNextMission(id: string): MissionDefinition | undefined {
-  const current = getMission(id)
-  return current ? MISSIONS.find((mission) => mission.order === current.order + 1) : undefined
+  const index = MISSIONS.findIndex((mission) => mission.id === id)
+  return index < 0 ? undefined : MISSIONS[index + 1]
 }
