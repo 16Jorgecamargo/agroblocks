@@ -75,6 +75,20 @@ const BASE_TRAILS: Record<WorldId, Vec2[]> = {
 }
 
 const DRAWN_TRAILS: Partial<Record<WorldId, Vec2[]>> = {
+  cornfield: points([
+    [-12, 10],
+    [-8.5, 9.5],
+    [-5, 8.6],
+    [-1.5, 7.6],
+    [2, 6.2],
+    [5.2, 4.4],
+    [7.4, 1.6],
+    [8.4, -1.8],
+    [8.2, -5.4],
+    [5.2, -7.4],
+    [1.6, -8.2],
+    [-2, -9.6],
+  ]),
   garden: points([
     [-11, 9],
     [-8, 7],
