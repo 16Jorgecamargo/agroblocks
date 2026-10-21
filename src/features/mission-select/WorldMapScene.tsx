@@ -190,16 +190,15 @@ export default function WorldMapScene({ world, nodes, states, stars, selected, o
                 ) : (
                   <Icon name="flag" size={14} />
                 )}
-                {state === 'done' && <Icon name="check" size={14} />}
+                {node.kind === 'mission' && state === 'done' && (
+                  <span className="map-label__stars" aria-hidden="true">
+                    {'★'.repeat(stars[index])}
+                    <span className="map-label__stars-off">{'★'.repeat(3 - stars[index])}</span>
+                  </span>
+                )}
                 {state === 'locked' && <Icon name="lock" size={14} />}
               </span>
               <span className="map-label__text">{labelText(node)}</span>
-              {node.kind === 'mission' && state === 'done' && (
-                <span className="map-label__stars" aria-hidden="true">
-                  {'★'.repeat(stars[index])}
-                  <span className="map-label__stars-off">{'★'.repeat(3 - stars[index])}</span>
-                </span>
-              )}
             </motion.span>
           </button>
         )

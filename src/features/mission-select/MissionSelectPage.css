@@ -322,8 +322,16 @@
   z-index: 3;
   width: 320px;
   max-height: calc(100% - 40px);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
   perspective: 1200px;
+}
+
+.world-stage__card > .mission-detail {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .mission-detail__role {
@@ -455,19 +463,15 @@
 }
 
 .map-label__stars {
-  margin-left: 2px;
+  margin-top: 1px;
   color: #f5c542;
-  font-size: 13px;
+  font-size: 9px;
   letter-spacing: -1px;
   text-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
 }
 
 .map-label__stars-off {
   color: rgb(255 255 255 / 0.35);
-}
-
-.map-scene .map-label--done .map-label__inner {
-  padding-right: 8px;
 }
 
 .mission-select {
