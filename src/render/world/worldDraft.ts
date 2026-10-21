@@ -1,6 +1,6 @@
 import type { ModelId } from '@/render/models/manifest'
 import { distanceToPolyline, pointInPolygon, rectDistance } from '@/render/world/geometry'
-import { EXEMPT_MODELS, FEATURE_FOOTPRINTS, footprint, FRONT_CLEARANCE, GRID_CLEARANCE, isClutter, RIVER_BANK, TALL_MODELS } from '@/render/world/worldCatalog'
+import { EXEMPT_MODELS, FEATURE_FOOTPRINTS, footprint, FRONT_CLEARANCE, GRID_CLEARANCE, isClutter, RIVER_BANK, TALL_FEATURES, TALL_MODELS } from '@/render/world/worldCatalog'
 import type { FeatureKind, Polyline, PropItem, Rect, Vec2, WorldFeature } from '@/render/world/worldTypes'
 
 export interface DraftRules {
@@ -31,7 +31,7 @@ export class WorldDraft {
   }
 
   placeFeature(kind: FeatureKind, point: Vec2, rotation: number, scale = 1, tint?: string, y?: number): boolean {
-    if (!this.fits(point, FEATURE_FOOTPRINTS[kind] * scale, kind === 'greenhouse' || kind === 'fruitTree', false)) return false
+    if (!this.fits(point, FEATURE_FOOTPRINTS[kind] * scale, TALL_FEATURES.has(kind), false)) return false
     this.forceFeature(kind, point, rotation, scale, tint, y)
     return true
   }

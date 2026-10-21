@@ -13,6 +13,7 @@ import { WORLD_THEMES } from '@/render/world/worldThemes'
 import { SceneLighting } from '@/render/world/SceneLighting'
 import { RobotModel } from '@/render/farm3d/RobotModel'
 import { buildWorld } from '@/render/world/buildWorld'
+import { Birds } from '@/render/world/Birds'
 import { Butterflies } from '@/render/world/Butterflies'
 import { Herd } from '@/render/world/Herd'
 import { InstancedFeatures } from '@/render/world/InstancedFeatures'
@@ -77,6 +78,7 @@ export default function FarmScene({
       <InstancedFeatures features={world.features} ambient={!reducedMotion && !lowGraphics} shadows={!lowGraphics} />
       <Herd animals={world.animals} active={!reducedMotion && !lowGraphics} />
       <Butterflies points={world.butterflies} active={!reducedMotion && !lowGraphics} />
+      <Birds points={world.birds ?? []} active={!reducedMotion && !lowGraphics} />
       {state.cells.map((row, y) =>
         row.map((cell, x) => {
           const point = cellToWorld(x, y, width, height)

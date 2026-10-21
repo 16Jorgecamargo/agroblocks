@@ -9,6 +9,7 @@ import { SPRINGS } from '@/motion/springs'
 import { CANVAS_RESIZE } from '@/render/canvasResize'
 import { DrawCallProbe } from '@/render/DrawCallProbe'
 import { buildWorld } from '@/render/world/buildWorld'
+import { Birds } from '@/render/world/Birds'
 import { Butterflies } from '@/render/world/Butterflies'
 import { InstancedFeatures } from '@/render/world/InstancedFeatures'
 import { WorldProps } from '@/render/world/WorldProps'
@@ -146,6 +147,7 @@ export default function WorldMapScene({ world, nodes, states, stars, selected, o
         <WorldProps world={map} shadows={!lowGraphics} ambient={alive} />
         <InstancedFeatures features={map.features} ambient={alive} />
         <Butterflies points={map.butterflies} active={alive} />
+        <Birds points={map.birds ?? []} active={alive} />
         {nodes.map((node, index) => {
           const point = map.trail[index]
           const key = nodeKey(node)

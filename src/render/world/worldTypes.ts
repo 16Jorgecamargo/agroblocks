@@ -52,7 +52,7 @@ export interface WorldInput {
   theme?: WorldId | null
 }
 
-export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence'] as const
+export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence', 'grainBin', 'grainDryer', 'cornWagon', 'scarecrow'] as const
 
 export type FeatureKind = (typeof FEATURE_KINDS)[number]
 
@@ -87,6 +87,7 @@ export interface World {
   style: WorldStyle
   patches?: GroundPatch[]
   mounds?: Mound[]
+  birds?: Vec2[]
 }
 
 export interface GroundPatch {

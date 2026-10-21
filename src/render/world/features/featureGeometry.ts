@@ -1,29 +1,7 @@
-import { BoxGeometry, BufferGeometry, Color, ConeGeometry, CylinderGeometry, Euler, Float32BufferAttribute, IcosahedronGeometry, Matrix4, Quaternion, SphereGeometry, Vector3 } from 'three'
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { BoxGeometry, BufferGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry } from 'three'
+import { cornfieldObjects } from '@/render/world/features/cornfieldObjects'
+import { compose, mergeParts, part, type Triple } from '@/render/world/features/parts'
 import type { FeatureKind, WorldFeature } from '@/render/world/worldTypes'
-
-type Triple = [number, number, number]
-
-export function compose(position: Triple, rotation: Triple = [0, 0, 0], scale: Triple = [1, 1, 1]): Matrix4 {
-  return new Matrix4().compose(new Vector3(...position), new Quaternion().setFromEuler(new Euler(...rotation)), new Vector3(...scale))
-}
-
-export function part(geometry: BufferGeometry, color: string, matrix: Matrix4): BufferGeometry {
-  const flat = geometry.index ? geometry.toNonIndexed() : geometry.clone()
-  flat.deleteAttribute('uv')
-  flat.applyMatrix4(matrix)
-  const tint = new Color(color)
-  const colors = new Float32Array(flat.attributes.position.count * 3)
-  for (let index = 0; index < colors.length; index += 3) colors.set([tint.r, tint.g, tint.b], index)
-  flat.setAttribute('color', new Float32BufferAttribute(colors, 3))
-  return flat
-}
-
-export function mergeParts(parts: BufferGeometry[]): BufferGeometry {
-  const merged = mergeGeometries(parts)
-  if (!merged) throw new Error('feature parts could not be merged')
-  return merged
-}
 
 const CORN_LEAVES: Triple[] = [
   [0.35, 0, 1],
@@ -116,7 +94,10 @@ function meshFence(): BufferGeometry[] {
 
 const DEFAULT_TINT = '#e0473c'
 
+export { compose, mergeParts, part }
+
 const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
+  ...cornfieldObjects,
   cornStalk,
   fruitTree,
   greenhouse,
