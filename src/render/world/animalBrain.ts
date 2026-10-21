@@ -9,6 +9,7 @@ export type AnimalGait = 'walk' | 'graze'
 export interface Course {
   from: Vec2
   to: Vec2
+  radius?: number
 }
 
 export const SPECIES_GAIT: Record<AnimalSpecies, AnimalGait> = {
@@ -61,6 +62,45 @@ export function nextTarget(random: () => number, area: Vec2[], from: Vec2, minSt
         segmentDistance(from, candidate, other.from, other.to) < PASSING_SPACE * spacing,
     )
     if (!crowded) return candidate
+  }
+  return from
+}
+
+const walkKeys = new WeakMap<Vec2[], Set<string>>()
+
+function keyOf(point: Vec2, cell: number): string {
+  return `${Math.floor(point.x / cell)},${Math.floor(point.z / cell)}`
+}
+
+function keysFor(walk: Vec2[], cell: number): Set<string> {
+  let keys = walkKeys.get(walk)
+  if (!keys) {
+    keys = new Set(walk.map((point) => keyOf(point, cell)))
+    walkKeys.set(walk, keys)
+  }
+  return keys
+}
+
+function staysOnWalk(keys: Set<string>, from: Vec2, to: Vec2, cell: number): boolean {
+  const samples = Math.max(1, Math.ceil(Math.hypot(to.x - from.x, to.z - from.z) / (cell / 2)))
+  for (let step = 0; step <= samples; step += 1) {
+    const t = step / samples
+    if (!keys.has(keyOf({ x: from.x + (to.x - from.x) * t, z: from.z + (to.z - from.z) * t }, cell))) return false
+  }
+  return true
+}
+
+export function nextWalkTarget(random: () => number, walk: Vec2[], from: Vec2, radius: number, others: Course[], minStep = 1.2, cell = 0.25): Vec2 {
+  const keys = keysFor(walk, cell)
+  for (let tries = 0; tries < TARGET_TRIES; tries += 1) {
+    const candidate = walk[Math.floor(random() * walk.length)]
+    if (Math.hypot(candidate.x - from.x, candidate.z - from.z) < minStep) continue
+    if (!staysOnWalk(keys, from, candidate, cell)) continue
+    const blocked = others.some((other) => {
+      const gap = radius + (other.radius ?? radius)
+      return distanceToSegment(candidate, other.from, other.to) < gap || segmentDistance(from, candidate, other.from, other.to) < gap
+    })
+    if (!blocked) return candidate
   }
   return from
 }

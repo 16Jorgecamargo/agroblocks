@@ -1,6 +1,6 @@
 import { DURATIONS } from '@/motion/presets'
 import { createRandom } from '@/render/seededRandom'
-import { closestAngle, headingTo, idleSeconds, nextTarget, walkSeconds } from '@/render/world/animalBrain'
+import { closestAngle, headingTo, idleSeconds, nextTarget, nextWalkTarget, walkSeconds, type Course } from '@/render/world/animalBrain'
 import { pointInPolygon, rectPolygon, segmentDistance } from '@/render/world/geometry'
 import { SPECIES_GAIT } from '@/render/world/animalBrain'
 
@@ -87,5 +87,31 @@ describe('animalBrain', () => {
     const others = [{ from: { x: 3, z: 2 }, to: { x: 3, z: 2 } }]
     const target = nextTarget(random, pasture, { x: 0.5, z: 0.5 }, 0.6, others, 0.5)
     expect(Math.hypot(target.x - 3, target.z - 2)).toBeGreaterThanOrEqual(0.6)
+  })
+
+  const walk = Array.from({ length: 24 * 24 }, (_, index) => ({ x: -3 + (index % 24) * 0.25 + 0.125, z: -3 + Math.floor(index / 24) * 0.25 + 0.125 })).filter((cell) => !(cell.x > -0.5 && cell.x < 0.5 && cell.z > -0.5 && cell.z < 0.5))
+
+  it('only walks across free cells of the pen', () => {
+    const random = createRandom(2)
+    for (let run = 0; run < 50; run += 1) {
+      const target = nextWalkTarget(random, walk, { x: -2.125, z: -2.125 }, 0.4, [])
+      for (let t = 0; t <= 1; t += 0.05) {
+        const point = { x: -2.125 + (target.x + 2.125) * t, z: -2.125 + (target.z + 2.125) * t }
+        expect(walk.some((cell) => Math.hypot(cell.x - point.x, cell.z - point.z) <= 0.19)).toBe(true)
+      }
+    }
+  })
+
+  it('never walks through another animal standing or walking', () => {
+    const random = createRandom(3)
+    const other: Course = { from: { x: 0.125, z: 2.125 }, to: { x: 0.125, z: 2.125 }, radius: 0.55 }
+    for (let run = 0; run < 50; run += 1) {
+      const target = nextWalkTarget(random, walk, { x: -2.125, z: 2.125 }, 0.55, [other])
+      expect(segmentDistance({ x: -2.125, z: 2.125 }, target, other.from, other.to)).toBeGreaterThanOrEqual(1.1 - 1e-9)
+    }
+  })
+
+  it('stays put when boxed in', () => {
+    expect(nextWalkTarget(createRandom(1), [{ x: 0.125, z: 0.125 }], { x: 0.125, z: 0.125 }, 0.4, [])).toEqual({ x: 0.125, z: 0.125 })
   })
 })

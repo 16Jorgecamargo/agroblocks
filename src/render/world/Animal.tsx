@@ -7,7 +7,7 @@ import { SPRINGS } from '@/motion/springs'
 import { modelEntry, modelUrl, type ModelEntry } from '@/render/models/manifest'
 import { ModelBoundary, useClonedScene } from '@/render/models/Model'
 import { createRandom, hashString } from '@/render/seededRandom'
-import { closestAngle, headingTo, idleSeconds, nextTarget, SPECIES_GAIT, SPECIES_SPEED, walkSeconds, type AnimalPhase, type Course } from '@/render/world/animalBrain'
+import { BODY_RADIUS, closestAngle, headingTo, idleSeconds, nextTarget, nextWalkTarget, SPECIES_GAIT, SPECIES_SPEED, walkSeconds, type AnimalPhase, type Course } from '@/render/world/animalBrain'
 import type { AnimalSpawn } from '@/render/world/worldTypes'
 
 export type Occupancy = Map<string, Course>
@@ -42,6 +42,7 @@ function AnimalBody({ entry, spawn, active, occupancy }: { entry: ModelEntry; sp
     const random = createRandom(hashString(spawn.id))
     const speed = SPECIES_SPEED[spawn.species] * spawn.scale
     const grazes = SPECIES_GAIT[spawn.species] === 'graze'
+    const radius = BODY_RADIUS[spawn.species] * spawn.scale
     let cancelled = false
     let running: AnimationPlaybackControls[] = []
     const loop = async () => {
@@ -60,15 +61,15 @@ function AnimalBody({ entry, spawn, active, occupancy }: { entry: ModelEntry; sp
         }
         const from = { x: body.position.x, z: body.position.z }
         const others = [...occupancy.entries()].filter(([id]) => id !== spawn.id).map(([, point]) => point)
-        const target = nextTarget(random, spawn.area, from, 1.2 * spawn.scale, others, spawn.scale)
-        occupancy.set(spawn.id, { from, to: target })
+        const target = spawn.walk ? nextWalkTarget(random, spawn.walk, from, radius, others, 1.2 * spawn.scale) : nextTarget(random, spawn.area, from, 1.2 * spawn.scale, others, spawn.scale)
+        occupancy.set(spawn.id, { from, to: target, radius })
         if (target === from) continue
         setPhase('walk')
         const turn = animate(body.rotation, { y: closestAngle(body.rotation.y, headingTo(from, target)) }, SPRINGS.snap)
         const walk = animate(body.position, { x: target.x, z: target.z }, { duration: walkSeconds(from, target, speed), ease: 'linear' })
         running = [turn, walk]
         await walk
-        occupancy.set(spawn.id, { from: target, to: target })
+        occupancy.set(spawn.id, { from: target, to: target, radius })
       }
     }
     void loop()
@@ -76,12 +77,12 @@ function AnimalBody({ entry, spawn, active, occupancy }: { entry: ModelEntry; sp
       cancelled = true
       running.forEach((controls) => controls.stop())
       const body = group.current
-      if (body) occupancy.set(spawn.id, { from: { x: body.position.x, z: body.position.z }, to: { x: body.position.x, z: body.position.z } })
+      if (body) occupancy.set(spawn.id, { from: { x: body.position.x, z: body.position.z }, to: { x: body.position.x, z: body.position.z }, radius: BODY_RADIUS[spawn.species] * spawn.scale })
     }
   }, [active, spawn, occupancy])
 
   useEffect(() => {
-    occupancy.set(spawn.id, { from: { x: spawn.x, z: spawn.z }, to: { x: spawn.x, z: spawn.z } })
+    occupancy.set(spawn.id, { from: { x: spawn.x, z: spawn.z }, to: { x: spawn.x, z: spawn.z }, radius: BODY_RADIUS[spawn.species] * spawn.scale })
     return () => {
       occupancy.delete(spawn.id)
     }
