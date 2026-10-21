@@ -1,6 +1,7 @@
 import { BoxGeometry, BufferGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry } from 'three'
 import { cornfieldObjects } from '@/render/world/features/cornfieldObjects'
 import { gardenObjects } from '@/render/world/features/gardenObjects'
+import { greenhouseGlass as greenhouseBayGlass, greenhouseObjects } from '@/render/world/features/greenhouseObjects'
 import { orchardObjects } from '@/render/world/features/orchardObjects'
 import { compose, mergeParts, part, type Triple } from '@/render/world/features/parts'
 import type { FeatureKind, WorldFeature } from '@/render/world/worldTypes'
@@ -102,6 +103,7 @@ const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
   ...cornfieldObjects,
   ...gardenObjects,
   ...orchardObjects,
+  ...greenhouseObjects,
   cornStalk,
   fruitTree,
   greenhouse,
@@ -115,6 +117,7 @@ const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
 
 const GLASS: Partial<Record<FeatureKind, () => BufferGeometry[]>> = {
   greenhouse: greenhouseGlass,
+  ...greenhouseBayGlass,
 }
 
 const cache = new Map<string, BufferGeometry>()
@@ -151,4 +154,4 @@ export const SWAYING: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['cornStal
 
 export const PECKING: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['chicken'])
 
-export const SPINNING: ReadonlySet<FeatureKind> = new Set<FeatureKind>([])
+export const SPINNING: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['sprinkler'])
