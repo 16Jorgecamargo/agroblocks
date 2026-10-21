@@ -47,7 +47,7 @@ export interface StageLook {
 const NODE_CLEARANCE = 1.6
 const MAP_CENTER: Rect = { minX: 0, maxX: 0, minZ: 0, maxZ: 0 }
 
-function world(theme: WorldId, ground: Rect, island: boolean, trail: Vec2[], paths: Polyline[], draft: WorldDraft, parts: StageParts, mounds: World['mounds']): World {
+function world(theme: WorldId, ground: Rect, island: boolean, trail: Vec2[], paths: Polyline[], draft: WorldDraft, parts: StageParts, mounds: World['mounds'], missionGrid: Rect | null): World {
   const style = WORLD_STYLES[theme]
   return {
     ground,
@@ -67,6 +67,7 @@ function world(theme: WorldId, ground: Rect, island: boolean, trail: Vec2[], pat
     waters: parts.waters ?? [],
     stains: parts.stains ?? [],
     actors: parts.actors ?? [],
+    missionGrid,
     mounds,
   }
 }
@@ -81,7 +82,7 @@ export function stageMap(theme: WorldId, input: WorldInput, random: () => number
   woodland(draft, inset(WORLD_MAP_ISLAND, 1.1), random, { trees: look.trees, openSides: look.openSides ?? ['maxX', 'maxZ'], density: input.density, gaps: parts.gaps, avoid: parts.blocks })
   edgeClutter(draft, parts.blocks, input.density, random, 3, parts.clutterModels)
   const mounds = reliefMounds(WORLD_STYLES[theme].relief, MAP_CENTER, inset(WORLD_MAP_ISLAND, 1.6), random, openGround(draft, paths, parts.patches))
-  return world(theme, WORLD_MAP_ISLAND, true, trail, paths, draft, parts, mounds)
+  return world(theme, WORLD_MAP_ISLAND, true, trail, paths, draft, parts, mounds, null)
 }
 
 export function stageFarm(theme: WorldId, input: WorldInput, random: () => number, look: StageLook, build: (context: FarmStageContext) => StageParts): World {
@@ -99,5 +100,5 @@ export function stageFarm(theme: WorldId, input: WorldInput, random: () => numbe
   woodland(draft, inset(core, -6), random, { trees: look.trees, openSides: [], density: input.density, gaps: [{ x: core.maxX + 6, z: 0.2 }], depth: 5 })
   edgeClutter(draft, parts.blocks, input.density, random, 5, parts.clutterModels)
   const mounds = reliefMounds(WORLD_STYLES[theme].relief, inset(core, -0.5), inset(core, -10), random, openGround(draft, paths, parts.patches))
-  return world(theme, inset(core, -12), false, [], paths, draft, parts, mounds)
+  return world(theme, inset(core, -12), false, [], paths, draft, parts, mounds, grid)
 }

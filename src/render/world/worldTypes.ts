@@ -91,6 +91,7 @@ export interface World {
   waters?: Vec2[][]
   stains?: Stain[]
   actors?: Actor[]
+  missionGrid?: Rect | null
 }
 
 export interface Stain {
