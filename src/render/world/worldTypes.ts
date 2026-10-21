@@ -90,6 +90,7 @@ export interface World {
   birds?: Vec2[]
   waters?: Vec2[][]
   stains?: Stain[]
+  actors?: Actor[]
 }
 
 export interface Stain {
@@ -111,4 +112,20 @@ export interface Mound {
   z: number
   radius: number
   height: number
+}
+
+export type ActorKind = 'worker' | 'tractor'
+
+export type ActorTask = 'walk' | 'hoe' | 'water' | 'pick' | 'feed' | 'carry' | 'drive' | 'tend'
+
+export interface Actor {
+  id: string
+  kind: ActorKind
+  route: Vec2[]
+  task: ActorTask
+  tint: string
+  speed: number
+  facing?: number
+  pause?: number
+  y?: number
 }

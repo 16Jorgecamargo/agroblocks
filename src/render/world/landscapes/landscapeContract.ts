@@ -69,7 +69,7 @@ export function describeLandscape(expected: LandscapeExpectations): void {
     const world = map()
     expect(openGroundUse(world)).toBeGreaterThanOrEqual(0.55)
     expect(world.waters?.length ?? 0).toBeGreaterThanOrEqual(1)
-    expect(world.features.some((feature) => feature.kind === 'tractor' || feature.kind === 'wheelbarrow')).toBe(true)
+    expect(world.features.some((feature) => feature.kind === 'tractor' || feature.kind === 'wheelbarrow') || (world.actors ?? []).some((actor) => actor.kind === 'tractor')).toBe(true)
   })
 
   it('map: a farm road links the landmark to the trail without crossing fields', () => {
@@ -142,6 +142,24 @@ export function describeLandscape(expected: LandscapeExpectations): void {
     const landmark = expected.landmark.flatMap((kind) => pieces(world, kind))
     const middle = { x: landmark.reduce((sum, item) => sum + item.x, 0) / landmark.length, z: landmark.reduce((sum, item) => sum + item.z, 0) / landmark.length }
     expect(middle.x + middle.z).toBeLessThan(0)
+  })
+
+  it('brings people to work on the map and the farm, never on the mission grid', () => {
+    expect((map().actors ?? []).filter((actor) => actor.kind === 'worker').length).toBeGreaterThanOrEqual(3)
+    for (const { width, height } of sizes) {
+      const world = farm(width, height)
+      const actors = world.actors ?? []
+      expect(actors.length).toBeGreaterThanOrEqual(2)
+      const grid = { minX: -width / 2, maxX: width / 2, minZ: -height / 2, maxZ: height / 2 }
+      for (const actor of actors) {
+        for (let index = 0; index < actor.route.length; index += 1) {
+          const a = actor.route[index]
+          const b = actor.route[Math.min(index + 1, actor.route.length - 1)]
+          for (let t = 0; t <= 1; t += 0.1) expect(rectDistance({ x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t }, grid), actor.id).toBeGreaterThanOrEqual(1.2)
+        }
+      }
+    }
+    expect(new Set((map().actors ?? []).map((actor) => actor.id)).size).toBe((map().actors ?? []).length)
   })
 
   it('farm: a new place, not the base farm, the same on every visit', () => {

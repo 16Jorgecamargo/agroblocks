@@ -1,12 +1,14 @@
 import { pen } from '@/render/world/landscapes/barnyardLandscape'
 import { cornField, stubbleField } from '@/render/world/landscapes/cornfieldLandscape'
 import { bayRow } from '@/render/world/landscapes/greenhouseLandscape'
-import { landmark } from '@/render/world/landscapes/landscapeKit'
+import { center, landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, scatterCover, stain, turn } from '@/render/world/landscapes/natureKit'
 import { grove } from '@/render/world/landscapes/orchardLandscape'
+import { ladderPickers, station, tractorRun, walker } from '@/render/world/landscapes/cast'
 import { bedPlot, channel, edgeSides } from '@/render/world/landscapes/plots'
-import { center } from '@/render/world/landscapes/landscapeKit'
+import { rectPolygon } from '@/render/world/geometry'
+import { spawnHerd } from '@/render/world/scenery'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import type { WorldDraft } from '@/render/world/worldDraft'
 import type { FeatureKind, GroundPatch, Rect, Stain, Vec2 } from '@/render/world/worldTypes'
@@ -113,8 +115,17 @@ export const homesteadLandscape: Landscape = {
         blocks: [orchard, garden, corn, young, beds, paddock],
         stains,
         waters: [pond.water, channel({ minX: -9.8, maxX: -9.4, minZ: 0.9, maxZ: 3.0 })],
-        animals: cows.animals,
+        animals: [...cows.animals, ...spawnHerd(random, rectPolygon({ minX: 1.4, maxX: 4.6, minZ: 1.6, maxZ: 2.8 }), [['pug', 1]], 'homestead-dog', 0.8)],
         pasture: cows.area,
+        actors: [
+          station('home-hoer', { x: -6.2, z: -4.2 }, { x: -7.6, z: -4.2 }, 'hoe', 0),
+          ...ladderPickers(draft, 'home', 1, 1),
+          station('home-feeder', { x: 12.2, z: -5.8 }, { x: 12.2, z: -6.6 }, 'feed', 2),
+          station('home-bench', { x: 5.0, z: -1.0 }, { x: 5.8, z: -1.0 }, 'tend', 3),
+          walker('home-waterer', [{ x: 4.4, z: 10.4 }, { x: 12.2, z: 10.4 }], 'water', 4, 3, Math.PI),
+          tractorRun('home-tractor', [{ x: 7.4, z: -4.6 }, { x: 8.4, z: -8.0 }]),
+          walker('home-walker', [{ x: 2.4, z: 3.0 }, { x: 2.6, z: 5.4 }, { x: -2.6, z: 6.0 }, { x: -5.6, z: 3.6 }], 'walk', 6, 2.5),
+        ],
         birds: [center(corn), center(young)],
         butterflies: [center(garden), center(beds), { x: -9.4, z: 11.9 }],
         clutterModels: FLOWERS,
@@ -144,6 +155,7 @@ export const homesteadLandscape: Landscape = {
         waters: [pond.water],
         animals: cows.animals,
         pasture: cows.area,
+        actors: [...ladderPickers(draft, 'home-farm', 1, 1), station('home-farm-bench', { x: -hw - 2.6, z: -hh - 7.0 }, { x: -hw - 2.2, z: -hh - 7.0 }, 'tend', 3), station('home-farm-hoer', { x: hw + 1.2, z: hh + 3.0 }, { x: hw + 2.2, z: hh + 3.0 }, 'hoe', 0)],
         birds: [center(corn)],
         butterflies: [center(beds)],
         clutterModels: FLOWERS,

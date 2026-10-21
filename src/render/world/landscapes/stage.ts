@@ -7,7 +7,7 @@ import { inset } from '@/render/world/landscapes/landscapeKit'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'
-import type { AnimalSpawn, GroundPatch, Polyline, Rect, Stain, Vec2, World, WorldInput } from '@/render/world/worldTypes'
+import type { Actor, AnimalSpawn, GroundPatch, Polyline, Rect, Stain, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
 export interface StageParts {
   patches: GroundPatch[]
@@ -21,6 +21,7 @@ export interface StageParts {
   butterflies?: Vec2[]
   clutterModels?: readonly ModelId[]
   gaps?: Vec2[]
+  actors?: Actor[]
 }
 
 export interface StageContext {
@@ -65,6 +66,7 @@ function world(theme: WorldId, ground: Rect, island: boolean, trail: Vec2[], pat
     patches: parts.patches,
     waters: parts.waters ?? [],
     stains: parts.stains ?? [],
+    actors: parts.actors ?? [],
     mounds,
   }
 }

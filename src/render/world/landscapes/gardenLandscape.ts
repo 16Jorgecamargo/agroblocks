@@ -1,9 +1,11 @@
-import { landmark } from '@/render/world/landscapes/landscapeKit'
+import { center, landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, rectStain, scatterCover, stain, turn } from '@/render/world/landscapes/natureKit'
+import { station, walker } from '@/render/world/landscapes/cast'
 import { bedPlot, channel, edgeSides } from '@/render/world/landscapes/plots'
-import { center } from '@/render/world/landscapes/landscapeKit'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
+import { rectPolygon } from '@/render/world/geometry'
+import { spawnHerd } from '@/render/world/scenery'
 import type { WorldDraft } from '@/render/world/worldDraft'
 import type { FeatureKind, GroundPatch, Rect, Stain, Vec2 } from '@/render/world/worldTypes'
 
@@ -127,6 +129,14 @@ export const gardenLandscape: Landscape = {
         waters,
         butterflies: [center(trellis), center(herbs), { x: 11, z: 11.8 }, { x: -6, z: 10 }],
         clutterModels: FLOWERS,
+        animals: spawnHerd(random, rectPolygon({ minX: 2.0, maxX: 5.8, minZ: 2.2, maxZ: 3.6 }), [['pug', 1]], 'garden-dog', 0.8),
+        actors: [
+          walker('garden-waterer', [{ x: -4, z: -6.6 }, { x: -4, z: -11.4 }], 'water', 1, 3.2, -Math.PI / 2),
+          station('garden-hoer', { x: -5.0, z: -2.0 }, { x: -6.6, z: -2.4 }, 'hoe', 0),
+          station('garden-bench', { x: 5.5, z: 2.4 }, { x: 5.5, z: 1.5 }, 'tend', 2),
+          walker('garden-carrier', [{ x: 1.4, z: 0.4 }, { x: -0.6, z: -3.2 }, { x: -4, z: -5.8 }], 'carry', 3, 2),
+          station('garden-nursery', { x: 5.6, z: -10.6 }, { x: 5.6, z: -11.4 }, 'tend', 4),
+        ],
         paths: [
           { points: [{ x: 4.1, z: 3.6 }, { x: 4.6, z: 5.3 }], width: 0.9 },
           { points: [{ x: 1.4, z: 0.4 }, { x: -0.6, z: -3.2 }, { x: -4, z: -5.8 }, { x: -4, z: -11.8 }], width: 0.8 },
@@ -164,6 +174,11 @@ export const gardenLandscape: Landscape = {
         waters: [pond.water, channel({ minX: -hw - 8.4, maxX: -hw - 2.2, minZ: hh + 4.5, maxZ: hh + 4.9 })],
         butterflies: [center(herbs), center(west)],
         clutterModels: FLOWERS,
+        actors: [
+          station('garden-farm-hoer', { x: -hw - 1.6, z: 1.4 }, { x: -hw - 3, z: 1.4 }, 'hoe', 0),
+          walker('garden-farm-waterer', [{ x: -hw - 0.6, z: -hh - 2.0 }, { x: hw + 3, z: -hh - 2.0 }], 'water', 1, 3, Math.PI),
+          station('garden-farm-bench', { x: -hw - 3.3, z: -hh - 4.8 }, { x: -hw - 3.3, z: -hh - 5.7 }, 'tend', 2),
+        ],
       }
     }),
 }

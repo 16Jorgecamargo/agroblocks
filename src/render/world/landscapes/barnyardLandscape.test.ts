@@ -35,7 +35,8 @@ describe('barnyard landscape', () => {
 
   it('gives the animals shelters, racks and nests, and the yard a working corner', () => {
     const world = map()
-    for (const kind of ['animalShelter', 'hayRack', 'nestBoxes', 'tractor', 'equipmentRack', 'farmhouse'] as FeatureKind[]) expect(ofKind(world, kind).length, kind).toBeGreaterThanOrEqual(1)
+    expect(world.actors?.some((actor) => actor.kind === 'tractor')).toBe(true)
+    for (const kind of ['animalShelter', 'hayRack', 'nestBoxes', 'equipmentRack', 'farmhouse'] as FeatureKind[]) expect(ofKind(world, kind).length, kind).toBeGreaterThanOrEqual(1)
     expect(world.stains?.length).toBeGreaterThanOrEqual(6)
   })
 })

@@ -1,9 +1,9 @@
 import { rectPolygon } from '@/render/world/geometry'
-import { landmark } from '@/render/world/landscapes/landscapeKit'
+import { center, inset, landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, stain, turn } from '@/render/world/landscapes/natureKit'
+import { station, tractorRun, walker } from '@/render/world/landscapes/cast'
 import { bedPlot, channel, edgeSides, type Side } from '@/render/world/landscapes/plots'
-import { center, inset } from '@/render/world/landscapes/landscapeKit'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import { spawnHerd } from '@/render/world/scenery'
 import type { WorldDraft } from '@/render/world/worldDraft'
@@ -85,7 +85,6 @@ function hayStore(draft: WorldDraft, at: Vec2, random: () => number): Stain {
 }
 
 function maintenanceCorner(draft: WorldDraft, at: Vec2, random: () => number): Stain {
-  draft.forceFeature('tractor', at, 0.4)
   landmark(draft, 'equipmentRack', { x: at.x + 1.6, z: at.z - 1.0 }, 0.2)
   draft.forceFeature('cornWagon', { x: at.x - 1.9, z: at.z - 0.6 }, -0.3)
   landmark(draft, 'log-stack', { x: at.x + 2.2, z: at.z + 0.8 }, 1.1, 0.8)
@@ -127,6 +126,14 @@ export const barnyardLandscape: Landscape = {
         pasture: cows.area,
         butterflies: [center(field.patch.rect), center(home.rect)],
         gaps: [{ x: -14.4, z: 8 }],
+        actors: [
+          station('barn-feeder', { x: -7.35, z: -11.0 }, { x: -7.35, z: -11.8 }, 'feed', 0),
+          walker('barn-hay', [{ x: -4.6, z: 3.6 }, { x: -1.4, z: 3.8 }, { x: 2.4, z: 2.2 }], 'carry', 2, 2.4),
+          station('barn-eggs', { x: -9.1, z: -3.3 }, { x: -9.1, z: -4.1 }, 'pick', 4),
+          tractorRun('barn-tractor', [{ x: 5.6, z: 1.6 }, { x: 5.4, z: -2.4 }, { x: 5.0, z: -5.0 }]),
+          station('barn-mechanic', { x: 6.2, z: -2.0 }, { x: 6.4, z: -1.8 }, 'tend', 5),
+          walker('barn-gardener', [{ x: -12.2, z: 3.1 }, { x: -9.6, z: 3.1 }], 'water', 1, 3, Math.PI),
+        ],
         paths: [
           { points: [{ x: -1.6, z: 5.6 }, { x: -2.6, z: 3.4 }], width: 1.0 },
           { points: [{ x: 5.6, z: 1.6 }, { x: 5.4, z: -2.4 }, { x: 5.0, z: -5.0 }], width: 0.9 },
@@ -147,6 +154,7 @@ export const barnyardLandscape: Landscape = {
         stains,
         animals: [...cows.animals, ...sheep.animals],
         pasture: cows.area,
+        actors: [station('barn-farm-feeder', { x: -hw - 4.0, z: -hh + 0.2 + 0.8 }, { x: -hw - 4.0, z: -hh + 0.2 }, 'feed', 0), station('barn-farm-eggs', { x: hw + 4.3, z: hh + 3.3 }, { x: hw + 4.3, z: hh + 2.5 }, 'pick', 4)],
       }
     }),
 }
