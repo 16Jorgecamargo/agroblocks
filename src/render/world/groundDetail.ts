@@ -17,7 +17,13 @@ const RIDGE_STEP = 0.4
 const STRIPE_STEP = 1.6
 const RUT_WIDTH = 0.16
 const BANK_GROWTH = 1.15
-const STAIN_HEIGHT = 0.022
+const STAIN_HEIGHT = 0.026
+const STAIN_STEP = 0.0007
+const POND_BANK = 0.042
+const POND_WATER = 0.048
+export const PATH_HEIGHT = 0.06
+export const PATH_STEP = 0.003
+const RUT_LIFT = 0.002
 
 function shade(color: string, factor: number): string {
   return `#${new Color(color).multiplyScalar(factor).getHexString()}`
@@ -65,12 +71,12 @@ export function groundDetail(world: World): GroundDetail {
   const textureList = (world.patches ?? []).flatMap(textureParts)
   const waters = world.waters ?? []
   const stains = world.stains ?? []
-  const rutList = world.paths.flatMap((path) => [-1, 1].map((side) => part(ribbonGeometry(offsetPolyline(path.points, side * path.width * 0.22), RUT_WIDTH), shade(world.palette.path, 0.8), compose([0, 0, 0]))))
+  const rutList = world.paths.flatMap((path, index) => [-1, 1].map((side) => part(ribbonGeometry(offsetPolyline(path.points, side * path.width * 0.22), RUT_WIDTH), shade(world.palette.path, 0.8), compose([0, PATH_HEIGHT + index * PATH_STEP + RUT_LIFT, 0]))))
   return {
     texture: textureList.length > 0 ? mergeParts(textureList) : null,
-    water: waters.length > 0 ? mergeParts(waters.map((points) => flatShape(points, WORLD_COLORS.water, 0.03))) : null,
-    bank: waters.length > 0 ? mergeParts(waters.map((points) => flatShape(grown(points, BANK_GROWTH), WORLD_COLORS.bank, 0.012))) : null,
+    water: waters.length > 0 ? mergeParts(waters.map((points) => flatShape(points, WORLD_COLORS.water, POND_WATER))) : null,
+    bank: waters.length > 0 ? mergeParts(waters.map((points) => flatShape(grown(points, BANK_GROWTH), WORLD_COLORS.bank, POND_BANK))) : null,
     ruts: rutList.length > 0 ? mergeParts(rutList) : null,
-    stains: stains.length > 0 ? mergeParts(stains.map((stain) => flatShape(stain.points, stain.color, STAIN_HEIGHT))) : null,
+    stains: stains.length > 0 ? mergeParts(stains.map((stain, index) => flatShape(stain.points, stain.color, STAIN_HEIGHT + index * STAIN_STEP))) : null,
   }
 }

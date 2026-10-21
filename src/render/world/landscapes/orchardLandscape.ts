@@ -1,7 +1,7 @@
 import { landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, scatterCover, stain, turn } from '@/render/world/landscapes/natureKit'
-import { center } from '@/render/world/landscapes/scaffold'
+import { center } from '@/render/world/landscapes/landscapeKit'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import { FEATURE_FOOTPRINTS } from '@/render/world/worldCatalog'
 import type { WorldDraft } from '@/render/world/worldDraft'

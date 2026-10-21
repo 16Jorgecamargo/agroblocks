@@ -3,7 +3,7 @@ import { landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, stain, turn } from '@/render/world/landscapes/natureKit'
 import { bedPlot, channel, edgeSides, type Side } from '@/render/world/landscapes/plots'
-import { center, inset } from '@/render/world/landscapes/scaffold'
+import { center, inset } from '@/render/world/landscapes/landscapeKit'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import { spawnHerd } from '@/render/world/scenery'
 import type { WorldDraft } from '@/render/world/worldDraft'
@@ -95,7 +95,7 @@ function maintenanceCorner(draft: WorldDraft, at: Vec2, random: () => number): S
 function homePlot(draft: WorldDraft, at: Vec2, random: () => number): GroundPatch {
   landmark(draft, 'farmhouse', at, 0, 0.8)
   draft.forceFeature('wheelbarrow', { x: at.x + 2.0, z: at.z + 0.4 }, 0.8)
-  return bedPlot(draft, { minX: at.x - 5.2, maxX: at.x - 2.0, minZ: at.z - 1.4, maxZ: at.z + 1.2 }, random, { crops: ['herbBed', 'cabbageBed', 'carrotBed'] })
+  return bedPlot(draft, { minX: at.x - 1.6, maxX: at.x + 1.4, minZ: at.z - 4.4, maxZ: at.z - 2.0 }, random, { crops: ['herbBed', 'cabbageBed', 'carrotBed'] })
 }
 
 export const barnyardLandscape: Landscape = {
@@ -106,17 +106,17 @@ export const barnyardLandscape: Landscape = {
       const pigs = pen(draft, { minX: 9.6, maxX: 12.8, minZ: -12.8, maxZ: -7.2 }, 'map-pigs', random, { herd: [['pig', 2]], gate: 'minX', color: '#9a8a5a', shelter: '#8a5a3c' })
       const horses = pen(draft, { minX: 10.4, maxX: 12.8, minZ: -4.6, maxZ: 3.8 }, 'map-horses', random, { herd: [['horse', 2]], gate: 'minX' })
       const field = pen(draft, { minX: 5.2, maxX: 12.6, minZ: 6.6, maxZ: 12.6 }, 'map-field', random, { herd: [['cow', 1], ['sheep', 1]], gate: 'minX', color: MEADOW, shelter: '#a33b2f' })
-      const run = chickenRun(draft, { minX: -12.4, maxX: -8.2, minZ: -3.2, maxZ: 1.6 }, 'maxZ', random)
+      const run = chickenRun(draft, { minX: -12.4, maxX: -8.2, minZ: -4.8, maxZ: -0.6 }, 'maxX', random)
       const stains = [
         ...barnComplex(draft, { x: -1.4, z: 0.2 }, 0, random),
-        hayStore(draft, { x: -7.2, z: 3.8 }, random),
+        hayStore(draft, { x: -6.0, z: 1.9 }, random),
         maintenanceCorner(draft, { x: 4.8, z: -0.8 }, random),
         stain({ x: 10.8, z: -10.0 }, 1.4, 2.0, MUD, random),
         stain({ x: -5.4, z: -9.0 }, 1.0, 1.4, WORN, random),
         stain({ x: 4.9, z: 9.6 }, 1.0, 1.3, WORN, random),
         stain({ x: -10.0, z: -9.6 }, 1.8, 1.2, STRAW, random),
       ]
-      const home = homePlot(draft, { x: -6.4, z: 11.6 }, random)
+      const home = homePlot(draft, { x: -10.8, z: 4.8 }, random)
       const waters = [channel({ minX: -3.2, maxX: 8.0, minZ: -11.9, maxZ: -11.55 })]
       return {
         patches: [cows.patch, sheep.patch, pigs.patch, horses.patch, field.patch, run, home],
@@ -131,7 +131,7 @@ export const barnyardLandscape: Landscape = {
           { points: [{ x: -1.6, z: 5.6 }, { x: -2.6, z: 3.4 }], width: 1.0 },
           { points: [{ x: 5.6, z: 1.6 }, { x: 5.4, z: -2.4 }, { x: 5.0, z: -5.0 }], width: 0.9 },
           { points: [{ x: -3.6, z: -8.6 }, { x: -5.0, z: -8.9 }], width: 0.9 },
-          { points: [{ x: -8.6, z: 8.0 }, { x: -10.0, z: 4.6 }, { x: -10.3, z: 2.2 }], width: 0.8 },
+          { points: [{ x: -8.0, z: 8.0 }, { x: -7.6, z: 4.2 }, { x: -7.6, z: -2.7 }], width: 0.8 },
         ],
       }
     }),

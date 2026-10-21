@@ -1,25 +1,15 @@
 import type { ModelId } from '@/render/models/manifest'
 import { distanceToPolyline, rectDistance } from '@/render/world/geometry'
-import { CLUTTER_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
+import { CLUTTER_MODELS } from '@/render/world/worldCatalog'
 import type { WorldDraft } from '@/render/world/worldDraft'
-import type { BorderKind, Relief } from '@/render/world/worldStyles'
+import type { Relief } from '@/render/world/worldStyles'
 import { FEATURE_KINDS, type FeatureKind, type GroundPatch, type Mound, type Polyline, type Rect, type Vec2, type WorldDensity } from '@/render/world/worldTypes'
 
 export type { Mound }
 
-export interface Block {
-  rect: Rect
-  color: string
-  height?: number
-}
-
 export const CLUTTER_CEILING = { map: 60, farm: 80 }
 
 export const WORLD_MAP_ISLAND: Rect = { minX: -15.5, maxX: 15.5, minZ: -15.5, maxZ: 15.5 }
-
-const GAP_RADIUS = 1.2
-const SEGMENT = 1
-const WINDBREAK_STEP = 1.6
 
 function pick<T>(items: readonly T[], random: () => number): T {
   return items[Math.floor(random() * items.length)]
@@ -33,26 +23,12 @@ function inside(point: Vec2, rect: Rect): boolean {
   return point.x >= rect.minX && point.x <= rect.maxX && point.z >= rect.minZ && point.z <= rect.maxZ
 }
 
-export function cropBlock(draft: WorldDraft, block: Block, feature: FeatureKind, [stepX, stepZ]: [number, number], random: () => number, options: { tints?: string[]; jitter?: number; scale?: number } = {}): GroundPatch {
-  const { rect, color, height } = block
-  const jitter = options.jitter ?? 0.1
-  for (let z = rect.minZ + stepZ / 2; z < rect.maxZ; z += stepZ) {
-    for (let x = rect.minX + stepX / 2; x < rect.maxX; x += stepX) {
-      const point = {
-        x: Math.min(rect.maxX, Math.max(rect.minX, x + (random() * 2 - 1) * jitter)),
-        z: Math.min(rect.maxZ, Math.max(rect.minZ, z + (random() * 2 - 1) * jitter)),
-      }
-      const tint = options.tints ? pick(options.tints, random) : undefined
-      const rotation = feature === 'cornStalk' ? random() * 0.4 - 0.2 : random() * Math.PI * 2
-      draft.placeFeature(feature, point, rotation, options.scale ?? 1, tint, height ?? 0)
-    }
-  }
-  return height === undefined ? { rect, color } : { rect, color, height }
+export function inset(rect: Rect, amount: number): Rect {
+  return { minX: rect.minX + amount, maxX: rect.maxX - amount, minZ: rect.minZ + amount, maxZ: rect.maxZ - amount }
 }
 
-export function landmark(draft: WorldDraft, kind: FeatureKind | ModelId, at: Vec2, rotation: number, scale = 1): void {
-  if (isFeature(kind)) draft.forceFeature(kind, at, rotation, scale)
-  else draft.force(kind, at, rotation, scale)
+export function center(rect: Rect): Vec2 {
+  return { x: (rect.minX + rect.maxX) / 2, z: (rect.minZ + rect.maxZ) / 2 }
 }
 
 function sides(rect: Rect): [Vec2, Vec2][] {
@@ -64,27 +40,9 @@ function sides(rect: Rect): [Vec2, Vec2][] {
   ]
 }
 
-const MIXED: Exclude<BorderKind, 'mixed'>[] = ['hedge', 'stoneWall', 'woodFence', 'windbreak']
-
-function walkSide(draft: WorldDraft, kind: Exclude<BorderKind, 'mixed'>, from: Vec2, to: Vec2, random: () => number, gaps: Vec2[]): void {
-  const dx = to.x - from.x
-  const dz = to.z - from.z
-  const length = Math.hypot(dx, dz)
-  const step = kind === 'windbreak' ? WINDBREAK_STEP : SEGMENT
-  const segments = Math.max(1, Math.round(length / step))
-  const rotation = Math.atan2(-dz, dx)
-  for (let index = 0; index < segments; index += 1) {
-    const t = (index + 0.5) / segments
-    const point = { x: from.x + dx * t, z: from.z + dz * t }
-    if (gaps.some((gap) => Math.hypot(gap.x - point.x, gap.z - point.z) <= GAP_RADIUS)) continue
-    if (kind === 'windbreak') draft.force(pick(TREE_MODELS, random), point, random() * Math.PI * 2, 0.9 + random() * 0.2)
-    else if (kind === 'woodFence') draft.force('fence', point, rotation, length / segments)
-    else draft.forceFeature(kind, point, rotation, 1)
-  }
-}
-
-export function borderBelt(draft: WorldDraft, border: BorderKind, rect: Rect, random: () => number, gaps: Vec2[] = []): void {
-  sides(rect).forEach(([from, to], index) => walkSide(draft, border === 'mixed' ? MIXED[index] : border, from, to, random, gaps))
+export function landmark(draft: WorldDraft, kind: FeatureKind | ModelId, at: Vec2, rotation: number, scale = 1): void {
+  if (isFeature(kind)) draft.forceFeature(kind, at, rotation, scale)
+  else draft.force(kind, at, rotation, scale)
 }
 
 export function edgeClutter(draft: WorldDraft, blocks: Rect[], density: WorldDensity, random: () => number, perBlock = 6, models: readonly ModelId[] = CLUTTER_MODELS): void {
@@ -128,70 +86,4 @@ export function reliefMounds(relief: Relief, outside: Rect, bounds: Rect, random
     mounds.push({ x, z, radius, height: 0.4 + random() * 0.6 })
   }
   return mounds
-}
-
-export const CELL = 1.2
-const TRAIL_CLEARANCE = 1.05
-const MIN_PARCEL_CELLS = 4
-
-export function trailDistance(rect: Rect, trail: Vec2[]): number {
-  let best = Number.POSITIVE_INFINITY
-  for (let index = 1; index < trail.length; index += 1) {
-    const a = trail[index - 1]
-    const b = trail[index]
-    const steps = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.25)
-    for (let step = 0; step <= steps; step += 1) {
-      best = Math.min(best, rectDistance({ x: a.x + ((b.x - a.x) * step) / steps, z: a.z + ((b.z - a.z) * step) / steps }, rect))
-    }
-  }
-  return best
-}
-
-export function freeGrid(rect: Rect, trail: Vec2[], clearance: number): boolean[][] {
-  const columns = Math.floor((rect.maxX - rect.minX) / CELL)
-  const rows = Math.floor((rect.maxZ - rect.minZ) / CELL)
-  return Array.from({ length: rows }, (_, row) =>
-    Array.from({ length: columns }, (_, column) => {
-      const cell = { minX: rect.minX + column * CELL, maxX: rect.minX + (column + 1) * CELL, minZ: rect.minZ + row * CELL, maxZ: rect.minZ + (row + 1) * CELL }
-      return trailDistance(cell, trail) > clearance
-    }),
-  )
-}
-
-export function largestBlock(grid: boolean[][]): { row: number; column: number; rows: number; columns: number } | null {
-  let best: { row: number; column: number; rows: number; columns: number } | null = null
-  const rows = grid.length
-  const columns = grid[0]?.length ?? 0
-  for (let top = 0; top < rows; top += 1) {
-    for (let left = 0; left < columns; left += 1) {
-      if (!grid[top][left]) continue
-      let width = columns - left
-      for (let bottom = top; bottom < rows; bottom += 1) {
-        let run = 0
-        while (run < width && grid[bottom][left + run]) run += 1
-        width = run
-        if (width === 0) break
-        const area = width * (bottom - top + 1)
-        if (!best || area > best.rows * best.columns) best = { row: top, column: left, rows: bottom - top + 1, columns: width }
-      }
-    }
-  }
-  return best
-}
-
-export function trailFreeParcels(rect: Rect, trail: Vec2[], limit: number, clearance = TRAIL_CLEARANCE): Rect[] {
-  const grid = freeGrid(rect, trail, clearance)
-  const found: Rect[] = []
-  while (found.length < limit) {
-    const block = largestBlock(grid)
-    if (!block || block.rows * block.columns < MIN_PARCEL_CELLS) break
-    for (let row = block.row; row < block.row + block.rows; row += 1) for (let column = block.column; column < block.column + block.columns; column += 1) grid[row][column] = false
-    found.push({
-      minX: rect.minX + block.column * CELL,
-      maxX: rect.minX + (block.column + block.columns) * CELL,
-      minZ: rect.minZ + block.row * CELL,
-      maxZ: rect.minZ + (block.row + block.rows) * CELL,
-    })
-  }
-  return found
 }

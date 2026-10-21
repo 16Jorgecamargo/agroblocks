@@ -34,9 +34,9 @@ function baleStack(): BufferGeometry[] {
 
 function animalShelter(tint: string): BufferGeometry[] {
   const parts: BufferGeometry[] = [part(new BoxGeometry(2.0, 0.05, 1.4), '#d9c682', compose([0, 0.025, 0])), part(new BoxGeometry(2.0, 1.1, 0.08), '#8a5a3c', compose([0, 0.55, -0.66]))]
-  for (const x of [-0.96, 0.96]) parts.push(part(new BoxGeometry(0.08, 1.0, 1.32), '#8a5a3c', compose([x, 0.5, 0])))
-  for (const x of [-0.96, 0.96]) parts.push(part(new BoxGeometry(0.1, 0.85, 0.1), '#6b4a2e', compose([x, 0.42, 0.66])))
-  parts.push(part(new BoxGeometry(2.3, 0.08, 1.7), tint, compose([0, 1.02, 0], [0.22, 0, 0])))
+  for (const x of [-0.96, 0.96]) parts.push(part(new BoxGeometry(0.08, 0.82, 1.32), '#8a5a3c', compose([x, 0.41, 0])))
+  for (const x of [-0.96, 0.96]) parts.push(part(new BoxGeometry(0.1, 0.82, 0.1), '#6b4a2e', compose([x, 0.41, 0.66])))
+  parts.push(part(new BoxGeometry(2.3, 0.08, 1.7), tint, compose([0, 1.06, 0], [0.22, 0, 0])))
   for (let index = 0; index < 3; index += 1) parts.push(part(new BoxGeometry(0.5, 0.08, 0.4), '#e2c46a', compose([-0.5 + index * 0.5, 0.06, -0.3 + (index % 2) * 0.3], [0, index, 0])))
   return parts
 }
@@ -52,7 +52,7 @@ function hayRack(): BufferGeometry[] {
 }
 
 function nestBoxes(): BufferGeometry[] {
-  const parts: BufferGeometry[] = [part(new BoxGeometry(1.2, 0.5, 0.45), '#b98a52', compose([0, 0.45, 0])), part(new BoxGeometry(1.3, 0.06, 0.55), '#a33b2f', compose([0, 0.73, 0], [0.25, 0, 0]))]
+  const parts: BufferGeometry[] = [part(new BoxGeometry(1.2, 0.5, 0.45), '#b98a52', compose([0, 0.45, 0])), part(new BoxGeometry(1.3, 0.06, 0.55), '#a33b2f', compose([0, 0.8, 0], [0.25, 0, 0]))]
   for (const x of [-0.6, 0.6]) parts.push(part(new BoxGeometry(0.06, 0.25, 0.06), '#6b4a2e', compose([x, 0.1, 0.18])))
   for (const x of [-0.4, 0, 0.4]) {
     parts.push(part(new BoxGeometry(0.3, 0.3, 0.02), '#4a3626', compose([x, 0.45, 0.23])))

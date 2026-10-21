@@ -2,7 +2,7 @@ import { landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, stain, turn } from '@/render/world/landscapes/natureKit'
 import { channel } from '@/render/world/landscapes/plots'
-import { center } from '@/render/world/landscapes/scaffold'
+import { center } from '@/render/world/landscapes/landscapeKit'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import type { WorldDraft } from '@/render/world/worldDraft'
 import type { GroundPatch, Rect, Stain, Vec2 } from '@/render/world/worldTypes'
@@ -78,7 +78,7 @@ export const cornfieldLandscape: Landscape = {
   map: (input, random) =>
     stageMap('cornfield', input, random, LOOK, ({ draft, full }) => {
       const ripe: Rect = { minX: -12.6, maxX: -4.4, minZ: -12.6, maxZ: -3.2 }
-      const young: Rect = { minX: -12.6, maxX: -4.8, minZ: -1.4, maxZ: 6.2 }
+      const young: Rect = { minX: -12.6, maxX: -4.8, minZ: -1.4, maxZ: 4.6 }
       const growing: Rect = { minX: -2.6, maxX: 5.8, minZ: -5.4, maxZ: -0.6 }
       const strip: Rect = { minX: -2.2, maxX: 1.6, minZ: 0.6, maxZ: 4.4 }
       const harvested: Rect = { minX: 3.4, maxX: 12.6, minZ: -12.6, maxZ: -9.8 }
@@ -90,10 +90,10 @@ export const cornfieldLandscape: Landscape = {
         stagingArea(draft, { x: -2.2, z: 10.4 }, random),
         stain({ x: 7.2, z: 6.2 }, 3.6, 2.6, YARD, random),
         stain({ x: -3.7, z: -2.2 }, 1.6, 1.1, PACKED, random),
-        stain({ x: -8.4, z: 7.6 }, 1.6, 0.9, DRY, random),
+        stain({ x: -6.0, z: 11.6 }, 1.8, 1.0, DRY, random),
         stain({ x: 2.4, z: -10.6 }, 0.9, 1.4, GRASS_STRIP, random),
       ]
-      farmOffice(draft, { x: -6.6, z: 12 })
+      farmOffice(draft, { x: -8.8, z: 6.6 })
       draft.forceFeature('scarecrow', { x: -8.6, z: 2.4 }, 0.5)
       draft.forceFeature('tractor', { x: -4.2, z: -1.9 }, 0)
       landmark(draft, 'baleStack', { x: 5.2, z: 10.6 }, -0.2)

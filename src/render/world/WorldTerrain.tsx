@@ -1,11 +1,10 @@
 import { useMemo } from 'react'
 import { DoubleSide } from 'three'
-import { groundDetail } from '@/render/world/groundDetail'
+import { groundDetail, PATH_HEIGHT, PATH_STEP } from '@/render/world/groundDetail'
 import { ribbonGeometry } from '@/render/world/ribbon'
 import { WORLD_COLORS } from '@/render/world/worldPalette'
 import type { World } from '@/render/world/worldTypes'
 
-const PATH_HEIGHT = 0.04
 const PATCH_HEIGHT = 0.006
 const BANK_HEIGHT = 0.008
 const WATER_HEIGHT = 0.02
@@ -54,7 +53,7 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
             receiveShadow
           >
             <boxGeometry args={[patch.rect.maxX - patch.rect.minX, thickness, patch.rect.maxZ - patch.rect.minZ]} />
-            <meshStandardMaterial color={patch.color} roughness={1} flatShading />
+            <meshStandardMaterial color={patch.color} roughness={1} flatShading polygonOffset polygonOffsetFactor={-index} polygonOffsetUnits={-index} />
           </mesh>
         )
       })}
@@ -65,7 +64,7 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
         </mesh>
       ))}
       {paths.map((geometry, index) => (
-        <mesh key={index} geometry={geometry} position={[0, PATH_HEIGHT, 0]} receiveShadow>
+        <mesh key={index} geometry={geometry} position={[0, PATH_HEIGHT + index * PATH_STEP, 0]} receiveShadow>
           <meshStandardMaterial color={world.palette.path} roughness={1} side={DoubleSide} />
         </mesh>
       ))}
@@ -80,7 +79,7 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
         </mesh>
       )}
       {detail.ruts && (
-        <mesh geometry={detail.ruts} position={[0, PATH_HEIGHT + 0.006, 0]} receiveShadow>
+        <mesh geometry={detail.ruts} receiveShadow>
           <meshStandardMaterial vertexColors roughness={1} side={DoubleSide} />
         </mesh>
       )}

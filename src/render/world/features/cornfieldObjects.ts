@@ -60,7 +60,7 @@ function plow(): BufferGeometry[] {
 
 function machineShed(): BufferGeometry[] {
   const parts: BufferGeometry[] = [part(new BoxGeometry(4.4, 0.06, 2.8), '#a99a80', compose([0, 0.03, 0])), part(new BoxGeometry(4.4, 2.0, 0.1), '#9a4a36', compose([0, 1.0, -1.35]))]
-  for (const x of [-2.15, -0.7, 0.7, 2.15]) parts.push(part(new BoxGeometry(0.14, 2.1, 0.14), '#7a5233', compose([x, 1.05, 1.3])))
+  for (const x of [-2.15, -0.7, 0.7, 2.15]) parts.push(part(new BoxGeometry(0.14, 2.0, 0.14), '#7a5233', compose([x, 1.0, 1.3])))
   parts.push(part(new BoxGeometry(0.1, 2.0, 2.7), '#9a4a36', compose([-2.15, 1.0, 0])))
   parts.push(part(new BoxGeometry(4.7, 0.1, 3.2), '#7d868e', compose([0, 2.22, 0], [0.12, 0, 0])))
   for (const x of [-1.6, -0.6, 0.4, 1.4]) parts.push(part(new BoxGeometry(0.04, 0.12, 3.2), '#6b737a', compose([x, 2.28, 0], [0.12, 0, 0])))

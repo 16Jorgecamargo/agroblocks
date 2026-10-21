@@ -1,4 +1,4 @@
-import { BufferGeometry, Color, Euler, Float32BufferAttribute, Matrix4, Quaternion, Vector3 } from 'three'
+import { BufferGeometry, Color, Euler, ExtrudeGeometry, Float32BufferAttribute, Matrix4, Quaternion, Shape, Vector3 } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
 export type Triple = [number, number, number]
@@ -16,6 +16,18 @@ export function part(geometry: BufferGeometry, color: string, matrix: Matrix4): 
   for (let index = 0; index < colors.length; index += 3) colors.set([tint.r, tint.g, tint.b], index)
   flat.setAttribute('color', new Float32BufferAttribute(colors, 3))
   return flat
+}
+
+export function gable(width: number, height: number, depth: number): BufferGeometry {
+  const shape = new Shape()
+  shape.moveTo(-depth / 2, 0)
+  shape.lineTo(depth / 2, 0)
+  shape.lineTo(0, height)
+  shape.closePath()
+  const prism = new ExtrudeGeometry(shape, { depth: width, bevelEnabled: false })
+  prism.translate(0, 0, -width / 2)
+  prism.rotateY(Math.PI / 2)
+  return prism
 }
 
 export function mergeParts(parts: BufferGeometry[]): BufferGeometry {

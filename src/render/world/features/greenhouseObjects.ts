@@ -27,7 +27,7 @@ function greenhouseBayGlass(): BufferGeometry[] {
 function supportShed(): BufferGeometry[] {
   return [
     part(new BoxGeometry(2, 1.6, 1.6), '#f1f1ea', compose([0, 0.8, 0])),
-    part(new BoxGeometry(2.2, 0.1, 1.9), '#3f8f5a', compose([0, 1.72, 0], [0.12, 0, 0])),
+    part(new BoxGeometry(2.2, 0.1, 1.9), '#3f8f5a', compose([0, 1.78, 0], [0.12, 0, 0])),
     part(new BoxGeometry(0.9, 1.1, 0.04), '#b9c2c8', compose([-0.3, 0.55, 0.81])),
     part(new BoxGeometry(0.4, 0.3, 0.04), '#7fb7c9', compose([0.6, 1.0, 0.81])),
   ]
@@ -109,7 +109,7 @@ function nurseryHouseGlass(): BufferGeometry[] {
 function pumpHouse(): BufferGeometry[] {
   return [
     part(new BoxGeometry(1.2, 1.0, 1.0), '#d9d2c3', compose([0, 0.5, 0])),
-    part(new BoxGeometry(1.35, 0.08, 1.15), '#3f8f5a', compose([0, 1.04, 0], [0.1, 0, 0])),
+    part(new BoxGeometry(1.35, 0.08, 1.15), '#3f8f5a', compose([0, 1.1, 0], [0.1, 0, 0])),
     part(new BoxGeometry(0.4, 0.7, 0.04), '#7d868e', compose([-0.2, 0.35, 0.51])),
     part(new CylinderGeometry(0.08, 0.08, 1.0, 6), '#4c78a8', compose([0.75, 0.2, 0.2], [0, 0, Math.PI / 2])),
     part(new CylinderGeometry(0.08, 0.08, 0.5, 6), '#4c78a8', compose([1.2, 0.2, 0.2], [Math.PI / 2, 0, 0])),

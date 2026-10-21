@@ -71,7 +71,7 @@ function hayBale(): BufferGeometry[] {
 }
 
 function trough(): BufferGeometry[] {
-  return [part(new BoxGeometry(1.2, 0.44, 0.5), '#8a6a4a', compose([0, 0.22, 0])), part(new BoxGeometry(1.05, 0.04, 0.36), '#4c9be8', compose([0, 0.42, 0]))]
+  return [part(new BoxGeometry(1.2, 0.44, 0.5), '#8a6a4a', compose([0, 0.22, 0])), part(new BoxGeometry(1.05, 0.04, 0.36), '#4c9be8', compose([0, 0.38, 0]))]
 }
 
 function hedge(): BufferGeometry[] {
