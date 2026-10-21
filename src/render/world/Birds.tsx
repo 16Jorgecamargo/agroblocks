@@ -27,6 +27,10 @@ export function birdPosition(point: Vec2, index: number, time: number): Vector3 
   return new Vector3(point.x + Math.cos(angle) * radius, height + Math.sin(time * 2 + phase) * 0.1, point.z + Math.sin(angle) * radius)
 }
 
+export function birdHeading(index: number, time: number): number {
+  return -(time * SPEED + orbit(index).phase) - Math.PI / 2
+}
+
 export function wingAngle(index: number, time: number): number {
   const phase = orbit(index).phase
   const beating = Math.sin(time * 0.7 + phase) > -GLIDE
@@ -50,7 +54,7 @@ export function Birds({ points, active }: { points: Vec2[]; active: boolean }) {
   const place = (time: number) => {
     points.forEach((point, index) => {
       dummy.position.copy(birdPosition(point, index, time))
-      dummy.rotation.set(0, -(time * SPEED + orbit(index).phase), 0)
+      dummy.rotation.set(0, birdHeading(index, time), 0)
       dummy.updateMatrix()
       body.current?.setMatrixAt(index, dummy.matrix)
       const flap = wingAngle(index, time)

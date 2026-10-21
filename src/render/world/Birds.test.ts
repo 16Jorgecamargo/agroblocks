@@ -1,4 +1,5 @@
-import { birdPosition, flockBounds, wingAngle } from '@/render/world/Birds'
+import { Vector3 } from 'three'
+import { birdHeading, birdPosition, flockBounds, wingAngle } from '@/render/world/Birds'
 
 describe('birds', () => {
   it('keeps every bird inside the flock bounds along its whole orbit', () => {
@@ -24,5 +25,17 @@ describe('birds', () => {
     expect(Math.min(...angles)).toBeLessThan(-0.5)
     expect(angles.filter((angle) => angle === 0.12).length).toBeGreaterThan(10)
     expect(wingAngle(0, 3)).not.toBe(wingAngle(1, 3))
+  })
+
+  it('points its beak where it flies, not sideways', () => {
+    const point = { x: 2, z: -3 }
+    for (const [index, time] of [[0, 0], [1, 2.3], [2, 7.1]]) {
+      const now = birdPosition(point, index, time)
+      const next = birdPosition(point, index, time + 0.01)
+      const travel = new Vector3(next.x - now.x, 0, next.z - now.z).normalize()
+      const heading = birdHeading(index, time)
+      const beak = new Vector3(Math.cos(heading), 0, -Math.sin(heading))
+      expect(beak.dot(travel)).toBeGreaterThan(0.99)
+    }
   })
 })
