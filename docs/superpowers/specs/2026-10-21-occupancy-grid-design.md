@@ -25,7 +25,7 @@ A malha é invisível para o jogador. Só o código (e os testes) a usam.
 ## Anti-objetivos (seria falha mesmo funcionando)
 
 - Animação de trabalho num lugar sem o objeto correspondente (regar grama, alimentar sem cocho).
-- Qualquer agente atravessando construção, cerca, água, cocho, árvore, canteiro ou a grade da missão.
+- Qualquer agente atravessando construção, cerca, água, cocho, árvore, canteiro, a grade da missão ou um hexágono de missão da trilha (a estrada continua passável; os hexágonos são contornados).
 - Resultado diferente a cada visita (tudo continua determinístico pela semente).
 - Queda perceptível de desempenho: a malha é calculada uma vez ao montar a cena, nunca por quadro.
 
@@ -34,7 +34,7 @@ A malha é invisível para o jogador. Só o código (e os testes) a usam.
 ### Malha
 
 - Retângulo que cobre o chão da cena, células de 0,25 unidade (decisão minha; ajustável).
-- Cada célula guarda o que a ocupa, em ordem de prioridade: grade da missão, água, cerca, construção/objeto, cocho/comida, árvore, plantio (canteiro, pé de milho, planta), estrada, livre.
+- Cada célula guarda o que a ocupa, em ordem de prioridade: grade da missão, marcador de missão (o hexágono de cada ponto da trilha no mapa, raio ~0,8), água, cerca, construção/objeto, cocho/comida, árvore, plantio (canteiro, pé de milho, planta), estrada, livre.
 - Formas reais: cada tipo de objeto ganha uma pegada retangular (largura × profundidade) girada pela rotação dele, em vez do raio usado hoje; cercas são segmentos com espessura; água e manchas usam o polígono; árvores e pés de milho usam círculo.
 - A ocupação é rasterizada a partir dos dados do `World` já montado; os landscapes não mudam o que colocam.
 
@@ -42,7 +42,7 @@ A malha é invisível para o jogador. Só o código (e os testes) a usam.
 
 | Agente | Pode | Não pode |
 |---|---|---|
-| Pessoa | livre, estrada, corredores entre fileiras de canteiros e borda de talhões | construção, objeto, cerca, água, cocho, árvore, canteiro, pé de milho, grade da missão |
+| Pessoa | livre, estrada, corredores entre fileiras de canteiros e borda de talhões | construção, objeto, cerca, água, cocho, árvore, canteiro, pé de milho, grade da missão, hexágono de missão |
 | Trator | estrada e livre com folga do tamanho dele (raio ~0,8) | tudo o que a pessoa não pode, mais corredores estreitos |
 | Animal | células livres dentro do próprio piquete, com folga da cerca | cocho, água, abrigo, cerca, fora do piquete |
 
