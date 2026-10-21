@@ -1,7 +1,7 @@
 import { center, landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, stain, turn } from '@/render/world/landscapes/natureKit'
-import { station, tractorRun, walker } from '@/render/world/landscapes/cast'
+import { around } from '@/render/world/navigation/planActors'
 import { channel } from '@/render/world/landscapes/plots'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import type { WorldDraft } from '@/render/world/worldDraft'
@@ -105,12 +105,12 @@ export const cornfieldLandscape: Landscape = {
         waters,
         birds: [center(ripe), center(young), center(growing)],
         gaps: [{ x: -14.4, z: 10 }],
-        actors: [
-          tractorRun('corn-tractor', [{ x: -2.4, z: 6.6 }, { x: -3.7, z: 4.8 }, { x: -3.7, z: -1.9 }, { x: -12.0, z: -1.95 }]),
-          walker('corn-sacks', [{ x: -0.4, z: 9.6 }, { x: 2.6, z: 8.6 }, { x: 6.0, z: 7.6 }], 'carry', 2, 2.4),
-          station('corn-auger', { x: 7.8, z: 9.6 }, { x: 8.6, z: 9.0 }, 'tend', 1),
-          station('corn-mechanic', { x: 9.0, z: -4.2 }, { x: 10.4, z: -4.2 }, 'tend', 5),
-          walker('corn-scout', [{ x: -4.4, z: -12.2 }, { x: -4.4, z: -3.6 }], 'walk', 3, 3),
+        jobs: [
+          { id: 'corn-tractor', kind: 'tractor', via: [{ x: -2.4, z: 6.6 }, { x: -3.7, z: 4.8 }, { x: -3.7, z: -1.9 }, { x: -12.0, z: -1.95 }] },
+          { id: 'corn-sacks', kind: 'worker', task: 'carry', shirt: 2, stops: 2, area: around(...[{ x: -0.4, z: 9.6 }, { x: 2.6, z: 8.6 }, { x: 6.0, z: 7.6 }]) },
+          { id: 'corn-auger', kind: 'worker', task: 'tend', shirt: 1, area: around({ x: 7.8, z: 9.6 }) },
+          { id: 'corn-mechanic', kind: 'worker', task: 'tend', shirt: 5, area: around({ x: 12.2, z: -0.4 }, { x: 12, z: -6.6 }) },
+          { id: 'corn-scout', kind: 'walker', shirt: 3, via: [{ x: -4.4, z: -12.2 }, { x: -4.4, z: -3.6 }] },
         ],
         paths: [
           { points: [{ x: -2.4, z: 6.6 }, { x: -3.7, z: 4.8 }, { x: -3.7, z: -1.9 }, { x: -12.4, z: -1.95 }], width: 1.0 },
@@ -133,7 +133,7 @@ export const cornfieldLandscape: Landscape = {
         stains,
         waters: [channel({ minX: -hw - 0.6, maxX: hw + 5, minZ: -hh - 2.15, maxZ: -hh - 1.8 })],
         birds: [center(west), center(back)],
-        actors: [tractorRun('corn-farm-tractor', [{ x: -hw - 1.5, z: hh + 4 }, { x: -hw - 1.5, z: -hh - 1 }]), station('corn-farm-mechanic', { x: hw + 5.6, z: -hh - 3.0 }, { x: hw + 7.6, z: -hh - 3.4 }, 'tend', 5)],
+        jobs: [{ id: 'corn-farm-tractor', kind: 'tractor', via: [{ x: hw + 3.4, z: 0.4 }, { x: hw + 12, z: 0.2 }] }, { id: 'corn-farm-mechanic', kind: 'worker', task: 'tend', shirt: 5, area: around({ x: hw + 8.2, z: -hh - 1.4 }, { x: hw + 8, z: -hh - 7.6 }) }],
       }
     }),
 }

@@ -1,5 +1,6 @@
 import { createGrid, markCircle, markPolygon, markRect, markSegment, type OccupancyGrid } from '@/render/world/navigation/occupancy'
 import { FEATURE_SHAPES, modelShape, type Shape } from '@/render/world/navigation/shapes'
+import { GRID_CLEARANCE } from '@/render/world/worldCatalog'
 import type { Vec2, World } from '@/render/world/worldTypes'
 
 const MARKER_RADIUS = 0.8
@@ -31,6 +32,6 @@ export function buildOccupancy(world: World): OccupancyGrid {
     markShape(grid, modelShape(prop.model), prop, prop.rotation, prop.scale)
   }
   for (const node of world.trail) markCircle(grid, node, MARKER_RADIUS, 'marker')
-  if (world.missionGrid) markRect(grid, { x: (world.missionGrid.minX + world.missionGrid.maxX) / 2, z: (world.missionGrid.minZ + world.missionGrid.maxZ) / 2 }, world.missionGrid.maxX - world.missionGrid.minX, world.missionGrid.maxZ - world.missionGrid.minZ, 0, 'missionGrid')
+  if (world.missionGrid) markRect(grid, { x: (world.missionGrid.minX + world.missionGrid.maxX) / 2, z: (world.missionGrid.minZ + world.missionGrid.maxZ) / 2 }, world.missionGrid.maxX - world.missionGrid.minX + GRID_CLEARANCE * 2, world.missionGrid.maxZ - world.missionGrid.minZ + GRID_CLEARANCE * 2, 0, 'missionGrid')
   return grid
 }

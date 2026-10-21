@@ -15,6 +15,25 @@ const DRIVE_PAUSE = 2.2
 const MIN_TRIP = 2
 const TRIES = 12
 const SNAP = 1.2
+const AROUND = 2.5
+
+export function around(...points: Vec2[]): Rect {
+  return {
+    minX: Math.min(...points.map((point) => point.x)) - AROUND,
+    maxX: Math.max(...points.map((point) => point.x)) + AROUND,
+    minZ: Math.min(...points.map((point) => point.z)) - AROUND,
+    maxZ: Math.max(...points.map((point) => point.z)) + AROUND,
+  }
+}
+
+export function pickers(prefix: string, count: number, shirt: number): Job[] {
+  return Array.from({ length: count }, (_, index) => ({ id: `${prefix}-picker-${index}`, kind: 'worker', task: 'pick', shirt: shirt + index }))
+}
+
+function groundHeight(world: World, point: Vec2): number {
+  const patch = (world.patches ?? []).find(({ rect, height }) => point.x >= rect.minX && point.x <= rect.maxX && point.z >= rect.minZ && point.z <= rect.maxZ && (height ?? 0) > 0)
+  return patch?.height ?? 0
+}
 
 function shirt(index: number): string {
   return SHIRTS[index % SHIRTS.length]
@@ -80,7 +99,8 @@ function worker(job: Extract<Job, { kind: 'worker' }>, world: World, person: Wal
   const base = { id: job.id, kind: 'worker' as const, task: job.task, tint: shirt(job.shirt), speed: WALK_SPEED, pause: WORK_PAUSE }
   if ((job.stops ?? 1) === 1) {
     const spot = pick(spots, random)
-    return { ...base, route: [spot.at], facing: spot.facing }
+    const y = groundHeight(world, spot.at)
+    return y > 0 ? { ...base, route: [spot.at], facing: spot.facing, y } : { ...base, route: [spot.at], facing: spot.facing }
   }
   const found = trip(person, spots, random)
   return found ? { ...base, route: found.route, facings: [found.from.facing, found.to.facing] } : null

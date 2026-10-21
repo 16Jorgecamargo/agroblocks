@@ -17,7 +17,7 @@ const PLANTS: readonly FeatureKind[] = ['vegetableBed', 'cabbageBed', 'carrotBed
 export const TASK_TARGETS: Record<WorkTask, readonly FeatureKind[]> = {
   water: PLANTS,
   hoe: PLANTS,
-  pick: ['orchardLadder'],
+  pick: ['orchardLadder', 'nestBoxes'],
   feed: ['trough', 'hayRack'],
   tend: ['workbench', 'seedlingTable', 'sortingTable', 'controlStation', 'equipmentRack', 'grainAuger', 'supplyTank', 'compostBins'],
   carry: ['baleStack', 'crateStack', 'sackPallet', 'harvestBin'],

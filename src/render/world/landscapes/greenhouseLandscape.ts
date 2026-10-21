@@ -1,7 +1,7 @@
 import { center, landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, rectStain, scatterCover, stain, turn } from '@/render/world/landscapes/natureKit'
-import { station, walker } from '@/render/world/landscapes/cast'
+import { around } from '@/render/world/navigation/planActors'
 import { bedPlot, channel, edgeRun, edgeSides } from '@/render/world/landscapes/plots'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import type { WorldDraft } from '@/render/world/worldDraft'
@@ -125,13 +125,13 @@ export const greenhouseLandscape: Landscape = {
         birds: [{ x: 8, z: -10 }, { x: -9, z: 9 }],
         clutterModels: FLOWERS,
         gaps: [{ x: -14.4, z: 6 }],
-        actors: [
-          walker('greenhouse-waterer', [{ x: 0.8, z: 9.3 }, { x: 5.6, z: 9.3 }], 'water', 1, 3, Math.PI),
-          station('greenhouse-bench', { x: 1.4, z: -0.8 }, { x: 1.4, z: -1.6 }, 'tend', 2),
-          walker('greenhouse-carrier', [{ x: 0.2, z: 1.0 }, { x: 0.4, z: -0.6 }, { x: -0.6, z: -3.6 }, { x: -0.8, z: -8.6 }], 'carry', 3, 2.2),
-          station('greenhouse-packer', { x: -8.4, z: 10.2 }, { x: -8.4, z: 9.0 }, 'tend', 4),
-          station('greenhouse-tech', { x: -7.6, z: -1.8 }, { x: -8.4, z: -2.8 }, 'tend', 6),
-          walker('greenhouse-hoer', [{ x: -12.2, z: -8.2 }, { x: -5.0, z: -8.2 }], 'hoe', 0, 3.4, Math.PI),
+        jobs: [
+          { id: 'greenhouse-waterer', kind: 'worker', task: 'water', shirt: 1, stops: 2, area: around(...[{ x: 0.8, z: 9.3 }, { x: 5.6, z: 9.3 }]) },
+          { id: 'greenhouse-bench', kind: 'worker', task: 'tend', shirt: 2, area: around({ x: 1.4, z: -0.8 }) },
+          { id: 'greenhouse-carrier', kind: 'worker', task: 'carry', shirt: 3, stops: 2 },
+          { id: 'greenhouse-packer', kind: 'worker', task: 'tend', shirt: 4, area: around({ x: -5.8, z: 7.6 }) },
+          { id: 'greenhouse-tech', kind: 'worker', task: 'tend', shirt: 6, area: around({ x: -7.6, z: -1.8 }) },
+          { id: 'greenhouse-hoer', kind: 'worker', task: 'hoe', shirt: 0, stops: 2, area: around(...[{ x: -12.2, z: -8.2 }, { x: -5.0, z: -8.2 }]) },
         ],
         paths: [
           { points: [{ x: 0.2, z: 1.0 }, { x: 0.4, z: -0.6 }, { x: -0.6, z: -3.6 }, { x: -0.8, z: -8.8 }], width: 0.9 },
@@ -150,6 +150,6 @@ export const greenhouseLandscape: Landscape = {
       const stains = [waterWorks(draft, { x: -hw - 5.6, z: -hh - 6.6 }, random), rectStain({ minX: -hw - 1.6, maxX: hw + 9.6, minZ: -hh - 3.6, maxZ: -hh - 1.6 }, PAVED, random, 0.25), stain({ x: hw + 3.2, z: -1.8 }, 1.2, 0.8, MOSS, random)]
       landmark(draft, 'nurseryHouse', { x: -hw - 5.2, z: hh + 6.4 }, 0)
       draft.forceFeature('shadeTree', { x: hw + 6.4, z: hh + 6.0 }, 0.6, 0.9, '#5fa045')
-      return { actors: [station('greenhouse-farm-bench', { x: -hw + 2.6, z: -hh - 3.3 }, { x: -hw + 2.6, z: -hh - 2.6 }, 'tend', 2), walker('greenhouse-farm-waterer', [{ x: hw + 1.4, z: hh + 5.0 }, { x: hw + 6.0, z: hh + 5.0 }], 'water', 1, 3, Math.PI)], patches, blocks: [west, front], stains, waters: [channel({ minX: -hw - 0.6, maxX: hw + 9.6, minZ: -hh - 7.1, maxZ: -hh - 6.75 })], butterflies: [center(front)], clutterModels: FLOWERS }
+      return { jobs: [{ id: 'greenhouse-farm-bench', kind: 'worker', task: 'tend', shirt: 2, area: around({ x: -hw + 2.6, z: -hh - 3.3 }) }, { id: 'greenhouse-farm-waterer', kind: 'worker', task: 'water', shirt: 1, stops: 2, area: around(...[{ x: hw + 1.4, z: hh + 5.0 }, { x: hw + 6.0, z: hh + 5.0 }]) }], patches, blocks: [west, front], stains, waters: [channel({ minX: -hw - 0.6, maxX: hw + 9.6, minZ: -hh - 7.1, maxZ: -hh - 6.75 })], butterflies: [center(front)], clutterModels: FLOWERS }
     }),
 }

@@ -1,7 +1,7 @@
 import { center, landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, rectStain, scatterCover, stain, turn } from '@/render/world/landscapes/natureKit'
-import { station, walker } from '@/render/world/landscapes/cast'
+import { around } from '@/render/world/navigation/planActors'
 import { bedPlot, channel, edgeSides } from '@/render/world/landscapes/plots'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import { rectPolygon } from '@/render/world/geometry'
@@ -131,12 +131,12 @@ export const gardenLandscape: Landscape = {
         birds: [{ x: -8, z: -9 }, { x: 9, z: 9 }],
         clutterModels: FLOWERS,
         animals: spawnHerd(random, rectPolygon({ minX: 2.0, maxX: 5.8, minZ: 2.2, maxZ: 3.6 }), [['pug', 1]], 'garden-dog', 0.8),
-        actors: [
-          walker('garden-waterer', [{ x: -4, z: -6.6 }, { x: -4, z: -11.4 }], 'water', 1, 3.2, -Math.PI / 2),
-          station('garden-hoer', { x: -5.0, z: -2.0 }, { x: -6.6, z: -2.4 }, 'hoe', 0),
-          station('garden-bench', { x: 5.5, z: 2.4 }, { x: 5.5, z: 1.5 }, 'tend', 2),
-          walker('garden-carrier', [{ x: 1.4, z: 0.4 }, { x: -0.6, z: -3.2 }, { x: -4, z: -5.8 }], 'carry', 3, 2),
-          station('garden-nursery', { x: 5.6, z: -10.6 }, { x: 5.6, z: -11.4 }, 'tend', 4),
+        jobs: [
+          { id: 'garden-waterer', kind: 'worker', task: 'water', shirt: 1, stops: 2, area: around(...[{ x: -4, z: -6.6 }, { x: -4, z: -11.4 }]) },
+          { id: 'garden-hoer', kind: 'worker', task: 'hoe', shirt: 0, area: herbs },
+          { id: 'garden-bench', kind: 'worker', task: 'tend', shirt: 2, area: around({ x: 5.5, z: 2.4 }) },
+          { id: 'garden-carrier', kind: 'worker', task: 'water', shirt: 3, stops: 2, area: long },
+          { id: 'garden-nursery', kind: 'worker', task: 'tend', shirt: 4, area: around({ x: 5.6, z: -10.6 }) },
         ],
         paths: [
           { points: [{ x: 4.1, z: 3.6 }, { x: 4.6, z: 5.3 }], width: 0.9 },
@@ -175,10 +175,10 @@ export const gardenLandscape: Landscape = {
         waters: [pond.water, channel({ minX: -hw - 8.4, maxX: -hw - 2.2, minZ: hh + 4.5, maxZ: hh + 4.9 })],
         butterflies: [center(herbs), center(west)],
         clutterModels: FLOWERS,
-        actors: [
-          station('garden-farm-hoer', { x: -hw - 1.6, z: 1.4 }, { x: -hw - 3, z: 1.4 }, 'hoe', 0),
-          walker('garden-farm-waterer', [{ x: -hw - 0.6, z: -hh - 2.0 }, { x: hw + 3, z: -hh - 2.0 }], 'water', 1, 3, Math.PI),
-          station('garden-farm-bench', { x: -hw - 3.3, z: -hh - 4.8 }, { x: -hw - 3.3, z: -hh - 5.7 }, 'tend', 2),
+        jobs: [
+          { id: 'garden-farm-hoer', kind: 'worker', task: 'hoe', shirt: 0, area: around({ x: -hw - 1.6, z: 1.4 }) },
+          { id: 'garden-farm-waterer', kind: 'worker', task: 'water', shirt: 1, stops: 2, area: around(...[{ x: -hw - 0.6, z: -hh - 2.0 }, { x: hw + 3, z: -hh - 2.0 }]) },
+          { id: 'garden-farm-bench', kind: 'worker', task: 'tend', shirt: 2, area: around({ x: -hw - 3.3, z: -hh - 4.8 }) },
         ],
       }
     }),

@@ -5,7 +5,7 @@ import { center, landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, scatterCover, stain, turn } from '@/render/world/landscapes/natureKit'
 import { grove } from '@/render/world/landscapes/orchardLandscape'
-import { ladderPickers, station, tractorRun, walker } from '@/render/world/landscapes/cast'
+import { around, pickers } from '@/render/world/navigation/planActors'
 import { bedPlot, channel, edgeSides } from '@/render/world/landscapes/plots'
 import { rectPolygon } from '@/render/world/geometry'
 import { spawnHerd } from '@/render/world/scenery'
@@ -117,14 +117,14 @@ export const homesteadLandscape: Landscape = {
         waters: [pond.water, channel({ minX: -9.8, maxX: -9.4, minZ: 0.9, maxZ: 3.0 })],
         animals: [...cows.animals, ...spawnHerd(random, rectPolygon({ minX: 1.4, maxX: 4.6, minZ: 1.6, maxZ: 2.8 }), [['pug', 1]], 'homestead-dog', 0.8)],
         pasture: cows.area,
-        actors: [
-          station('home-hoer', { x: -6.2, z: -4.2 }, { x: -7.6, z: -4.2 }, 'hoe', 0),
-          ...ladderPickers(draft, 'home', 1, 1),
-          station('home-feeder', { x: 12.2, z: -5.8 }, { x: 12.2, z: -6.6 }, 'feed', 2),
-          station('home-bench', { x: 5.0, z: -1.0 }, { x: 5.8, z: -1.0 }, 'tend', 3),
-          walker('home-waterer', [{ x: 4.4, z: 10.4 }, { x: 12.2, z: 10.4 }], 'water', 4, 3, Math.PI),
-          tractorRun('home-tractor', [{ x: 7.4, z: -4.6 }, { x: 8.4, z: -8.0 }]),
-          walker('home-walker', [{ x: 2.4, z: 3.0 }, { x: 2.6, z: 5.4 }, { x: -2.6, z: 6.0 }, { x: -5.6, z: 3.6 }], 'walk', 6, 2.5),
+        jobs: [
+          { id: 'home-hoer', kind: 'worker', task: 'hoe', shirt: 0, area: around({ x: -6.2, z: -4.2 }) },
+          ...pickers('home', 1, 1),
+          { id: 'home-feeder', kind: 'worker', task: 'feed', shirt: 2, area: around({ x: 12.2, z: -5.8 }) },
+          { id: 'home-bench', kind: 'worker', task: 'tend', shirt: 3, area: around({ x: 5.0, z: -1.0 }) },
+          { id: 'home-waterer', kind: 'worker', task: 'water', shirt: 4, stops: 2, area: around(...[{ x: 4.4, z: 10.4 }, { x: 12.2, z: 10.4 }]) },
+          { id: 'home-tractor', kind: 'tractor', via: [{ x: 7.4, z: -4.6 }, { x: 8.4, z: -8.0 }] },
+          { id: 'home-walker', kind: 'walker', shirt: 6, via: [{ x: 2.4, z: 3.0 }, { x: 2.6, z: 5.4 }, { x: -2.6, z: 6.0 }, { x: -5.6, z: 3.6 }] },
         ],
         birds: [center(corn), center(young)],
         butterflies: [center(garden), center(beds), { x: -9.4, z: 11.9 }],
@@ -155,7 +155,7 @@ export const homesteadLandscape: Landscape = {
         waters: [pond.water],
         animals: cows.animals,
         pasture: cows.area,
-        actors: [...ladderPickers(draft, 'home-farm', 1, 1), station('home-farm-bench', { x: -hw - 2.6, z: -hh - 7.0 }, { x: -hw - 2.2, z: -hh - 7.0 }, 'tend', 3), station('home-farm-hoer', { x: hw + 1.2, z: hh + 3.0 }, { x: hw + 2.2, z: hh + 3.0 }, 'hoe', 0)],
+        jobs: [...pickers('home-farm', 1, 1), { id: 'home-farm-bench', kind: 'worker', task: 'tend', shirt: 3, area: around({ x: -hw - 2.6, z: -hh - 7.0 }) }, { id: 'home-farm-hoer', kind: 'worker', task: 'hoe', shirt: 0, area: around({ x: hw + 1.2, z: hh + 3.0 }) }],
         birds: [center(corn)],
         butterflies: [center(beds)],
         clutterModels: FLOWERS,

@@ -1,7 +1,7 @@
 import { center, landmark } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { blob, scatterCover, stain, turn } from '@/render/world/landscapes/natureKit'
-import { ladderPickers, station, walker } from '@/render/world/landscapes/cast'
+import { around, pickers } from '@/render/world/navigation/planActors'
 import { stageFarm, stageMap, type StageLook } from '@/render/world/landscapes/stage'
 import { FEATURE_FOOTPRINTS } from '@/render/world/worldCatalog'
 import type { WorldDraft } from '@/render/world/worldDraft'
@@ -178,11 +178,11 @@ export const orchardLandscape: Landscape = {
         butterflies: [center(berries), { x: 9.4, z: 8 }, { x: -9.4, z: 6.1 }, { x: -2.6, z: -11.1 }],
         birds: [{ x: -8.6, z: -9.4 }, { x: 9, z: 4.6 }, { x: -9, z: 2.6 }],
         clutterModels: FLOWERS,
-        actors: [
-          ...ladderPickers(draft, 'orchard', 3, 0),
-          walker('orchard-carrier', [{ x: 2.8, z: 3.4 }, { x: 4.4, z: 6.6 }, { x: 5.6, z: 8.3 }, { x: 11.6, z: 8.3 }], 'carry', 3, 2.4),
-          station('orchard-sorter', { x: 2.0, z: 8.7 }, { x: 2.0, z: 7.8 }, 'tend', 4),
-          walker('orchard-nursery', [{ x: 9.8, z: -10.0 }, { x: 9.8, z: -12.4 }], 'water', 5, 3, Math.PI / 2),
+        jobs: [
+          ...pickers('orchard', 3, 0),
+          { id: 'orchard-carrier', kind: 'worker', task: 'carry', shirt: 3, stops: 2, area: around(...[{ x: 2.8, z: 3.4 }, { x: 4.4, z: 6.6 }, { x: 5.6, z: 8.3 }, { x: 11.6, z: 8.3 }]) },
+          { id: 'orchard-sorter', kind: 'worker', task: 'tend', shirt: 4, area: around({ x: 2.0, z: 8.7 }) },
+          { id: 'orchard-nursery', kind: 'worker', task: 'water', shirt: 5, stops: 2, area: around(...[{ x: 9.8, z: -10.0 }, { x: 9.8, z: -12.4 }]) },
         ],
         paths: [
           { points: [{ x: 2.6, z: 3.0 }, { x: 4.4, z: 6.6 }, { x: 5.6, z: 8.3 }, { x: 12.6, z: 8.3 }], width: 0.9 },
@@ -207,6 +207,6 @@ export const orchardLandscape: Landscape = {
       const pond = pondCorner(draft, { x: -hw - 5, z: hh + 7.4 }, random)
       const stains = [packingYard(draft, { x: -hw - 5.4, z: -hh - 5.4 }, 0, random), pond.stain, stain({ x: hw + 3, z: -1.8 }, 1.6, 1.0, LEAVES, random)]
       restSpot(draft, { x: hw + 6.6, z: hh + 6.4 }, Math.PI * 0.85)
-      return { patches, blocks: [west, back, east, berries], stains, waters: [pond.water], butterflies: [center(berries)], clutterModels: FLOWERS, actors: [...ladderPickers(draft, 'orchard-farm', 2, 0), station('orchard-farm-sorter', { x: -hw - 5.0, z: -hh - 2.4 }, { x: -hw - 5.0, z: -hh - 3.2 }, 'tend', 4)] }
+      return { patches, blocks: [west, back, east, berries], stains, waters: [pond.water], butterflies: [center(berries)], clutterModels: FLOWERS, jobs: [...pickers('orchard-farm', 2, 0), { id: 'orchard-farm-sorter', kind: 'worker', task: 'tend', shirt: 4, area: around({ x: -hw - 5.0, z: -hh - 2.4 }) }] }
     }),
 }
