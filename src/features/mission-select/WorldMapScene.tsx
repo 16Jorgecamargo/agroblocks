@@ -7,6 +7,7 @@ import { nodeKey, type NodeState, type TrailNode } from '@/features/mission-sele
 import type { WorldId } from '@/game/worlds/worldTypes'
 import { SPRINGS } from '@/motion/springs'
 import { CANVAS_RESIZE } from '@/render/canvasResize'
+import { DrawCallProbe } from '@/render/DrawCallProbe'
 import { PALETTE } from '@/render/palette'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
@@ -138,6 +139,7 @@ export default function WorldMapScene({ world, nodes, states, stars, selected, o
       >
         <color attach="background" args={['#131f29']} />
         <LabelProjector labels={labels} trail={map.trail} />
+        <DrawCallProbe />
         <MapCamera focus={focus} pan={pan} instant={!ambient} />
         <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
         <directionalLight position={[10, 18, 8]} intensity={1.5} castShadow={!lowGraphics} shadow-mapSize={[2048, 2048]} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={14} shadow-camera-bottom={-14} />

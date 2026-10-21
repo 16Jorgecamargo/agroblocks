@@ -18,6 +18,7 @@ import { WorldFeatures } from '@/render/world/WorldFeatures'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import { CANVAS_RESIZE } from '@/render/canvasResize'
+import { DrawCallProbe } from '@/render/DrawCallProbe'
 
 export default function FarmScene({
   state,
@@ -65,6 +66,7 @@ export default function FarmScene({
         kickKey={failed ? eventKey : 0}
       />
       <CellLocatorBridge width={width} height={height} />
+      <DrawCallProbe />
       <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
       <directionalLight
         position={[10, 18, 8]}
