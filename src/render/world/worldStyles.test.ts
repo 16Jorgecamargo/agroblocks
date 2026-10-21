@@ -12,12 +12,12 @@ describe('world styles', () => {
   it('keeps the training look outside the worlds', () => {
     expect(styleOf(null)).toEqual(TRAINING_STYLE)
     expect(styleOf(undefined)).toEqual(TRAINING_STYLE)
-    expect(styleOf('cornfield').sun.color).toBe('#ffcf86')
+    expect(styleOf('cornfield').sun.color).toBe('#ffdca0')
   })
 
   it('lights the cornfield with a warm late-afternoon sun', () => {
     const { sun, hemisphere, palette } = WORLD_STYLES.cornfield
-    expect(sun).toEqual({ color: '#ffcf86', intensity: 1.6, position: [14, 10, 4] })
+    expect(sun).toEqual({ color: '#ffdca0', intensity: 1.5, position: [14, 12, 4] })
     expect(hemisphere).toEqual({ sky: '#f6d9a8', ground: palette.grassDeep, intensity: 0.9 })
   })
 

@@ -108,8 +108,8 @@ export function reliefMounds(relief: Relief, outside: Rect, bounds: Rect, random
   if (relief !== 'rolling') return []
   const target = 6 + Math.floor(random() * 5)
   const mounds: Mound[] = []
-  for (let tries = 0; tries < target * 40 && mounds.length < target; tries += 1) {
-    const radius = 1.5 + random() * 1.5
+  for (let tries = 0; tries < target * 200 && mounds.length < target; tries += 1) {
+    const radius = 1 + random() * 1.5
     const x = bounds.minX + radius + random() * (bounds.maxX - bounds.minX - radius * 2)
     const z = bounds.minZ + radius + random() * (bounds.maxZ - bounds.minZ - radius * 2)
     if (rectDistance({ x, z }, outside) <= radius) continue
@@ -117,4 +117,70 @@ export function reliefMounds(relief: Relief, outside: Rect, bounds: Rect, random
     mounds.push({ x, z, radius, height: 0.4 + random() * 0.6 })
   }
   return mounds
+}
+
+export const CELL = 1.2
+const TRAIL_CLEARANCE = 1.05
+const MIN_PARCEL_CELLS = 4
+
+function trailDistance(rect: Rect, trail: Vec2[]): number {
+  let best = Number.POSITIVE_INFINITY
+  for (let index = 1; index < trail.length; index += 1) {
+    const a = trail[index - 1]
+    const b = trail[index]
+    const steps = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.25)
+    for (let step = 0; step <= steps; step += 1) {
+      best = Math.min(best, rectDistance({ x: a.x + ((b.x - a.x) * step) / steps, z: a.z + ((b.z - a.z) * step) / steps }, rect))
+    }
+  }
+  return best
+}
+
+export function freeGrid(rect: Rect, trail: Vec2[], clearance: number): boolean[][] {
+  const columns = Math.floor((rect.maxX - rect.minX) / CELL)
+  const rows = Math.floor((rect.maxZ - rect.minZ) / CELL)
+  return Array.from({ length: rows }, (_, row) =>
+    Array.from({ length: columns }, (_, column) => {
+      const cell = { minX: rect.minX + column * CELL, maxX: rect.minX + (column + 1) * CELL, minZ: rect.minZ + row * CELL, maxZ: rect.minZ + (row + 1) * CELL }
+      return trailDistance(cell, trail) > clearance
+    }),
+  )
+}
+
+export function largestBlock(grid: boolean[][]): { row: number; column: number; rows: number; columns: number } | null {
+  let best: { row: number; column: number; rows: number; columns: number } | null = null
+  const rows = grid.length
+  const columns = grid[0]?.length ?? 0
+  for (let top = 0; top < rows; top += 1) {
+    for (let left = 0; left < columns; left += 1) {
+      if (!grid[top][left]) continue
+      let width = columns - left
+      for (let bottom = top; bottom < rows; bottom += 1) {
+        let run = 0
+        while (run < width && grid[bottom][left + run]) run += 1
+        width = run
+        if (width === 0) break
+        const area = width * (bottom - top + 1)
+        if (!best || area > best.rows * best.columns) best = { row: top, column: left, rows: bottom - top + 1, columns: width }
+      }
+    }
+  }
+  return best
+}
+
+export function trailFreeParcels(rect: Rect, trail: Vec2[], limit: number, clearance = TRAIL_CLEARANCE): Rect[] {
+  const grid = freeGrid(rect, trail, clearance)
+  const found: Rect[] = []
+  while (found.length < limit) {
+    const block = largestBlock(grid)
+    if (!block || block.rows * block.columns < MIN_PARCEL_CELLS) break
+    for (let row = block.row; row < block.row + block.rows; row += 1) for (let column = block.column; column < block.column + block.columns; column += 1) grid[row][column] = false
+    found.push({
+      minX: rect.minX + block.column * CELL,
+      maxX: rect.minX + (block.column + block.columns) * CELL,
+      minZ: rect.minZ + block.row * CELL,
+      maxZ: rect.minZ + (block.row + block.rows) * CELL,
+    })
+  }
+  return found
 }
