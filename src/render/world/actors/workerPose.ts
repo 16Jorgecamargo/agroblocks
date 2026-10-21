@@ -8,18 +8,47 @@ export interface Limbs {
   arms: [number, number]
   bob: number
   seated: boolean
+  armRoll?: number
+  handle?: number
+}
+
+const HOE_RAISED = -2.15
+const HOE_STRIKE = -0.72
+const HOE_DRAG = -0.66
+const HOE_GRIP_ROLL = 0.56
+const HOE_CARRY_ARM = -0.5
+const HOE_CARRY_HANDLE = 2.5
+
+function ease(t: number): number {
+  return 0.5 - 0.5 * Math.cos(Math.PI * t)
+}
+
+export function hoeSwing(cycle: number): number {
+  const phase = (((cycle / 4) % 1) + 1) % 1
+  if (phase < 0.55) return HOE_DRAG + (HOE_RAISED - HOE_DRAG) * ease(phase / 0.55)
+  if (phase < 0.68) {
+    const t = (phase - 0.55) / 0.13
+    return HOE_RAISED + (HOE_STRIKE - HOE_RAISED) * t * t
+  }
+  return HOE_STRIKE + (HOE_DRAG - HOE_STRIKE) * ease((phase - 0.68) / 0.32)
 }
 
 export function limbs(task: ActorTask, pose: ActorPose): Limbs {
   const swing = Math.sin(pose.cycle)
-  if (task === 'drive') return { legs: [-1.45, -1.45], arms: [-1.05 + swing * 0.03, -1.05 - swing * 0.03], bob: 0, seated: true }
+  if (task === 'drive') return { legs: [-1.0, -1.0], arms: [-1.05 + swing * 0.03, -1.05 - swing * 0.03], bob: 0, seated: true, armRoll: 0.25 }
   if (pose.moving) {
     const legs: [number, number] = [swing * 0.55, -swing * 0.55]
     const bob = Math.abs(swing) * 0.025
     if (task === 'carry') return { legs, arms: [-1.15, -1.15], bob, seated: false }
+    if (task === 'hoe') return { legs, arms: [-swing * 0.45, HOE_CARRY_ARM], bob, seated: false, handle: HOE_CARRY_HANDLE }
     return { legs, arms: [-swing * 0.45, swing * 0.45], bob, seated: false }
   }
-  if (task === 'hoe' || task === 'tend') {
+  if (task === 'hoe') {
+    const swing = hoeSwing(pose.cycle)
+    const reach = (swing - HOE_DRAG) / (HOE_RAISED - HOE_DRAG)
+    return { legs: [0.28 - 0.08 * reach, -0.22], arms: [swing, swing], bob: 0, seated: false, armRoll: HOE_GRIP_ROLL, handle: swing }
+  }
+  if (task === 'tend') {
     const stroke = -0.55 - 0.75 * (0.5 + 0.5 * Math.sin(pose.cycle * 0.8))
     return { legs: [0.12, -0.12], arms: [stroke, stroke], bob: 0, seated: false }
   }
@@ -37,8 +66,8 @@ export function bodyMatrix(pose: ActorPose, bob: number, parent?: Matrix4): Matr
   return parent ? parent.clone().multiply(local) : local
 }
 
-export function jointMatrix(body: Matrix4, x: number, y: number, angle: number): Matrix4 {
-  return body.clone().multiply(new Matrix4().compose(new Vector3(x, y, 0), new Quaternion().setFromEuler(new Euler(angle, 0, 0)), new Vector3(1, 1, 1)))
+export function jointMatrix(body: Matrix4, x: number, y: number, angle: number, roll = 0, z = 0): Matrix4 {
+  return body.clone().multiply(new Matrix4().compose(new Vector3(x, y, z), new Quaternion().setFromEuler(new Euler(angle, 0, roll)), new Vector3(1, 1, 1)))
 }
 
 export function legMatrices(body: Matrix4, limbs: Limbs): [Matrix4, Matrix4] {
@@ -46,7 +75,15 @@ export function legMatrices(body: Matrix4, limbs: Limbs): [Matrix4, Matrix4] {
 }
 
 export function armMatrices(body: Matrix4, limbs: Limbs): [Matrix4, Matrix4] {
-  return [jointMatrix(body, -SHOULDER_SPREAD, SHOULDER, limbs.arms[0]), jointMatrix(body, SHOULDER_SPREAD, SHOULDER, limbs.arms[1])]
+  const roll = limbs.armRoll ?? 0
+  return [jointMatrix(body, -SHOULDER_SPREAD, SHOULDER, limbs.arms[0], roll), jointMatrix(body, SHOULDER_SPREAD, SHOULDER, limbs.arms[1], -roll)]
+}
+
+export function hoeMatrix(body: Matrix4, limbs: Limbs): Matrix4 {
+  const roll = limbs.armRoll ?? 0
+  const arm = limbs.arms[1]
+  const reach = ARM_LENGTH * Math.cos(roll)
+  return jointMatrix(body, SHOULDER_SPREAD - ARM_LENGTH * Math.sin(roll), SHOULDER - reach * Math.cos(arm), limbs.handle ?? arm, 0, -reach * Math.sin(arm))
 }
 
 export function handMatrix(arm: Matrix4): Matrix4 {

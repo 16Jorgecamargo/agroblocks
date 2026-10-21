@@ -4,7 +4,7 @@ import { Color, Euler, Matrix4, Quaternion, Vector3, type BufferGeometry, type I
 import { hashString } from '@/render/seededRandom'
 import { armGeometry, DRIVER_SEAT, hatGeometry, headGeometry, legGeometry, skinTones, TASK_TOOL, toolGeometry, torsoGeometry, tractorBodyGeometry, TRACTOR_WHEELS, wheelGeometry, type ToolKind } from '@/render/world/actors/actorGeometry'
 import { actorPose, type ActorPose } from '@/render/world/actors/actorMotion'
-import { armMatrices, bodyMatrix, handMatrix, legMatrices, limbs } from '@/render/world/actors/workerPose'
+import { armMatrices, bodyMatrix, handMatrix, hoeMatrix, legMatrices, limbs } from '@/render/world/actors/workerPose'
 import type { Actor, ActorTask } from '@/render/world/worldTypes'
 
 const TOOL_KINDS: ToolKind[] = ['hoe', 'can', 'basket', 'bucket', 'crate']
@@ -52,11 +52,13 @@ export function Actors({ actors, active, shadows = true }: { actors: Actor[]; ac
   }, [actors])
   const toolCounts = useMemo(() => Object.fromEntries(TOOL_KINDS.map((kind) => [kind, people.filter((person) => person.tool === kind).length])) as Record<ToolKind, number>, [people])
   const meshes = useRef<Record<string, InstancedMesh | null>>({})
+  const lastTime = useRef(0)
   const bind = (name: string) => (mesh: InstancedMesh | null) => {
     meshes.current[name] = mesh
   }
 
   const place = (time: number) => {
+    lastTime.current = time
     const { leg, arm, torso, head, hat, tractor, wheel } = meshes.current
     const toolIndex: Record<ToolKind, number> = { hoe: 0, can: 0, basket: 0, bucket: 0, crate: 0 }
     const tractorPose = new Map<string, { pose: ActorPose; matrix: Matrix4 }>()
@@ -85,7 +87,7 @@ export function Actors({ actors, active, shadows = true }: { actors: Actor[]; ac
       head?.setMatrixAt(index, body)
       hat?.setMatrixAt(index, body)
       if (person.tool) {
-        const matrix = person.tool === 'crate' ? body.clone().multiply(CRATE_AT) : handMatrix(arms[LEFT_HANDED.has(person.tool) ? 0 : 1])
+        const matrix = person.tool === 'crate' ? body.clone().multiply(CRATE_AT) : person.tool === 'hoe' ? hoeMatrix(body, motion) : handMatrix(arms[LEFT_HANDED.has(person.tool) ? 0 : 1])
         meshes.current[`tool-${person.tool}`]?.setMatrixAt(toolIndex[person.tool], matrix)
         toolIndex[person.tool] += 1
       }
@@ -104,7 +106,7 @@ export function Actors({ actors, active, shadows = true }: { actors: Actor[]; ac
       head?.setColorAt(index, tint.set(person.skin))
     })
     for (const mesh of [arm, torso, head]) if (mesh?.instanceColor) mesh.instanceColor.needsUpdate = true
-    place(0)
+    place(lastTime.current)
   })
 
   useFrame(({ clock }) => {

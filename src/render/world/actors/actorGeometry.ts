@@ -1,6 +1,5 @@
 import { BoxGeometry, type BufferGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry } from 'three'
 import { compose, mergeParts, part } from '@/render/world/features/parts'
-import { workObjects } from '@/render/world/features/workObjects'
 import type { ActorTask } from '@/render/world/worldTypes'
 
 export const HIP = 0.42
@@ -8,6 +7,8 @@ export const SHOULDER = 0.76
 export const HIP_SPREAD = 0.085
 export const SHOULDER_SPREAD = 0.2
 export const ARM_LENGTH = 0.36
+export const HOE_HANDLE = 0.62
+export const HOE_BUTT = 0.26
 
 const WHITE = '#ffffff'
 const PANTS = '#4c6fa8'
@@ -39,7 +40,11 @@ export function hatGeometry(): BufferGeometry {
 }
 
 const TOOLS: Record<ToolKind, () => BufferGeometry[]> = {
-  hoe: () => [part(new BoxGeometry(0.03, 0.95, 0.03), '#b98a52', compose([0, -0.05, 0.12], [0.5, 0, 0])), part(new BoxGeometry(0.16, 0.03, 0.1), '#7d868e', compose([0, -0.47, 0.38]))],
+  hoe: () => [
+    part(new BoxGeometry(0.03, HOE_HANDLE + HOE_BUTT, 0.03), '#b98a52', compose([0, (HOE_BUTT - HOE_HANDLE) / 2, 0])),
+    part(new BoxGeometry(0.04, 0.05, 0.04), '#5f666d', compose([0, -HOE_HANDLE, -0.01])),
+    part(new BoxGeometry(0.17, 0.025, 0.13), '#7d868e', compose([0, -HOE_HANDLE, -0.07])),
+  ],
   can: () => [
     part(new CylinderGeometry(0.08, 0.09, 0.15, 7), '#4f9a3a', compose([0, -0.1, 0.03])),
     part(new CylinderGeometry(0.012, 0.02, 0.18, 5), '#3f7f2e', compose([0, -0.07, 0.15], [1.1, 0, 0])),
@@ -60,13 +65,35 @@ export const TRACTOR_WHEELS: { x: number; z: number; radius: number; width: numb
   { x: 0.36, z: 0.55, radius: 0.18, width: 0.12 },
 ]
 
-export const DRIVER_SEAT = { x: 0, y: 0.5, z: -0.38 }
+export const DRIVER_SEAT = { x: 0, y: 0.22, z: -0.42 }
+
+const TRACTOR_GREEN = '#3f8f3a'
+const TRACTOR_YELLOW = '#f2c14e'
+const TRACTOR_DARK = '#2f2f2f'
 
 export function tractorBodyGeometry(): BufferGeometry {
-  const wheels = new Set([5, 6, 7, 8, 9, 10])
-  const parts = workObjects.tractor().filter((_, index) => !wheels.has(index))
-  parts.push(part(new BoxGeometry(0.3, 0.06, 0.3), '#2f2f2f', compose([-0.42, 0.62, 0])))
-  return mergeParts(parts.map((piece) => piece.rotateY(-Math.PI / 2)))
+  return mergeParts([
+    part(new BoxGeometry(0.5, 0.4, 0.85), TRACTOR_GREEN, compose([0, 0.5, 0.375])),
+    part(new BoxGeometry(0.44, 0.3, 0.02), TRACTOR_DARK, compose([0, 0.5, 0.805])),
+    part(new BoxGeometry(0.08, 0.06, 0.03), TRACTOR_YELLOW, compose([-0.17, 0.63, 0.8])),
+    part(new BoxGeometry(0.08, 0.06, 0.03), TRACTOR_YELLOW, compose([0.17, 0.63, 0.8])),
+    part(new CylinderGeometry(0.035, 0.035, 0.45, 6), TRACTOR_DARK, compose([0.15, 0.9, 0.55])),
+    part(new BoxGeometry(0.44, 0.22, 0.1), TRACTOR_GREEN, compose([0, 0.79, 0])),
+    part(new CylinderGeometry(0.02, 0.02, 0.16, 5), TRACTOR_DARK, compose([0, 0.84, -0.07], [-1.2, 0, 0])),
+    part(new CylinderGeometry(0.13, 0.13, 0.02, 12), TRACTOR_DARK, compose([0, 0.87, -0.14], [-0.6, 0, 0])),
+    part(new BoxGeometry(0.56, 0.12, 0.45), TRACTOR_GREEN, compose([0, 0.42, -0.4])),
+    part(new BoxGeometry(0.56, 0.03, 0.3), TRACTOR_DARK, compose([0, 0.38, -0.18])),
+    part(new BoxGeometry(0.66, 0.05, 0.05), TRACTOR_DARK, compose([0, 0.18, 0.55])),
+    part(new BoxGeometry(0.6, 0.06, 0.06), TRACTOR_DARK, compose([0, 0.34, -0.35])),
+    part(new BoxGeometry(0.2, 0.04, 0.55), TRACTOR_GREEN, compose([-0.36, 0.72, -0.35])),
+    part(new BoxGeometry(0.2, 0.04, 0.55), TRACTOR_GREEN, compose([0.36, 0.72, -0.35])),
+    part(new BoxGeometry(0.08, 0.06, 0.08), TRACTOR_DARK, compose([0, 0.5, -0.42])),
+    part(new BoxGeometry(0.3, 0.06, 0.28), TRACTOR_DARK, compose([0, 0.55, -0.42])),
+    part(new BoxGeometry(0.3, 0.3, 0.05), TRACTOR_DARK, compose([0, 0.72, -0.58])),
+    part(new BoxGeometry(0.05, 0.97, 0.05), TRACTOR_DARK, compose([-0.24, 0.965, -0.6])),
+    part(new BoxGeometry(0.05, 0.97, 0.05), TRACTOR_DARK, compose([0.24, 0.965, -0.6])),
+    part(new BoxGeometry(0.7, 0.04, 0.75), TRACTOR_YELLOW, compose([0, 1.47, -0.35])),
+  ])
 }
 
 export function wheelGeometry(): BufferGeometry {
