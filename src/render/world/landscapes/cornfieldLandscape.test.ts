@@ -1,6 +1,7 @@
 import { MISSIONS } from '@/data/missions'
 import { buildWorld, gridSizeOf } from '@/render/world/buildWorld'
 import { distanceToPolyline, rectDistance } from '@/render/world/geometry'
+import { describeLandscape } from '@/render/world/landscapes/landscapeContract'
 import { CLUTTER_CEILING } from '@/render/world/landscapes/landscapeKit'
 import { FEATURE_FOOTPRINTS, FRONT_CLEARANCE, GRID_CLEARANCE, isClutter, TALL_FEATURES, TREE_MODELS } from '@/render/world/worldCatalog'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
@@ -116,4 +117,8 @@ describe('cornfield mission farm', () => {
     expect(farm(6, 1)).toEqual(farm(6, 1))
     expect(ofKind(farm(6, 1, 'light'), 'grainBin')).toHaveLength(3)
   })
+})
+
+describe('cornfield landscape contract', () => {
+  describeLandscape({ world: 'cornfield', landmark: ['grainBin', 'grainDryer'], crops: ['cornStalk'], minBlocks: { map: 3, farm: 2 } })
 })

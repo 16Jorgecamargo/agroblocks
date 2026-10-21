@@ -85,7 +85,7 @@ export function borderBelt(draft: WorldDraft, border: BorderKind, rect: Rect, ra
   sides(rect).forEach(([from, to], index) => walkSide(draft, border === 'mixed' ? MIXED[index] : border, from, to, random, gaps))
 }
 
-export function edgeClutter(draft: WorldDraft, blocks: Rect[], density: WorldDensity, random: () => number, perBlock = 6): void {
+export function edgeClutter(draft: WorldDraft, blocks: Rect[], density: WorldDensity, random: () => number, perBlock = 6, models: readonly ModelId[] = CLUTTER_MODELS): void {
   const target = density === 'light' ? Math.floor(perBlock / 2) : perBlock
   for (const block of blocks) {
     let placed = 0
@@ -99,7 +99,7 @@ export function edgeClutter(draft: WorldDraft, blocks: Rect[], density: WorldDen
       const offset = 0.4 + random() * 0.5
       const point = { x: along.x + outward.x * offset, z: along.z + outward.z * offset }
       if (blocks.some((other) => inside(point, other))) continue
-      if (draft.place(pick(CLUTTER_MODELS, random), point, random() * Math.PI * 2, 0.8 + random() * 0.4)) placed += 1
+      if (draft.place(pick(models, random), point, random() * Math.PI * 2, 0.8 + random() * 0.4)) placed += 1
     }
   }
 }
