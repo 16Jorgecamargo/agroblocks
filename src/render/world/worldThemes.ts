@@ -20,7 +20,7 @@ export const WORLD_THEMES: Record<WorldId, WorldTheme> = {
 
 const FRUIT_TINTS = ['#e0473c', '#f29a2e', '#f2c94c']
 
-const FEATURE_COUNTS: Record<FeatureKind, number> = {
+const FEATURE_COUNTS: Partial<Record<FeatureKind, number>> = {
   cornStalk: 0,
   fruitTree: 14,
   greenhouse: 2,
@@ -59,7 +59,7 @@ export function addThemeFeatures(draft: WorldDraft, theme: WorldId | null | unde
       for (let patch = 0; patch < patches; patch += 1) cornPatch(draft, pointIn(area, random), random)
       continue
     }
-    const target = Math.max(1, Math.round(FEATURE_COUNTS[kind] * share * mixed))
+    const target = Math.max(1, Math.round((FEATURE_COUNTS[kind] ?? 0) * share * mixed))
     let placed = 0
     for (let tries = 0; tries < target * TRIES && placed < target; tries += 1) {
       const tint = kind === 'fruitTree' ? FRUIT_TINTS[Math.floor(random() * FRUIT_TINTS.length)] : undefined

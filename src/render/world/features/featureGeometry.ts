@@ -89,6 +89,31 @@ function trough(): BufferGeometry[] {
   return [part(new BoxGeometry(1.2, 0.44, 0.5), '#8a6a4a', compose([0, 0.22, 0])), part(new BoxGeometry(1.05, 0.04, 0.36), '#4c9be8', compose([0, 0.42, 0]))]
 }
 
+function hedge(): BufferGeometry[] {
+  const parts = [part(new BoxGeometry(1, 0.55, 0.45), '#4f8f3a', compose([0, 0.275, 0]))]
+  for (const x of [-0.3, 0.05, 0.35]) parts.push(part(new IcosahedronGeometry(0.26, 0), x > 0 ? '#5fa045' : '#47833a', compose([x, 0.55, 0])))
+  return parts
+}
+
+function stoneWall(): BufferGeometry[] {
+  const stones: [number, number, number, string][] = [
+    [-0.27, 0.12, 0.46, '#9a9a92'],
+    [0.22, 0.12, 0.54, '#8a8a82'],
+    [-0.02, 0.34, 0.5, '#a7a79e'],
+    [0.36, 0.33, 0.28, '#94948b'],
+  ]
+  return stones.map(([x, y, width, color]) => part(new BoxGeometry(width, 0.24, 0.4), color, compose([x, y, 0])))
+}
+
+function meshFence(): BufferGeometry[] {
+  return [
+    part(new BoxGeometry(0.06, 1, 0.06), '#8d969b', compose([-0.47, 0.5, 0])),
+    part(new BoxGeometry(0.06, 1, 0.06), '#8d969b', compose([0.47, 0.5, 0])),
+    part(new BoxGeometry(1, 0.04, 0.04), '#8d969b', compose([0, 0.97, 0])),
+    part(new BoxGeometry(0.94, 0.85, 0.01), '#c9d1d4', compose([0, 0.5, 0])),
+  ]
+}
+
 const DEFAULT_TINT = '#e0473c'
 
 const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
@@ -98,6 +123,9 @@ const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
   vegetableBed,
   hayBale,
   trough,
+  hedge,
+  stoneWall,
+  meshFence,
 }
 
 const GLASS: Partial<Record<FeatureKind, () => BufferGeometry[]>> = {

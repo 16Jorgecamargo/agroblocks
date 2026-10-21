@@ -41,14 +41,25 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
           </mesh>
         </>
       )}
-      {(world.patches ?? []).map((patch, index) => (
-        <mesh
-          key={`patch-${index}`}
-          position={[(patch.rect.minX + patch.rect.maxX) / 2, PATCH_HEIGHT, (patch.rect.minZ + patch.rect.maxZ) / 2]}
-          receiveShadow
-        >
-          <boxGeometry args={[patch.rect.maxX - patch.rect.minX, 0.02, patch.rect.maxZ - patch.rect.minZ]} />
-          <meshStandardMaterial color={patch.color} roughness={1} flatShading />
+      {(world.patches ?? []).map((patch, index) => {
+        const lift = patch.height ?? 0
+        const thickness = lift > 0 ? lift : 0.02
+        return (
+          <mesh
+            key={`patch-${index}`}
+            position={[(patch.rect.minX + patch.rect.maxX) / 2, lift > 0 ? lift / 2 : PATCH_HEIGHT, (patch.rect.minZ + patch.rect.maxZ) / 2]}
+            castShadow={lift > 0}
+            receiveShadow
+          >
+            <boxGeometry args={[patch.rect.maxX - patch.rect.minX, thickness, patch.rect.maxZ - patch.rect.minZ]} />
+            <meshStandardMaterial color={patch.color} roughness={1} flatShading />
+          </mesh>
+        )
+      })}
+      {(world.mounds ?? []).map((mound, index) => (
+        <mesh key={`mound-${index}`} position={[mound.x, 0, mound.z]} scale={[1, mound.height / mound.radius, 1]} receiveShadow>
+          <sphereGeometry args={[mound.radius, 7, 3, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial color={world.palette.grassDeep} roughness={1} flatShading />
         </mesh>
       ))}
       {paths.map((geometry, index) => (

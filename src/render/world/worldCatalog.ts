@@ -61,6 +61,9 @@ export const FEATURE_FOOTPRINTS: Record<FeatureKind, number> = {
   vegetableBed: 0.8,
   hayBale: 0.55,
   trough: 0.6,
+  hedge: 0.3,
+  stoneWall: 0.3,
+  meshFence: 0.2,
 }
 
 export const GRID_CLEARANCE = 1.2

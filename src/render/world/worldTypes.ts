@@ -52,7 +52,7 @@ export interface WorldInput {
   theme?: WorldId | null
 }
 
-export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough'] as const
+export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence'] as const
 
 export type FeatureKind = (typeof FEATURE_KINDS)[number]
 
@@ -86,9 +86,18 @@ export interface World {
   palette: WorldPaletteColors
   style: WorldStyle
   patches?: GroundPatch[]
+  mounds?: Mound[]
 }
 
 export interface GroundPatch {
   rect: Rect
   color: string
+  height?: number
+}
+
+export interface Mound {
+  x: number
+  z: number
+  radius: number
+  height: number
 }

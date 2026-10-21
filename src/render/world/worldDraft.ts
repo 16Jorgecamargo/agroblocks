@@ -30,10 +30,17 @@ export class WorldDraft {
     return this.fits(point, footprint(model) * scale, TALL_MODELS.has(model), isClutter(model))
   }
 
-  placeFeature(kind: FeatureKind, point: Vec2, rotation: number, scale = 1, tint?: string): boolean {
+  placeFeature(kind: FeatureKind, point: Vec2, rotation: number, scale = 1, tint?: string, y?: number): boolean {
     if (!this.fits(point, FEATURE_FOOTPRINTS[kind] * scale, kind === 'greenhouse' || kind === 'fruitTree', false)) return false
-    this.features.push(tint === undefined ? { kind, x: point.x, z: point.z, rotation, scale } : { kind, x: point.x, z: point.z, rotation, scale, tint })
+    this.forceFeature(kind, point, rotation, scale, tint, y)
     return true
+  }
+
+  forceFeature(kind: FeatureKind, point: Vec2, rotation: number, scale = 1, tint?: string, y?: number): void {
+    const feature: WorldFeature = { kind, x: point.x, z: point.z, rotation, scale }
+    if (tint !== undefined) feature.tint = tint
+    if (y !== undefined) feature.y = y
+    this.features.push(feature)
   }
 
   private fits(point: Vec2, radius: number, tall: boolean, clutter: boolean): boolean {
