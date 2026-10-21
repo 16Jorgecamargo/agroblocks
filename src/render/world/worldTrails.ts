@@ -75,6 +75,20 @@ const BASE_TRAILS: Record<WorldId, Vec2[]> = {
 }
 
 const DRAWN_TRAILS: Partial<Record<WorldId, Vec2[]>> = {
+  greenhouse: points([
+    [-12, 6],
+    [-8.6, 4.8],
+    [-5.2, 3.6],
+    [-1.8, 2.4],
+    [1.6, 1.2],
+    [4.8, 2.6],
+    [7.8, 4.6],
+    [9.6, 7.8],
+    [7.6, 10.8],
+    [4.2, 11.6],
+    [0.8, 10.4],
+    [-2.6, 9.6],
+  ]),
   orchard: points([
     [-12, -4],
     [-8.6, -2.8],
