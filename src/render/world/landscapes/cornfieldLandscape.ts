@@ -1,7 +1,6 @@
 import { rectPolygon } from '@/render/world/geometry'
-import { borderBelt, cropBlock, edgeClutter, landmark, reliefMounds } from '@/render/world/landscapes/landscapeKit'
+import { borderBelt, cropBlock, edgeClutter, landmark, reliefMounds, WORLD_MAP_ISLAND } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
-import { WORLD_MAP_ISLAND } from '@/render/world/worldMapLayout'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'

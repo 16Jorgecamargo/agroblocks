@@ -9,7 +9,7 @@ import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 
 export type { Landscape }
 
-export const LANDSCAPES: Partial<Record<WorldId, Landscape>> = {
+export const LANDSCAPES: Record<WorldId, Landscape> = {
   garden: gardenLandscape,
   cornfield: cornfieldLandscape,
   orchard: orchardLandscape,

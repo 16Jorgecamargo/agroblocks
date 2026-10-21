@@ -15,6 +15,8 @@ export interface Block {
 
 export const CLUTTER_CEILING = { map: 60, farm: 80 }
 
+export const WORLD_MAP_ISLAND: Rect = { minX: -15.5, maxX: 15.5, minZ: -15.5, maxZ: 15.5 }
+
 const GAP_RADIUS = 1.2
 const SEGMENT = 1
 const WINDBREAK_STEP = 1.6

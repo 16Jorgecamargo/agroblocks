@@ -129,6 +129,7 @@ Veja `docs/decisions/`:
 10. Treinamento guiado com vídeos do próprio jogo.
 11. Cadastro do aluno, envio ao servidor e painel do professor.
 12. Mundos de conceitos com 10 missões e provas por mundo.
+13. Paisagens temáticas: estilo e planta própria por mundo, objetos desenhados por instância.
 
 ## Mundos e missões
 
@@ -141,6 +142,8 @@ Veja `docs/decisions/`:
 | 4 Estufa | sensores e laço enquanto | 10 |
 | 5 Celeiro | variáveis | 10 |
 | 6 Fazenda completa | eficiência, procedimentos e depuração | 10 |
+
+Cada mundo tem estilo próprio (cores, luz, relevo e borda) e uma paisagem feita à mão, tanto no mapa da tela de missões quanto no cenário da missão: silos e campos de milho no Milharal, quadras de frutíferas em degraus no Pomar, estufas geminadas na Estufa, celeiro e piquetes no Celeiro, canteiros com sebe e galinheiro na Horta e a casa da fazenda com um pedaço de cada mundo na Fazenda completa.
 
 As 10 missões de cada mundo seguem o mesmo ritmo: aprender (1–3), praticar (4–6), desafio (7–8), consertar um programa (9) e missão final (10). Antes da primeira missão o aluno faz a prova inicial do mundo e, depois da décima, a prova final, com 10 questões cada (4 de montar, 3 de prever e 3 de consertar programas).
 

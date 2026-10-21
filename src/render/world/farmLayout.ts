@@ -3,7 +3,7 @@ import { addButterflies, addClutter, addLilies, spawnHerd } from '@/render/world
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import { styleOf } from '@/render/world/worldStyles'
 import { WorldDraft } from '@/render/world/worldDraft'
-import { addThemeFeatures, themePalette } from '@/render/world/worldThemes'
+import { themePalette } from '@/render/world/worldThemes'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
 export function farmLayout(input: WorldInput, random: () => number): World {
@@ -65,7 +65,6 @@ export function farmLayout(input: WorldInput, random: () => number): World {
   }
 
   const core: Rect = { minX: -hw - 13, maxX: hw + 16, minZ: -hh - 13, maxZ: hh + 8.5 }
-  addThemeFeatures(draft, input.theme, { minX: -hw - 9, maxX: hw + 9, minZ: -hh - 6, maxZ: hh + 7 }, input.density, random)
   draft.scatter(FOREST_MODELS, full ? 30 : 15, core, [0.85, 1.15])
   const ring: Rect = { minX: core.minX - 10, maxX: core.maxX + 10, minZ: core.minZ - 10, maxZ: core.maxZ + 10 }
   const outsideCore = (point: Vec2) => point.x < core.minX || point.x > core.maxX || point.z < core.minZ || point.z > core.maxZ

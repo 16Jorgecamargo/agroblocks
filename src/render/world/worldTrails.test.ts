@@ -1,4 +1,3 @@
-import { LANDSCAPES } from '@/render/world/landscapes/landscapes'
 import { WORLD_IDS } from '@/game/worlds/worldTypes'
 import { buildWorld } from '@/render/world/buildWorld'
 import { crossings, distanceToPolyline, rectDistance } from '@/render/world/geometry'
@@ -52,7 +51,6 @@ describe('world map landscapes', () => {
     for (const theme of WORLD_IDS) {
       const world = map(theme)
       const fences = world.props.filter((prop) => prop.model === 'fence')
-      if (!LANDSCAPES[theme]) expect(fences.length).toBeGreaterThan(0)
       for (const fence of fences) {
         for (let index = 1; index < world.trail.length; index += 1) {
           const a = world.trail[index - 1]
