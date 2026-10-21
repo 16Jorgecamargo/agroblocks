@@ -106,7 +106,7 @@ export const cornfieldLandscape: Landscape = {
         birds: [center(ripe), center(young), center(growing)],
         gaps: [{ x: -14.4, z: 10 }],
         jobs: [
-          { id: 'corn-tractor', kind: 'tractor', via: [{ x: -2.4, z: 6.6 }, { x: -3.7, z: 4.8 }, { x: -3.7, z: -1.9 }, { x: -12.0, z: -1.95 }] },
+          { id: 'corn-tractor', kind: 'tractor', via: [{ x: -3.6, z: 6.0 }, { x: -3.6, z: 1.0 }] },
           { id: 'corn-sacks', kind: 'worker', task: 'carry', shirt: 2, stops: 2, area: around(...[{ x: -0.4, z: 9.6 }, { x: 2.6, z: 8.6 }, { x: 6.0, z: 7.6 }]) },
           { id: 'corn-auger', kind: 'worker', task: 'tend', shirt: 1, area: around({ x: 7.8, z: 9.6 }) },
           { id: 'corn-mechanic', kind: 'worker', task: 'tend', shirt: 5, area: around({ x: 12.2, z: -0.4 }, { x: 12, z: -6.6 }) },

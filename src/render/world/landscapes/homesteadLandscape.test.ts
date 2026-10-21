@@ -30,4 +30,8 @@ describe('homestead landscape', () => {
     expect(Math.hypot(house.x, house.z)).toBeLessThan(4.5)
     expect(Math.min(...world.trail.map((node) => Math.hypot(node.x - house.x, node.z - house.z)))).toBeLessThan(6)
   })
+
+  it('keeps its tractor at work', () => {
+    expect((map().actors ?? []).some((actor) => actor.kind === 'tractor')).toBe(true)
+  })
 })

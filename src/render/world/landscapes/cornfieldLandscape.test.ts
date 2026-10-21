@@ -45,4 +45,10 @@ describe('cornfield landscape', () => {
     expect(ofKind(map('light'), 'cornStalk').length).toBeLessThan(ofKind(map(), 'cornStalk').length)
     expect(ofKind(farm('light'), 'grainBin')).toHaveLength(3)
   })
+
+  it('drives a tractor on the map and around the mission farm', () => {
+    expect((map().actors ?? []).some((actor) => actor.kind === 'tractor')).toBe(true)
+    expect((map('light').actors ?? []).some((actor) => actor.kind === 'tractor')).toBe(true)
+    expect((farm().actors ?? []).some((actor) => actor.kind === 'tractor')).toBe(true)
+  })
 })
