@@ -20,6 +20,15 @@ export const SPECIES_GAIT: Record<AnimalSpecies, AnimalGait> = {
   pug: 'graze',
 }
 
+export const BODY_RADIUS: Record<AnimalSpecies, number> = {
+  cow: 0.55,
+  horse: 0.6,
+  pig: 0.4,
+  sheep: 0.4,
+  llama: 0.45,
+  pug: 0.25,
+}
+
 export const SPECIES_SPEED: Record<AnimalSpecies, number> = {
   cow: 0.45,
   horse: 0.9,

@@ -37,6 +37,7 @@ export interface AnimalSpawn {
   z: number
   area: Vec2[]
   scale: number
+  walk?: Vec2[]
 }
 
 export type WorldLayout = 'farm' | 'worldMap' | 'home' | 'celebration'

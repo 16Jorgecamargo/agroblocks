@@ -4,6 +4,8 @@ import { rectPolygon } from '@/render/world/geometry'
 import { edgeClutter, openGround, reliefMounds, WORLD_MAP_ISLAND } from '@/render/world/landscapes/landscapeKit'
 import { smoothPath, woodland } from '@/render/world/landscapes/natureKit'
 import { buildOccupancy } from '@/render/world/navigation/buildOccupancy'
+import { walkMask } from '@/render/world/navigation/passability'
+import { placeHerd } from '@/render/world/navigation/placeHerd'
 import { planActors, type Job } from '@/render/world/navigation/planActors'
 import { inset } from '@/render/world/landscapes/landscapeKit'
 import { WorldDraft } from '@/render/world/worldDraft'
@@ -50,7 +52,10 @@ const NODE_CLEARANCE = 1.6
 const MAP_CENTER: Rect = { minX: 0, maxX: 0, minZ: 0, maxZ: 0 }
 
 function populate(scene: World, jobs: Job[], random: () => number): World {
-  return { ...scene, actors: planActors(scene, buildOccupancy(scene), jobs, random) }
+  const grid = buildOccupancy(scene)
+  const actors = planActors(scene, grid, jobs, random)
+  const animals = placeHerd(scene.animals, walkMask(grid, 'animal'), random)
+  return { ...scene, actors, animals, pasture: scene.pasture }
 }
 
 function world(theme: WorldId, ground: Rect, island: boolean, trail: Vec2[], paths: Polyline[], draft: WorldDraft, parts: StageParts, mounds: World['mounds'], missionGrid: Rect | null): World {
