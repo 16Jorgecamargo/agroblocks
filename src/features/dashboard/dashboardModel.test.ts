@@ -92,13 +92,24 @@ describe('dashboard model', () => {
     const cornIds = missionsOfWorld('cornfield', MISSIONS).slice(0, 3).map((mission) => mission.id)
     const completed = { status: 'completed' as const, attempts: 1, bestResult: { actions: 1, blocks: 1, usage: { seeds: 0, water: 0, energy: 1 }, efficiencyStars: 3 as const }, hintsUsed: 0, errorCounts: {} }
     const missions = Object.fromEntries([...gardenIds, ...cornIds].map((id) => [id, completed]))
-    const model = buildDashboard([run({ runId: 'run-d1', student: { name: 'Dani Reis', school: 'Escola Azul' }, missions })], MISSIONS, EMPTY_FILTERS)
+    const assessments = { ...validSnapshot.assessments, garden: { pre: null, post: { world: 'garden' as const, form: 'post' as const, startedAt: 's', completedAt: 'c', skipped: false, answers: answers('post', 5) } } }
+    const model = buildDashboard([run({ runId: 'run-d1', student: { name: 'Dani Reis', school: 'Escola Azul' }, missions, assessments })], MISSIONS, EMPTY_FILTERS)
     const dani = model.students[0]
     expect(dani.worlds.garden).toMatchObject({ completed: 10, state: 'done' })
     expect(dani.worlds.cornfield).toMatchObject({ completed: 3, state: 'trying' })
     expect(dani.worlds.orchard).toMatchObject({ completed: 0, state: 'empty' })
     expect(dani).toMatchObject({ worldsDone: 1, completedMissions: 13 })
     expect(model.worldRows.find((row) => row.world === 'garden')?.finished).toBe(1)
+  })
+
+  it('does not count a world as finished before its post-test', () => {
+    const completed = { status: 'completed' as const, attempts: 1, bestResult: { actions: 1, blocks: 1, usage: { seeds: 0, water: 0, energy: 1 }, efficiencyStars: 3 as const }, hintsUsed: 0, errorCounts: {} }
+    const missions = Object.fromEntries(missionsOfWorld('cornfield', MISSIONS).map((mission) => [mission.id, completed]))
+    const model = buildDashboard([run({ runId: 'run-e1', student: { name: 'Eva Melo', school: 'Escola Azul' }, missions })], MISSIONS, EMPTY_FILTERS)
+    const eva = model.students[0]
+    expect(eva.worlds.cornfield).toMatchObject({ completed: 10, state: 'trying', post: null })
+    expect(eva.worldsDone).toBe(0)
+    expect(model.worldRows.find((row) => row.world === 'cornfield')?.finished).toBe(0)
   })
 
   it('lists the most common errors', () => {

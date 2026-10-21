@@ -309,6 +309,7 @@
   color: #ffffff;
   font-weight: 700;
   text-align: center;
+  pointer-events: none;
 }
 
 .world-stage__veil span {

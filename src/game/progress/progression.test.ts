@@ -51,6 +51,12 @@ describe('progression', () => {
     expect(continueMissionId(save, missions)).toBeNull()
   })
 
+  it('counts a finished pre-test as progress so the student can continue', () => {
+    const save = storeAssessment(createInitialSave(missions, now), { world: 'garden', form: 'pre', startedAt: now, completedAt: now, skipped: false, answers: {} }, missions)
+    expect(hasProgress(save)).toBe(true)
+    expect(continueMissionId(save, missions)).toBe('a')
+  })
+
   it('records failed attempts and error counts without unlocking', () => {
     const save = recordAttempt(createInitialSave(missions, now), attempt('b', 'error'), missions)
     expect(save.missions.b).toMatchObject({ status: 'available', attempts: 1, errorCounts: { HIT_OBSTACLE: 1 } })

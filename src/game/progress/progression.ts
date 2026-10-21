@@ -150,7 +150,11 @@ export function storeAssessment(save: SaveData, response: AssessmentResponse, mi
 }
 
 export function hasProgress(save: SaveData): boolean {
-  return save.attempts.length > 0 || Object.values(save.missions).some((progress) => progress.status === 'completed')
+  return (
+    save.attempts.length > 0 ||
+    Object.values(save.missions).some((progress) => progress.status === 'completed') ||
+    Object.values(save.assessments).some((tests) => tests?.pre != null || tests?.post != null)
+  )
 }
 
 export function failedAttempts(save: SaveData, missionId: string): number {

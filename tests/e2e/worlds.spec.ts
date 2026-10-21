@@ -51,4 +51,11 @@ test('a closed world shows the lock message', async ({ page }) => {
   await page.getByRole('button', { name: 'Próximo mundo' }).click()
   await expect(page.getByText('Mundo 2: Milharal')).toBeVisible()
   await expect(page.getByText('Conclua o mundo Horta para abrir este')).toBeVisible()
+  await expect(page.locator('.world-stage__map canvas')).toBeVisible()
+  const target = await page.evaluate(() => {
+    const stage = document.querySelector('.world-stage') as HTMLElement
+    const box = stage.getBoundingClientRect()
+    return document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)?.tagName
+  })
+  expect(target).toBe('CANVAS')
 })

@@ -132,7 +132,7 @@ function worldCell(runs: RunSnapshot[], world: WorldId, missions: MissionDefinit
   const attempts = ids.reduce((sum, id) => sum + (plots[id]?.attempts ?? 0), 0)
   const pre = firstWith(runs, (run) => scoreAssessment(run.assessments[world]?.pre ?? null))
   const post = firstWith(runs, (run) => scoreAssessment(run.assessments[world]?.post ?? null))
-  const state: PlotState = ids.length > 0 && completed === ids.length ? 'done' : completed > 0 || attempts > 0 || pre !== null ? 'trying' : 'empty'
+  const state: PlotState = ids.length > 0 && completed === ids.length && post !== null ? 'done' : completed > 0 || attempts > 0 || pre !== null ? 'trying' : 'empty'
   return { completed, total: ids.length, state, attempts, pre, post }
 }
 
