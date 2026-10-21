@@ -11,8 +11,8 @@ function crate(x: number, y: number, z: number, fruit: string, rotation = 0): Bu
 function packingShed(): BufferGeometry[] {
   const parts: BufferGeometry[] = [part(new BoxGeometry(2.6, 0.1, 2), '#a99a80', compose([0, 0.05, 0]))]
   for (const x of [-1.15, 1.15]) for (const z of [-0.85, 0.85]) parts.push(part(new BoxGeometry(0.12, 1.6, 0.12), '#7a5233', compose([x, 0.85, z])))
-  parts.push(part(new BoxGeometry(2.8, 0.08, 1.2), '#a33b2f', compose([0, 1.85, -0.5], [0.45, 0, 0])))
-  parts.push(part(new BoxGeometry(2.8, 0.08, 1.2), '#a33b2f', compose([0, 1.85, 0.5], [-0.45, 0, 0])))
+  parts.push(part(new BoxGeometry(2.8, 0.08, 1.2), '#a33b2f', compose([0, 1.85, -0.5], [-0.45, 0, 0])))
+  parts.push(part(new BoxGeometry(2.8, 0.08, 1.2), '#a33b2f', compose([0, 1.85, 0.5], [0.45, 0, 0])))
   parts.push(part(new BoxGeometry(2.4, 0.5, 0.06), '#8a5a3c', compose([0, 0.35, -0.9])))
   parts.push(part(new BoxGeometry(1.4, 0.08, 0.6), '#c49a63', compose([0.3, 0.75, 0.1])))
   parts.push(...crate(-0.7, 0.1, -0.3, '#e0473c'), ...crate(-0.7, 0.42, -0.3, '#f29a2e'), ...crate(-0.2, 0.1, -0.3, '#f2c94c'), ...crate(0.6, 0.83, 0.1, '#e0473c'))

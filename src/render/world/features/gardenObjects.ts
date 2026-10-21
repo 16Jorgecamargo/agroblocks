@@ -12,8 +12,8 @@ function wateringCanParts(x: number, z: number, rotation: number): BufferGeometr
 function toolShed(): BufferGeometry[] {
   return [
     part(new BoxGeometry(1.6, 1.3, 1.2), '#9c6b43', compose([0, 0.65, 0])),
-    part(new BoxGeometry(1.8, 0.08, 0.75), '#5d7a3a', compose([0, 1.5, -0.32], [0.62, 0, 0])),
-    part(new BoxGeometry(1.8, 0.08, 0.75), '#5d7a3a', compose([0, 1.5, 0.32], [-0.62, 0, 0])),
+    part(new BoxGeometry(1.8, 0.08, 0.75), '#5d7a3a', compose([0, 1.5, -0.32], [-0.62, 0, 0])),
+    part(new BoxGeometry(1.8, 0.08, 0.75), '#5d7a3a', compose([0, 1.5, 0.32], [0.62, 0, 0])),
     part(new BoxGeometry(1.6, 0.42, 0.02), '#9c6b43', compose([0, 1.42, 0], [0, 0, 0], [1, 1, 50])),
     part(new BoxGeometry(0.5, 0.9, 0.04), '#6b4a2e', compose([0.2, 0.45, 0.61])),
     part(new BoxGeometry(0.34, 0.26, 0.04), '#cfe6f0', compose([-0.45, 0.85, 0.61])),
