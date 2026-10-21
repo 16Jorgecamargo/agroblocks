@@ -23,12 +23,12 @@ Todos os modelos 3D são CC0 1.0 (domínio público) e foram convertidos para GL
 | flower-red | flor | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | flower-yellow | flor | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | flower-purple | flor | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
-| flower-patch | canteiro de flores | Quaternius | https://quaternius.com/packs/stylizednaturemegakit.html |
-| grass-short | tufo de grama | Quaternius | https://quaternius.com/packs/stylizednaturemegakit.html |
-| grass-tall | grama alta | Quaternius | https://quaternius.com/packs/stylizednaturemegakit.html |
-| clover | trevos | Quaternius | https://quaternius.com/packs/stylizednaturemegakit.html |
-| fern | samambaia | Quaternius | https://quaternius.com/packs/stylizednaturemegakit.html |
-| pebble | pedrinha | Quaternius | https://quaternius.com/packs/stylizednaturemegakit.html |
+| flower-patch | canteiro de flores | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
+| grass-short | tufo de grama | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
+| grass-tall | grama alta | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
+| clover | trevos | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
+| fern | samambaia | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
+| pebble | pedrinha | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | rock-medium | rocha | Kenney (kenney.nl) | https://kenney.nl/assets/nature-kit |
 | barn | celeiro grande | Quaternius | https://quaternius.com/packs/farmbuildings.html |
 | small-barn | celeiro pequeno | Quaternius | https://quaternius.com/packs/farmbuildings.html |

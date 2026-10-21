@@ -190,57 +190,69 @@
     },
     {
       "id": "flower-patch",
-      "pack": "megakit",
-      "source": "glTF/Flower_4_Group.gltf",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/flower_yellowC.glb",
       "usage": "canteiro de flores",
       "targetHeight": 0.35,
-      "rotationY": 0
+      "rotationY": 0,
+      "tint": {
+        "grass": "#5fae46"
+      }
     },
     {
       "id": "grass-short",
-      "pack": "megakit",
-      "source": "glTF/Grass_Common_Short.gltf",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/grass.glb",
       "usage": "tufo de grama",
       "targetHeight": 0.25,
       "rotationY": 0,
       "tint": {
-        "Grass": "#86c84f"
+        "grass": "#86c84f"
       }
     },
     {
       "id": "grass-tall",
-      "pack": "megakit",
-      "source": "glTF/Grass_Wispy_Tall.gltf",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/grass_large.glb",
       "usage": "grama alta",
       "targetHeight": 0.45,
       "rotationY": 0,
       "tint": {
-        "Grass": "#86c84f"
+        "grass": "#7dbd48"
       }
     },
     {
       "id": "clover",
-      "pack": "megakit",
-      "source": "glTF/Clover_1.gltf",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/grass_leafs.glb",
       "usage": "trevos",
       "targetHeight": 0.12,
-      "rotationY": 0
+      "rotationY": 0,
+      "tint": {
+        "grass": "#5fa844"
+      }
     },
     {
       "id": "fern",
-      "pack": "megakit",
-      "source": "glTF/Fern_1.gltf",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/plant_flatTall.glb",
       "usage": "samambaia",
       "targetHeight": 0.5,
-      "rotationY": 0
+      "rotationY": 0,
+      "tint": {
+        "leafsGreen": "#4f9a3a"
+      }
     },
     {
       "id": "pebble",
-      "pack": "megakit",
-      "source": "glTF/Pebble_Round_1.gltf",
+      "pack": "nature-kit",
+      "source": "Models/GLTF format/stone_smallFlatA.glb",
       "usage": "pedrinha",
       "targetHeight": 0.12,
-      "rotationY": 0
+      "rotationY": 0,
+      "tint": {
+        "stone": "#a9a39a"
+      }
     },
     {
       "id": "rock-medium",
