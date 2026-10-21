@@ -1,4 +1,4 @@
-import { BoxGeometry, type BufferGeometry, ConeGeometry, CylinderGeometry } from 'three'
+import { BoxGeometry, type BufferGeometry, ConeGeometry, CylinderGeometry, SphereGeometry } from 'three'
 import { compose, part } from '@/render/world/features/parts'
 
 const FRAME = '#eef3f1'
@@ -51,6 +51,85 @@ function sprinkler(): BufferGeometry[] {
   ]
 }
 
-export const greenhouseObjects = { greenhouseBay, supportShed, waterTank, sprinkler }
+function tallGreenhouse(): BufferGeometry[] {
+  const parts: BufferGeometry[] = [part(new BoxGeometry(4.2, 0.08, 2.6), '#cfc6b0', compose([0, 0.04, 0])), part(new BoxGeometry(4.2, 0.3, 2.6), '#b7b0a0', compose([0, 0.15, 0], [0, 0, 0], [1, 1, 1]))]
+  for (const x of [-2.07, -1.03, 0, 1.03, 2.07]) {
+    for (const z of [-1.27, 1.27]) parts.push(part(new BoxGeometry(0.07, 2.0, 0.07), FRAME, compose([x, 1.0, z])))
+    parts.push(part(new BoxGeometry(0.06, 0.06, 1.5), FRAME, compose([x, 2.4, -0.62], [-0.55, 0, 0])))
+    parts.push(part(new BoxGeometry(0.06, 0.06, 1.5), FRAME, compose([x, 2.4, 0.62], [0.55, 0, 0])))
+  }
+  parts.push(part(new BoxGeometry(4.2, 0.07, 0.07), FRAME, compose([0, 2.82, 0])))
+  for (const z of [-1.27, 1.27]) parts.push(part(new BoxGeometry(4.2, 0.07, 0.07), FRAME, compose([0, 2.0, z])))
+  parts.push(part(new BoxGeometry(0.06, 1.3, 0.7), '#b9c2c8', compose([2.1, 0.8, 0])))
+  for (const z of [-0.75, 0, 0.75]) {
+    parts.push(part(new BoxGeometry(3.6, 0.2, 0.42), '#6b4a2e', compose([0, 0.38, z])))
+    for (let index = 0; index < 6; index += 1) {
+      const x = -1.5 + index * 0.6
+      parts.push(part(new CylinderGeometry(0.1, 0.13, 1.1, 5), index % 2 === 0 ? '#3f8f3a' : '#4f9a3a', compose([x, 1.0, z])))
+      parts.push(part(new SphereGeometry(0.06, 5, 4), index % 3 === 0 ? '#f2a03c' : '#e0473c', compose([x + 0.1, 0.9 + (index % 2) * 0.3, z + 0.1])))
+    }
+    parts.push(part(new BoxGeometry(3.6, 0.02, 0.02), '#2f2f2f', compose([0, 1.65, z])))
+  }
+  return parts
+}
 
-export const greenhouseGlass = { greenhouseBay: greenhouseBayGlass }
+function tallGreenhouseGlass(): BufferGeometry[] {
+  return [
+    part(new BoxGeometry(4.2, 1.7, 0.02), GLASS, compose([0, 1.15, -1.28])),
+    part(new BoxGeometry(4.2, 1.7, 0.02), GLASS, compose([0, 1.15, 1.28])),
+    part(new BoxGeometry(0.02, 1.7, 2.56), GLASS, compose([-2.09, 1.15, 0])),
+    part(new BoxGeometry(4.2, 0.02, 1.55), GLASS, compose([0, 2.41, -0.64], [-0.55, 0, 0])),
+    part(new BoxGeometry(4.2, 0.02, 1.55), GLASS, compose([0, 2.41, 0.64], [0.55, 0, 0])),
+  ]
+}
+
+function nurseryHouse(): BufferGeometry[] {
+  const parts: BufferGeometry[] = [part(new BoxGeometry(2.0, 0.06, 1.5), '#cfc6b0', compose([0, 0.03, 0]))]
+  for (const x of [-0.97, 0.97]) for (const z of [-0.72, 0.72]) parts.push(part(new BoxGeometry(0.05, 1.0, 0.05), FRAME, compose([x, 0.5, z])))
+  for (const z of [-0.72, 0.72]) parts.push(part(new BoxGeometry(2.0, 0.05, 0.05), FRAME, compose([0, 1.0, z])))
+  parts.push(part(new BoxGeometry(2.0, 0.05, 0.05), FRAME, compose([0, 1.5, 0])))
+  for (const z of [-0.4, 0.4]) {
+    parts.push(part(new BoxGeometry(1.7, 0.05, 0.5), '#b98a52', compose([0, 0.55, z])))
+    for (const x of [-0.6, 0, 0.6]) parts.push(part(new BoxGeometry(0.45, 0.05, 0.4), '#3b3b3b', compose([x, 0.6, z])))
+    for (let index = 0; index < 9; index += 1) parts.push(part(new ConeGeometry(0.035, 0.1, 4), '#8fd45a', compose([-0.75 + index * 0.19, 0.68, z + (index % 2) * 0.1 - 0.05])))
+  }
+  return parts
+}
+
+function nurseryHouseGlass(): BufferGeometry[] {
+  return [
+    part(new BoxGeometry(2.0, 0.98, 0.02), GLASS, compose([0, 0.5, -0.73])),
+    part(new BoxGeometry(2.0, 0.98, 0.02), GLASS, compose([0, 0.5, 0.73])),
+    part(new BoxGeometry(0.02, 0.98, 1.44), GLASS, compose([0.98, 0.5, 0])),
+    part(new BoxGeometry(2.0, 0.02, 0.9), GLASS, compose([0, 1.25, -0.37], [-0.6, 0, 0])),
+    part(new BoxGeometry(2.0, 0.02, 0.9), GLASS, compose([0, 1.25, 0.37], [0.6, 0, 0])),
+  ]
+}
+
+function pumpHouse(): BufferGeometry[] {
+  return [
+    part(new BoxGeometry(1.2, 1.0, 1.0), '#d9d2c3', compose([0, 0.5, 0])),
+    part(new BoxGeometry(1.35, 0.08, 1.15), '#3f8f5a', compose([0, 1.04, 0], [0.1, 0, 0])),
+    part(new BoxGeometry(0.4, 0.7, 0.04), '#7d868e', compose([-0.2, 0.35, 0.51])),
+    part(new CylinderGeometry(0.08, 0.08, 1.0, 6), '#4c78a8', compose([0.75, 0.2, 0.2], [0, 0, Math.PI / 2])),
+    part(new CylinderGeometry(0.08, 0.08, 0.5, 6), '#4c78a8', compose([1.2, 0.2, 0.2], [Math.PI / 2, 0, 0])),
+    part(new CylinderGeometry(0.15, 0.15, 0.25, 8), '#4c78a8', compose([0.4, 0.2, 0.2], [0, 0, Math.PI / 2])),
+  ]
+}
+
+function controlStation(): BufferGeometry[] {
+  return [
+    part(new BoxGeometry(0.1, 1.1, 0.1), '#8d969b', compose([-0.25, 0.55, 0])),
+    part(new BoxGeometry(0.1, 1.1, 0.1), '#8d969b', compose([0.25, 0.55, 0])),
+    part(new BoxGeometry(0.7, 0.55, 0.25), '#e9ece6', compose([0, 0.95, 0.05])),
+    part(new BoxGeometry(0.25, 0.15, 0.02), '#2f6690', compose([-0.12, 1.05, 0.18])),
+    part(new BoxGeometry(0.06, 0.06, 0.02), '#3fa34d', compose([0.15, 1.05, 0.18])),
+    part(new BoxGeometry(0.06, 0.06, 0.02), '#e0473c', compose([0.15, 0.9, 0.18])),
+    part(new BoxGeometry(0.8, 0.05, 0.4), '#3f8f5a', compose([0, 1.26, 0.05])),
+    part(new CylinderGeometry(0.04, 0.04, 0.9, 5), '#4c78a8', compose([0, 0.12, 0.45], [Math.PI / 2, 0, 0])),
+  ]
+}
+
+export const greenhouseObjects = { greenhouseBay, supportShed, waterTank, sprinkler, tallGreenhouse, nurseryHouse, pumpHouse, controlStation }
+
+export const greenhouseGlass = { greenhouseBay: greenhouseBayGlass, tallGreenhouse: tallGreenhouseGlass, nurseryHouse: nurseryHouseGlass }

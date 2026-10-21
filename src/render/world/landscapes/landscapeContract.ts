@@ -99,11 +99,13 @@ export function describeLandscape(expected: LandscapeExpectations): void {
     }
   })
 
-  it('map: trees only on the border belt', () => {
+  it('map: wild trees grow in clusters along the edge, not across the farm', () => {
     const world = map()
-    for (const tree of world.props.filter((prop) => (TREE_MODELS as readonly string[]).includes(prop.model))) {
-      expect(Math.min(tree.x - world.ground.minX, world.ground.maxX - tree.x, tree.z - world.ground.minZ, world.ground.maxZ - tree.z)).toBeLessThanOrEqual(1.5)
-    }
+    const trees = world.props.filter((prop) => (TREE_MODELS as readonly string[]).includes(prop.model))
+    expect(trees.length).toBeGreaterThan(12)
+    for (const tree of trees) expect(Math.min(tree.x - world.ground.minX, world.ground.maxX - tree.x, tree.z - world.ground.minZ, world.ground.maxZ - tree.z)).toBeLessThanOrEqual(4.6)
+    const back = trees.filter((tree) => tree.x + tree.z < 0).length
+    expect(back).toBeGreaterThan(trees.length - back)
   })
 
   it('raises hills only on open ground, never under objects, roads or blocks', () => {

@@ -43,6 +43,16 @@ export class WorldDraft {
     this.features.push(feature)
   }
 
+  clearOfRoutes(point: Vec2, radius: number, tall = false): boolean {
+    const { grid, paths, river, keepOut, frontGuard, bounds } = this.rules
+    if (bounds && (point.x < bounds.minX || point.x > bounds.maxX || point.z < bounds.minZ || point.z > bounds.maxZ)) return false
+    if (grid && rectDistance(point, grid) < GRID_CLEARANCE + radius) return false
+    if (frontGuard && tall && point.x + point.z > 0 && rectDistance(point, frontGuard) < FRONT_CLEARANCE) return false
+    if (paths.some((path) => distanceToPolyline(point, path.points) < path.width / 2 + radius)) return false
+    if (river && distanceToPolyline(point, river.points) < river.width / 2 + radius + RIVER_BANK) return false
+    return !keepOut.some((zone) => pointInPolygon(point, zone))
+  }
+
   private fits(point: Vec2, radius: number, tall: boolean, clutter: boolean): boolean {
     const { grid, paths, river, keepOut, frontGuard, bounds } = this.rules
     if (bounds && (point.x < bounds.minX || point.x > bounds.maxX || point.z < bounds.minZ || point.z > bounds.maxZ)) return false

@@ -74,4 +74,21 @@ const BASE_TRAILS: Record<WorldId, Vec2[]> = {
   homestead: spiral(),
 }
 
-export const WORLD_TRAILS: Record<WorldId, Vec2[]> = Object.fromEntries(Object.entries(BASE_TRAILS).map(([world, trail]) => [world, spread(trail)])) as Record<WorldId, Vec2[]>
+const DRAWN_TRAILS: Partial<Record<WorldId, Vec2[]>> = {
+  garden: points([
+    [-11, 9],
+    [-8, 7],
+    [-5.5, 4.5],
+    [-3.5, 1.5],
+    [-1, -1.5],
+    [2.5, -3],
+    [6, -2],
+    [8.5, 0.5],
+    [8, 4],
+    [5, 6.5],
+    [1.5, 8.5],
+    [-1.5, 11],
+  ]),
+}
+
+export const WORLD_TRAILS: Record<WorldId, Vec2[]> = Object.fromEntries(Object.entries(BASE_TRAILS).map(([world, trail]) => [world, DRAWN_TRAILS[world as WorldId] ?? spread(trail)])) as Record<WorldId, Vec2[]>

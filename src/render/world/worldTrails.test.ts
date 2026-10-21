@@ -39,7 +39,7 @@ describe('world map landscapes', () => {
   })
 
   it('gives every world its own organised zones', () => {
-    expect(count('garden', 'vegetableBed')).toBeGreaterThanOrEqual(12)
+    expect(['vegetableBed', 'cabbageBed', 'carrotBed', 'tomatoBed', 'pepperBed', 'onionBed', 'herbBed', 'sproutBed', 'beanTrellis'].reduce((sum, kind) => sum + count('garden', kind), 0)).toBeGreaterThanOrEqual(30)
     expect(count('cornfield', 'cornStalk')).toBeGreaterThanOrEqual(80)
     expect(count('orchard', 'fruitTree')).toBeGreaterThanOrEqual(12)
     expect(count('greenhouse', 'greenhouseBay')).toBeGreaterThanOrEqual(3)

@@ -1,4 +1,5 @@
 import { BoxGeometry, BufferGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry } from 'three'
+import { commonObjects } from '@/render/world/features/commonObjects'
 import { barnyardObjects } from '@/render/world/features/barnyardObjects'
 import { cornfieldObjects } from '@/render/world/features/cornfieldObjects'
 import { gardenObjects } from '@/render/world/features/gardenObjects'
@@ -103,6 +104,7 @@ const DEFAULT_TINT = '#e0473c'
 export { compose, mergeParts, part }
 
 const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
+  ...commonObjects,
   ...cornfieldObjects,
   ...gardenObjects,
   ...orchardObjects,
@@ -156,7 +158,7 @@ export function groupFeatures(features: WorldFeature[]): Map<string, WorldFeatur
   return groups
 }
 
-export const SWAYING: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['cornStalk', 'fruitTree'])
+export const SWAYING: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['cornStalk', 'fruitTree', 'reeds'])
 
 export const PECKING: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['chicken'])
 

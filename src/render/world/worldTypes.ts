@@ -52,7 +52,7 @@ export interface WorldInput {
   theme?: WorldId | null
 }
 
-export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence', 'grainBin', 'grainDryer', 'cornWagon', 'scarecrow', 'toolShed', 'compostBins', 'wateringCan', 'chicken', 'packingShed', 'crateStack', 'orchardLadder', 'greenhouseBay', 'supportShed', 'waterTank', 'sprinkler', 'feedShed', 'baleStack', 'farmhouse', 'tractor', 'wheelbarrow', 'pier'] as const
+export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence', 'grainBin', 'grainDryer', 'cornWagon', 'scarecrow', 'toolShed', 'compostBins', 'wateringCan', 'chicken', 'packingShed', 'crateStack', 'orchardLadder', 'greenhouseBay', 'supportShed', 'waterTank', 'sprinkler', 'feedShed', 'baleStack', 'farmhouse', 'tractor', 'wheelbarrow', 'pier', 'shadeTree', 'bench', 'pergola', 'rainBarrel', 'workbench', 'basket', 'potStack', 'sackPallet', 'reeds', 'fallenFruit', 'barrels', 'supplyTank', 'cabbageBed', 'carrotBed', 'tomatoBed', 'pepperBed', 'onionBed', 'herbBed', 'sproutBed', 'beanTrellis', 'seedlingTable', 'trailer', 'plow', 'machineShed', 'grainAuger', 'harvestBin', 'pearTree', 'peachTree', 'cherryTree', 'citrusTree', 'sapling', 'berryBush', 'sortingTable', 'handcart', 'tallGreenhouse', 'nurseryHouse', 'pumpHouse', 'controlStation', 'animalShelter', 'hayRack', 'nestBoxes', 'equipmentRack'] as const
 
 export type FeatureKind = (typeof FEATURE_KINDS)[number]
 
@@ -89,6 +89,12 @@ export interface World {
   mounds?: Mound[]
   birds?: Vec2[]
   waters?: Vec2[][]
+  stains?: Stain[]
+}
+
+export interface Stain {
+  points: Vec2[]
+  color: string
 }
 
 export type GroundTexture = 'furrows' | 'stripes'

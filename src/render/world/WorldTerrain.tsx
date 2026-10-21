@@ -74,6 +74,11 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
           <meshStandardMaterial vertexColors roughness={1} flatShading />
         </mesh>
       )}
+      {detail.stains && (
+        <mesh geometry={detail.stains} receiveShadow>
+          <meshStandardMaterial vertexColors roughness={1} side={DoubleSide} />
+        </mesh>
+      )}
       {detail.ruts && (
         <mesh geometry={detail.ruts} position={[0, PATH_HEIGHT + 0.006, 0]} receiveShadow>
           <meshStandardMaterial vertexColors roughness={1} side={DoubleSide} />

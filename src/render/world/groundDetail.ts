@@ -10,12 +10,14 @@ export interface GroundDetail {
   water: BufferGeometry | null
   bank: BufferGeometry | null
   ruts: BufferGeometry | null
+  stains: BufferGeometry | null
 }
 
 const RIDGE_STEP = 0.4
 const STRIPE_STEP = 1.6
 const RUT_WIDTH = 0.16
 const BANK_GROWTH = 1.15
+const STAIN_HEIGHT = 0.022
 
 function shade(color: string, factor: number): string {
   return `#${new Color(color).multiplyScalar(factor).getHexString()}`
@@ -62,11 +64,13 @@ function grown(points: Vec2[], factor: number): Vec2[] {
 export function groundDetail(world: World): GroundDetail {
   const textureList = (world.patches ?? []).flatMap(textureParts)
   const waters = world.waters ?? []
+  const stains = world.stains ?? []
   const rutList = world.paths.flatMap((path) => [-1, 1].map((side) => part(ribbonGeometry(offsetPolyline(path.points, side * path.width * 0.22), RUT_WIDTH), shade(world.palette.path, 0.8), compose([0, 0, 0]))))
   return {
     texture: textureList.length > 0 ? mergeParts(textureList) : null,
     water: waters.length > 0 ? mergeParts(waters.map((points) => flatShape(points, WORLD_COLORS.water, 0.03))) : null,
     bank: waters.length > 0 ? mergeParts(waters.map((points) => flatShape(grown(points, BANK_GROWTH), WORLD_COLORS.bank, 0.012))) : null,
     ruts: rutList.length > 0 ? mergeParts(rutList) : null,
+    stains: stains.length > 0 ? mergeParts(stains.map((stain) => flatShape(stain.points, stain.color, STAIN_HEIGHT))) : null,
   }
 }

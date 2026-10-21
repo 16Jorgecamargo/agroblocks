@@ -22,7 +22,7 @@ function world(overrides: Partial<World>): World {
 
 describe('ground detail', () => {
   it('draws nothing extra on plain ground', () => {
-    expect(groundDetail(world({}))).toEqual({ texture: null, water: null, bank: null, ruts: null })
+    expect(groundDetail(world({}))).toEqual({ texture: null, water: null, bank: null, ruts: null, stains: null })
   })
 
   it('draws furrows and mown stripes as one mesh, standing on the lot', () => {
@@ -53,5 +53,14 @@ describe('ground detail', () => {
     detail.ruts?.computeBoundingBox()
     expect(detail.ruts?.boundingBox?.min.z).toBeGreaterThan(4.4)
     expect(detail.ruts?.boundingBox?.max.z).toBeLessThan(5.6)
+  })
+
+  it('lays worn soil and moss stains flat on the ground as one mesh', () => {
+    const detail = groundDetail(world({ stains: [{ points: [{ x: 0, z: 0 }, { x: 2, z: 0 }, { x: 1, z: 2 }], color: '#b49a6a' }, { points: [{ x: 4, z: 4 }, { x: 5, z: 4 }, { x: 5, z: 5 }], color: '#5f9e44' }] }))
+    detail.stains?.computeBoundingBox()
+    expect(detail.stains?.boundingBox?.min.x).toBeCloseTo(0, 2)
+    expect(detail.stains?.boundingBox?.max.x).toBeCloseTo(5, 2)
+    expect(detail.stains?.boundingBox?.max.y).toBeLessThan(0.05)
+    expect(detail.stains?.attributes.color.count).toBe(detail.stains?.attributes.position.count)
   })
 })
