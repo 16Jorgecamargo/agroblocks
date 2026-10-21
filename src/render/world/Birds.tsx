@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { ConeGeometry, Object3D, type InstancedMesh } from 'three'
+import { ConeGeometry, Object3D, Sphere, Vector3, type InstancedMesh } from 'three'
 import { compose, mergeParts, part } from '@/render/world/features/parts'
 import type { Vec2 } from '@/render/world/worldTypes'
 
@@ -18,6 +18,20 @@ function orbit(index: number) {
   return { radius: 1.5 + (index % 3) * 0.7, height: 4 + (index % 2) * 0.8, phase: index * 1.9 }
 }
 
+export function birdPosition(point: Vec2, index: number, time: number): Vector3 {
+  const { radius, height, phase } = orbit(index)
+  const angle = time * SPEED + phase
+  return new Vector3(point.x + Math.cos(angle) * radius, height + Math.sin(time * 2 + phase) * 0.1, point.z + Math.sin(angle) * radius)
+}
+
+export function flockBounds(points: Vec2[]): Sphere {
+  const center = new Vector3()
+  for (const point of points) center.add(new Vector3(point.x, 4.4, point.z))
+  center.divideScalar(Math.max(1, points.length))
+  const reach = Math.max(0, ...points.map((point) => Math.hypot(point.x - center.x, point.z - center.z)))
+  return new Sphere(center, reach + 3.6)
+}
+
 export function Birds({ points, active }: { points: Vec2[]; active: boolean }) {
   const mesh = useRef<InstancedMesh>(null)
   const geometry = useMemo(birdGeometry, [])
@@ -25,14 +39,15 @@ export function Birds({ points, active }: { points: Vec2[]; active: boolean }) {
 
   const place = (time: number) => {
     points.forEach((point, index) => {
-      const { radius, height, phase } = orbit(index)
-      const angle = time * SPEED + phase
-      dummy.position.set(point.x + Math.cos(angle) * radius, height + Math.sin(time * 2 + phase) * 0.1, point.z + Math.sin(angle) * radius)
-      dummy.rotation.set(0, -angle, 0)
+      dummy.position.copy(birdPosition(point, index, time))
+      dummy.rotation.set(0, -(time * SPEED + orbit(index).phase), 0)
       dummy.updateMatrix()
       mesh.current?.setMatrixAt(index, dummy.matrix)
     })
-    if (mesh.current) mesh.current.instanceMatrix.needsUpdate = true
+    if (mesh.current) {
+      mesh.current.instanceMatrix.needsUpdate = true
+      mesh.current.boundingSphere = flockBounds(points)
+    }
   }
 
   useLayoutEffect(() => place(0))

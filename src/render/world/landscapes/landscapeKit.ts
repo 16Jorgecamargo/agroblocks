@@ -1,9 +1,9 @@
 import type { ModelId } from '@/render/models/manifest'
-import { rectDistance } from '@/render/world/geometry'
+import { distanceToPolyline, rectDistance } from '@/render/world/geometry'
 import { CLUTTER_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import type { WorldDraft } from '@/render/world/worldDraft'
 import type { BorderKind, Relief } from '@/render/world/worldStyles'
-import { FEATURE_KINDS, type FeatureKind, type GroundPatch, type Mound, type Rect, type Vec2, type WorldDensity } from '@/render/world/worldTypes'
+import { FEATURE_KINDS, type FeatureKind, type GroundPatch, type Mound, type Polyline, type Rect, type Vec2, type WorldDensity } from '@/render/world/worldTypes'
 
 export type { Mound }
 
@@ -106,7 +106,15 @@ export function edgeClutter(draft: WorldDraft, blocks: Rect[], density: WorldDen
   }
 }
 
-export function reliefMounds(relief: Relief, outside: Rect, bounds: Rect, random: () => number): Mound[] {
+export function openGround(draft: WorldDraft, paths: Polyline[], patches: GroundPatch[]): (point: Vec2, radius: number) => boolean {
+  return (point, radius) =>
+    draft.props.every((prop) => Math.hypot(prop.x - point.x, prop.z - point.z) > radius + 0.3) &&
+    draft.features.every((feature) => Math.hypot(feature.x - point.x, feature.z - point.z) > radius + 0.3) &&
+    paths.every((path) => distanceToPolyline(point, path.points) > radius + path.width / 2 + 0.2) &&
+    patches.every((patch) => rectDistance(point, patch.rect) > radius + 0.2)
+}
+
+export function reliefMounds(relief: Relief, outside: Rect, bounds: Rect, random: () => number, open: (point: Vec2, radius: number) => boolean = () => true): Mound[] {
   if (relief !== 'rolling') return []
   const target = 6 + Math.floor(random() * 5)
   const mounds: Mound[] = []
@@ -116,6 +124,7 @@ export function reliefMounds(relief: Relief, outside: Rect, bounds: Rect, random
     const z = bounds.minZ + radius + random() * (bounds.maxZ - bounds.minZ - radius * 2)
     if (rectDistance({ x, z }, outside) <= radius) continue
     if (mounds.some((mound) => Math.hypot(mound.x - x, mound.z - z) < mound.radius + radius)) continue
+    if (!open({ x, z }, radius)) continue
     mounds.push({ x, z, radius, height: 0.4 + random() * 0.6 })
   }
   return mounds

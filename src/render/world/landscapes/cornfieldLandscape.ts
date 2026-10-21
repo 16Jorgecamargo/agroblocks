@@ -1,5 +1,5 @@
 import { rectPolygon } from '@/render/world/geometry'
-import { borderBelt, cropBlock, edgeClutter, landmark, reliefMounds, WORLD_MAP_ISLAND } from '@/render/world/landscapes/landscapeKit'
+import { borderBelt, cropBlock, edgeClutter, landmark, openGround, reliefMounds, WORLD_MAP_ISLAND } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
@@ -77,7 +77,7 @@ function map(input: WorldInput, random: () => number): World {
     palette: STYLE.palette,
     style: STYLE,
     patches,
-    mounds: reliefMounds(STYLE.relief, inset(WORLD_MAP_ISLAND, 3.2), inset(WORLD_MAP_ISLAND, 0.3), random),
+    mounds: reliefMounds(STYLE.relief, { minX: 0, maxX: 0, minZ: 0, maxZ: 0 }, inset(WORLD_MAP_ISLAND, 1.6), random, openGround(draft, [road, lane], patches)),
   }
 }
 
@@ -126,7 +126,7 @@ function farm(input: WorldInput, random: () => number): World {
     palette: STYLE.palette,
     style: STYLE,
     patches,
-    mounds: reliefMounds(STYLE.relief, expand(core, 0.5), expand(core, 10), random),
+    mounds: reliefMounds(STYLE.relief, expand(core, 0.5), expand(core, 10), random, openGround(draft, [road], patches)),
   }
 }
 

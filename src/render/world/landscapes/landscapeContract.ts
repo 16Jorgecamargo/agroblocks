@@ -60,6 +60,18 @@ export function describeLandscape(expected: LandscapeExpectations): void {
     }
   })
 
+  it('raises hills only on open ground, never under objects, roads or blocks', () => {
+    const [{ width, height }] = sizes
+    for (const world of [map(), farm(width, height)]) {
+      for (const mound of world.mounds ?? []) {
+        for (const prop of world.props) expect(Math.hypot(prop.x - mound.x, prop.z - mound.z), `${prop.model} under a hill`).toBeGreaterThan(mound.radius)
+        for (const feature of world.features) expect(Math.hypot(feature.x - mound.x, feature.z - mound.z), `${feature.kind} under a hill`).toBeGreaterThan(mound.radius)
+        for (const path of world.paths) expect(distanceToPolyline(mound, path.points)).toBeGreaterThan(mound.radius + path.width / 2)
+        for (const patch of world.patches ?? []) expect(rectDistance(mound, patch.rect)).toBeGreaterThan(mound.radius)
+      }
+    }
+  })
+
   it('map: the same on every visit, and recognisable in light graphics', () => {
     expect(map()).toEqual(map())
     const light = map('light')
