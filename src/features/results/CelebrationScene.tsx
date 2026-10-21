@@ -8,7 +8,7 @@ import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
 import { CELEBRATION_BED_CENTERS, CELEBRATION_ROBOT } from '@/render/world/celebrationLayout'
 import { Herd } from '@/render/world/Herd'
-import { WorldFeatures } from '@/render/world/WorldFeatures'
+import { InstancedFeatures } from '@/render/world/InstancedFeatures'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import { CANVAS_RESIZE } from '@/render/canvasResize'
@@ -47,7 +47,7 @@ export default function CelebrationScene({ reducedMotion, lowGraphics, onReady }
       />
       <WorldTerrain world={world} />
       <WorldProps world={world} shadows={!lowGraphics} ambient={alive} />
-      <WorldFeatures features={world.features} ambient={alive} />
+      <InstancedFeatures features={world.features} ambient={alive} />
       <Herd animals={world.animals} active={alive} />
       <Butterflies points={world.butterflies} active={alive} />
       {CELEBRATION_BED_CENTERS.map((center) => (

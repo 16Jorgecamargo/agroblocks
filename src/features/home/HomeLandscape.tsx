@@ -12,7 +12,7 @@ import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
 import { Herd } from '@/render/world/Herd'
 import { HILL_BASE_Y, HOME_HILLS } from '@/render/world/hillScatter'
-import { WorldFeatures } from '@/render/world/WorldFeatures'
+import { InstancedFeatures } from '@/render/world/InstancedFeatures'
 import { WorldProps } from '@/render/world/WorldProps'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import type { Cell } from '@/game/world/types'
@@ -117,7 +117,7 @@ export default function HomeLandscape({ ambient, lowGraphics, onReady }: { ambie
       ))}
       <WorldTerrain world={world} withGround={false} />
       <WorldProps world={world} shadows={!lowGraphics} ambient={alive} />
-      <WorldFeatures features={world.features} ambient={alive} />
+      <InstancedFeatures features={world.features} ambient={alive} />
       <Herd animals={world.animals} active={alive} />
       <Butterflies points={world.butterflies} active={alive} />
       <group position={[0.6, 0, 1.6]} rotation={[0, -0.18, 0]}>

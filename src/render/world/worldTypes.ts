@@ -52,7 +52,9 @@ export interface WorldInput {
   theme?: WorldId | null
 }
 
-export type FeatureKind = 'cornStalk' | 'fruitTree' | 'greenhouse' | 'vegetableBed' | 'hayBale' | 'trough'
+export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough'] as const
+
+export type FeatureKind = (typeof FEATURE_KINDS)[number]
 
 export interface WorldFeature {
   kind: FeatureKind
@@ -61,6 +63,7 @@ export interface WorldFeature {
   rotation: number
   scale: number
   tint?: string
+  y?: number
 }
 
 export interface WorldPaletteColors {

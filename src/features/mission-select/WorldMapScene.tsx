@@ -10,7 +10,7 @@ import { CANVAS_RESIZE } from '@/render/canvasResize'
 import { DrawCallProbe } from '@/render/DrawCallProbe'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
-import { WorldFeatures } from '@/render/world/WorldFeatures'
+import { InstancedFeatures } from '@/render/world/InstancedFeatures'
 import { WorldProps } from '@/render/world/WorldProps'
 import { SceneLighting } from '@/render/world/SceneLighting'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
@@ -144,7 +144,7 @@ export default function WorldMapScene({ world, nodes, states, stars, selected, o
         <SceneLighting style={map.style} shadows={!lowGraphics} shadowExtent={14} background={false} />
         <WorldTerrain world={map} />
         <WorldProps world={map} shadows={!lowGraphics} ambient={alive} />
-        <WorldFeatures features={map.features} ambient={alive} />
+        <InstancedFeatures features={map.features} ambient={alive} />
         <Butterflies points={map.butterflies} active={alive} />
         {nodes.map((node, index) => {
           const point = map.trail[index]
