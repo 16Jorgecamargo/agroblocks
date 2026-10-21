@@ -1,4 +1,5 @@
 import { BoxGeometry, BufferGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry } from 'three'
+import { barnyardObjects } from '@/render/world/features/barnyardObjects'
 import { cornfieldObjects } from '@/render/world/features/cornfieldObjects'
 import { gardenObjects } from '@/render/world/features/gardenObjects'
 import { greenhouseGlass as greenhouseBayGlass, greenhouseObjects } from '@/render/world/features/greenhouseObjects'
@@ -104,6 +105,7 @@ const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
   ...gardenObjects,
   ...orchardObjects,
   ...greenhouseObjects,
+  ...barnyardObjects,
   cornStalk,
   fruitTree,
   greenhouse,
