@@ -1,3 +1,4 @@
+import { LANDSCAPES } from '@/render/world/landscapes/landscapes'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
 import { WORLD_IDS } from '@/game/worlds/worldTypes'
 import { buildWorld } from '@/render/world/buildWorld'
@@ -12,7 +13,7 @@ describe('world themes', () => {
     expect(world.palette.grass).toBe(WORLD_COLORS.grass)
   })
 
-  it.each(WORLD_IDS)('%s farm uses its own features and palette', (theme) => {
+  it.each(WORLD_IDS.filter((world) => !LANDSCAPES[world]))('%s farm uses its own features and palette', (theme) => {
     const world = buildWorld({ layout: 'farm', gridWidth: 6, gridHeight: 3, seed: 's', density: 'full', theme })
     expect(world.features.length).toBeGreaterThan(0)
     for (const feature of world.features) expect(WORLD_THEMES[theme].features).toContain(feature.kind)

@@ -71,7 +71,7 @@ export default function FarmScene({
       <SceneLighting style={world.style} shadows={!lowGraphics} shadowExtent={26} />
       <mesh position={[0, -0.01, 0]} receiveShadow>
         <boxGeometry args={[width + 0.6, 0.06, height + 0.6]} />
-        <Flat color={PALETTE.grassDark} />
+        <Flat color={theme ? world.style.palette.grassDeep : PALETTE.grassDark} />
       </mesh>
       <WorldTerrain world={world} />
       <WorldProps world={world} shadows={!lowGraphics} ambient={!reducedMotion && !lowGraphics} />

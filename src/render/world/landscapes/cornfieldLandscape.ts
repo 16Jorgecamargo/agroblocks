@@ -1,5 +1,4 @@
 import { rectPolygon } from '@/render/world/geometry'
-import { farmLayout } from '@/render/world/farmLayout'
 import { borderBelt, cropBlock, edgeClutter, landmark, reliefMounds } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 import { WORLD_MAP_ISLAND } from '@/render/world/worldMapLayout'
@@ -83,7 +82,53 @@ function map(input: WorldInput, random: () => number): World {
   }
 }
 
-export const cornfieldLandscape: Landscape = {
-  map,
-  farm: (input, random) => farmLayout(input, random),
+function expand(rect: Rect, amount: number): Rect {
+  return inset(rect, -amount)
 }
+
+function farm(input: WorldInput, random: () => number): World {
+  const full = input.density === 'full'
+  const hw = input.gridWidth / 2
+  const hh = input.gridHeight / 2
+  const grid: Rect = { minX: -hw, maxX: hw, minZ: -hh, maxZ: hh }
+  const core = expand(grid, 9)
+  const exit = { x: core.maxX, z: 0.4 }
+  const road: Polyline = { points: [{ x: hw + 1.4, z: 0 }, { x: hw + 5, z: 0.5 }, exit, { x: core.maxX + 4, z: 0.2 }], width: 1.4 }
+  const draft = new WorldDraft(random, { grid, paths: [road], river: null, keepOut: [], frontGuard: grid })
+  const spacing: [number, number] = full ? [0.62, 0.8] : [1, 1.2]
+  const blocks: Rect[] = [
+    { minX: -hw - 7.6, maxX: -hw - 1.6, minZ: -hh - 0.4, maxZ: hh + 4.2 },
+    { minX: -hw - 0.4, maxX: hw + 4.2, minZ: -hh - 7.6, maxZ: -hh - 1.6 },
+  ]
+  const yard: Rect = { minX: -hw - 9, maxX: -hw - 2, minZ: -hh - 9, maxZ: -hh - 2 }
+  const stubble: Rect = { minX: -hw - 0.4, maxX: hw + 3.4, minZ: hh + 1.8, maxZ: hh + 4 }
+  const patches: GroundPatch[] = blocks.map((rect) => cropBlock(draft, { rect, color: SOIL }, 'cornStalk', spacing, random))
+  patches.push({ rect: yard, color: YARD }, { rect: stubble, color: STUBBLE })
+  binCluster(draft, center(yard), 0)
+  for (let x = stubble.minX + 0.9; x < stubble.maxX - 0.4; x += full ? 2.2 : 3.6) draft.forceFeature('hayBale', { x, z: (stubble.minZ + stubble.maxZ) / 2 + (random() - 0.5) * 0.5 }, random() * 0.5, 1)
+  draft.forceFeature('cornWagon', { x: hw + 4.2, z: 2 }, -0.3, 1)
+  draft.forceFeature('scarecrow', { x: hw + 3, z: -hh - 1.2 }, 0.6, 1)
+  borderBelt(draft, 'windbreak', core, random, [exit])
+  edgeClutter(draft, [...blocks, yard, stubble], input.density, random, 6)
+  const ground = expand(core, 12)
+
+  return {
+    ground,
+    island: false,
+    paths: [road],
+    river: null,
+    trail: [],
+    props: draft.props,
+    pasture: null,
+    animals: [],
+    butterflies: [],
+    birds: blocks.map(center),
+    features: draft.features,
+    palette: STYLE.palette,
+    style: STYLE,
+    patches,
+    mounds: reliefMounds(STYLE.relief, expand(core, 0.5), expand(core, 10), random),
+  }
+}
+
+export const cornfieldLandscape: Landscape = { map, farm }

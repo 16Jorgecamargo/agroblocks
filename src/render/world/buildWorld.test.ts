@@ -1,7 +1,7 @@
 import { MISSIONS } from '@/data/missions'
 import { buildWorld, gridSizeOf } from '@/render/world/buildWorld'
 import { distanceToPolyline, pointInPolygon, rectDistance } from '@/render/world/geometry'
-import { CLUTTER_MODELS, EXEMPT_MODELS, GRID_CLEARANCE, TALL_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
+import { CLUTTER_MODELS, EXEMPT_MODELS, GRID_CLEARANCE, TALL_FEATURES, TALL_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import type { World } from '@/render/world/worldTypes'
 import { HOME_BEDS, HOME_ROBOT, HOME_TITLE_LANE } from '@/render/world/homeLayout'
 import { HOME_HILLS, hillSurfaceY } from '@/render/world/hillScatter'
@@ -17,13 +17,17 @@ describe('buildWorld farm', () => {
     expect(farm(5, 5)).toEqual(farm(5, 5))
   })
 
-  it.each(MISSIONS.map((mission) => [mission.id, gridSizeOf(mission.map.cells)] as const))('keeps the grid of %s clear and visible', (_, size) => {
-    const world = farm(size.width, size.height)
+  it.each(MISSIONS.map((mission) => [mission.id, gridSizeOf(mission.map.cells), mission.world] as const))('keeps the grid of %s clear and visible', (_, size, theme) => {
+    const world = buildWorld({ layout: 'farm', gridWidth: size.width, gridHeight: size.height, seed: 'test', density: 'full', theme })
     const grid = { minX: -size.width / 2, maxX: size.width / 2, minZ: -size.height / 2, maxZ: size.height / 2 }
     for (const prop of world.props) {
       if (prop.model === 'fence' || prop.model === 'fence-gate') continue
       expect(rectDistance(prop, grid)).toBeGreaterThanOrEqual(GRID_CLEARANCE)
       if (TALL_MODELS.has(prop.model) && prop.x + prop.z > 0) expect(rectDistance(prop, grid)).toBeGreaterThanOrEqual(5)
+    }
+    for (const feature of world.features) {
+      expect(rectDistance(feature, grid)).toBeGreaterThanOrEqual(GRID_CLEARANCE)
+      if (TALL_FEATURES.has(feature.kind) && feature.x + feature.z > 0) expect(rectDistance(feature, grid)).toBeGreaterThanOrEqual(5)
     }
   })
 
