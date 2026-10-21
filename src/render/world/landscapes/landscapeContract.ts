@@ -4,7 +4,12 @@ import type { WorldId } from '@/game/worlds/worldTypes'
 import type { ModelId } from '@/render/models/manifest'
 import { buildWorld, gridSizeOf } from '@/render/world/buildWorld'
 import { distanceToPolyline, pointInPolygon, rectDistance } from '@/render/world/geometry'
+import { BODY_RADIUS } from '@/render/world/animalBrain'
 import { CLUTTER_CEILING } from '@/render/world/landscapes/landscapeKit'
+import { buildOccupancy } from '@/render/world/navigation/buildOccupancy'
+import { segmentClear } from '@/render/world/navigation/findPath'
+import { isOpen, walkMask } from '@/render/world/navigation/passability'
+import { TASK_TARGETS, type WorkTask } from '@/render/world/navigation/workSpots'
 import { FEATURE_FOOTPRINTS, FRONT_CLEARANCE, GRID_CLEARANCE, isClutter, TALL_FEATURES, TALL_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
 import { FEATURE_KINDS, type FeatureKind, type Rect, type Vec2, type World, type WorldDensity } from '@/render/world/worldTypes'
@@ -142,6 +147,40 @@ export function describeLandscape(expected: LandscapeExpectations): void {
     const landmark = expected.landmark.flatMap((kind) => pieces(world, kind))
     const middle = { x: landmark.reduce((sum, item) => sum + item.x, 0) / landmark.length, z: landmark.reduce((sum, item) => sum + item.z, 0) / landmark.length }
     expect(middle.x + middle.z).toBeLessThan(0)
+  })
+
+  const scenes = () => (['full', 'light'] as const).flatMap((density) => [map(density), ...sizes.map(({ width, height }) => farm(width, height, density))])
+
+  it('moves people and tractors only through cells open to them', () => {
+    for (const world of scenes()) {
+      const grid = buildOccupancy(world)
+      const person = walkMask(grid, 'person')
+      const tractor = walkMask(grid, 'tractor')
+      for (const actor of world.actors ?? []) {
+        const mask = actor.kind === 'tractor' ? tractor : person
+        expect(isOpen(mask, actor.route[0]), actor.id).toBe(true)
+        for (let index = 1; index < actor.route.length; index += 1) expect(segmentClear(mask, actor.route[index - 1], actor.route[index]), actor.id).toBe(true)
+      }
+    }
+  })
+
+  it('works only beside the object its task needs', () => {
+    for (const world of scenes()) {
+      for (const actor of (world.actors ?? []).filter((item) => item.kind === 'worker' && item.task !== 'walk')) {
+        const ends = actor.route.length === 1 ? [actor.route[0]] : [actor.route[0], actor.route[actor.route.length - 1]]
+        for (const end of ends) expect(world.features.some((feature) => TASK_TARGETS[actor.task as WorkTask].includes(feature.kind) && Math.hypot(feature.x - end.x, feature.z - end.z) < 2.6), actor.id).toBe(true)
+      }
+    }
+  })
+
+  it('keeps every animal on free pen cells, apart from the others', () => {
+    for (const world of scenes()) {
+      const mask = walkMask(buildOccupancy(world), 'animal')
+      for (const animal of world.animals) expect(isOpen(mask, animal), animal.id).toBe(true)
+      world.animals.forEach((a, index) =>
+        world.animals.slice(index + 1).forEach((b) => expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeGreaterThanOrEqual(BODY_RADIUS[a.species] * a.scale + BODY_RADIUS[b.species] * b.scale - 1e-9)),
+      )
+    }
   })
 
   it('brings people to work on the map and the farm, never on the mission grid', () => {
