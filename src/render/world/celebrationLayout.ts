@@ -1,6 +1,7 @@
 import { rectDistance, rectPolygon } from '@/render/world/geometry'
 import { addButterflies, addClutter, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
+import { styleOf } from '@/render/world/worldStyles'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { themePalette } from '@/render/world/worldThemes'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
@@ -56,5 +57,6 @@ export function celebrationLayout(input: WorldInput, random: () => number): Worl
     butterflies: addButterflies(random, { minX: -5, maxX: -0.5, minZ: -0.5, maxZ: 4 }, 6),
     features: draft.features,
     palette: themePalette(input.theme),
+    style: styleOf(input.theme),
   }
 }

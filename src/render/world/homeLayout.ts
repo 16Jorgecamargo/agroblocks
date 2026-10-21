@@ -2,6 +2,7 @@ import { rectDistance, rectPolygon } from '@/render/world/geometry'
 import { addButterflies, addClutter, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import { HOME_HILLS, hillScatter, hillSurfaceY } from '@/render/world/hillScatter'
+import { styleOf } from '@/render/world/worldStyles'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { themePalette } from '@/render/world/worldThemes'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
@@ -55,5 +56,6 @@ export function homeLayout(input: WorldInput, random: () => number): World {
     butterflies: addButterflies(random, { minX: -2, maxX: 4, minZ: -0.5, maxZ: 4 }, 5),
     features: draft.features,
     palette: themePalette(input.theme),
+    style: styleOf(input.theme),
   }
 }

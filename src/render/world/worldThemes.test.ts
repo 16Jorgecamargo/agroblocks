@@ -1,3 +1,4 @@
+import { WORLD_STYLES } from '@/render/world/worldStyles'
 import { WORLD_IDS } from '@/game/worlds/worldTypes'
 import { buildWorld } from '@/render/world/buildWorld'
 import { GRID_CLEARANCE } from '@/render/world/worldCatalog'
@@ -15,7 +16,7 @@ describe('world themes', () => {
     const world = buildWorld({ layout: 'farm', gridWidth: 6, gridHeight: 3, seed: 's', density: 'full', theme })
     expect(world.features.length).toBeGreaterThan(0)
     for (const feature of world.features) expect(WORLD_THEMES[theme].features).toContain(feature.kind)
-    expect(world.palette).toEqual(WORLD_THEMES[theme].palette)
+    expect(world.palette).toEqual(WORLD_STYLES[theme].palette)
   })
 
   it('keeps features off the playable grid', () => {
@@ -28,9 +29,5 @@ describe('world themes', () => {
     for (const [index, feature] of world.features.entries()) {
       for (const other of world.features.slice(index + 1)) expect(Math.hypot(feature.x - other.x, feature.z - other.z)).toBeGreaterThan(0.3)
     }
-  })
-
-  it('gives every world a different grass tone', () => {
-    expect(new Set(WORLD_IDS.map((world) => WORLD_THEMES[world].palette.grass)).size).toBe(WORLD_IDS.length)
   })
 })

@@ -8,11 +8,11 @@ import type { WorldId } from '@/game/worlds/worldTypes'
 import { SPRINGS } from '@/motion/springs'
 import { CANVAS_RESIZE } from '@/render/canvasResize'
 import { DrawCallProbe } from '@/render/DrawCallProbe'
-import { PALETTE } from '@/render/palette'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
 import { WorldFeatures } from '@/render/world/WorldFeatures'
 import { WorldProps } from '@/render/world/WorldProps'
+import { SceneLighting } from '@/render/world/SceneLighting'
 import { WorldTerrain } from '@/render/world/WorldTerrain'
 import type { Vec2 } from '@/render/world/worldTypes'
 
@@ -141,8 +141,7 @@ export default function WorldMapScene({ world, nodes, states, stars, selected, o
         <LabelProjector labels={labels} trail={map.trail} />
         <DrawCallProbe />
         <MapCamera focus={focus} pan={pan} instant={!ambient} />
-        <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
-        <directionalLight position={[10, 18, 8]} intensity={1.5} castShadow={!lowGraphics} shadow-mapSize={[2048, 2048]} shadow-camera-left={-14} shadow-camera-right={14} shadow-camera-top={14} shadow-camera-bottom={-14} />
+        <SceneLighting style={map.style} shadows={!lowGraphics} shadowExtent={14} background={false} />
         <WorldTerrain world={map} />
         <WorldProps world={map} shadows={!lowGraphics} ambient={alive} />
         <WorldFeatures features={map.features} ambient={alive} />

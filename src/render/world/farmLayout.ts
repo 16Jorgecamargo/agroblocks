@@ -1,6 +1,7 @@
 import { crossings, rectPolygon } from '@/render/world/geometry'
 import { addButterflies, addClutter, addLilies, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
+import { styleOf } from '@/render/world/worldStyles'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { addThemeFeatures, themePalette } from '@/render/world/worldThemes'
 import type { Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
@@ -91,5 +92,6 @@ export function farmLayout(input: WorldInput, random: () => number): World {
     butterflies: addButterflies(random, { minX: -hw - 3, maxX: hw + 3, minZ: hh + 1.5, maxZ: hh + 7 }, 8),
     features: draft.features,
     palette: themePalette(input.theme),
+    style: styleOf(input.theme),
   }
 }

@@ -1,22 +1,21 @@
 import type { WorldId } from '@/game/worlds/worldTypes'
 import type { CropKind } from '@/render/crops/cropShape'
-import { DEFAULT_PALETTE } from '@/render/world/worldPalette'
+import { styleOf } from '@/render/world/worldStyles'
 import type { WorldDraft } from '@/render/world/worldDraft'
 import type { FeatureKind, Rect, Vec2, WorldDensity, WorldPaletteColors } from '@/render/world/worldTypes'
 
 export interface WorldTheme {
-  palette: WorldPaletteColors
   crop: CropKind
   features: FeatureKind[]
 }
 
 export const WORLD_THEMES: Record<WorldId, WorldTheme> = {
-  garden: { palette: { grass: '#7cc35a', grassDeep: '#63a945', path: '#c9a46b' }, crop: 'vegetable', features: ['vegetableBed'] },
-  cornfield: { palette: { grass: '#cdbd62', grassDeep: '#b5a54d', path: '#b88f55' }, crop: 'corn', features: ['cornStalk', 'hayBale'] },
-  orchard: { palette: { grass: '#6fb54e', grassDeep: '#57993b', path: '#c29c63' }, crop: 'fruit', features: ['fruitTree'] },
-  greenhouse: { palette: { grass: '#83c493', grassDeep: '#69ab7a', path: '#c7b08a' }, crop: 'seedling', features: ['greenhouse', 'vegetableBed'] },
-  barnyard: { palette: { grass: '#b9b071', grassDeep: '#a19858', path: '#a9875b' }, crop: 'grain', features: ['hayBale', 'trough'] },
-  homestead: { palette: DEFAULT_PALETTE, crop: 'mixed', features: ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough'] },
+  garden: { crop: 'vegetable', features: ['vegetableBed'] },
+  cornfield: { crop: 'corn', features: ['cornStalk', 'hayBale'] },
+  orchard: { crop: 'fruit', features: ['fruitTree'] },
+  greenhouse: { crop: 'seedling', features: ['greenhouse', 'vegetableBed'] },
+  barnyard: { crop: 'grain', features: ['hayBale', 'trough'] },
+  homestead: { crop: 'mixed', features: ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough'] },
 }
 
 const FRUIT_TINTS = ['#e0473c', '#f29a2e', '#f2c94c']
@@ -70,5 +69,5 @@ export function addThemeFeatures(draft: WorldDraft, theme: WorldId | null | unde
 }
 
 export function themePalette(theme: WorldId | null | undefined): WorldPaletteColors {
-  return theme ? WORLD_THEMES[theme].palette : DEFAULT_PALETTE
+  return styleOf(theme).palette
 }

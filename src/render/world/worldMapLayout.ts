@@ -3,6 +3,7 @@ import type { ModelId } from '@/render/models/manifest'
 import { rectDistance, rectPolygon } from '@/render/world/geometry'
 import { addButterflies, addClutter, addLilies, spawnHerd } from '@/render/world/scenery'
 import { FOREST_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
+import { styleOf } from '@/render/world/worldStyles'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { themePalette } from '@/render/world/worldThemes'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'
@@ -284,6 +285,7 @@ export function worldMapLayout(input: WorldInput, random: () => number): World {
     butterflies: addButterflies(random, WORLD_MAP_ISLAND, 10),
     features: draft.features,
     palette: themePalette(theme),
+    style: styleOf(theme),
     patches,
   }
 }

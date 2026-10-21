@@ -1,5 +1,6 @@
 import type { WorldId } from '@/game/worlds/worldTypes'
 import type { ModelId } from '@/render/models/manifest'
+import type { WorldStyle } from '@/render/world/worldStyles'
 
 export interface Vec2 {
   x: number
@@ -80,6 +81,7 @@ export interface World {
   butterflies: Vec2[]
   features: WorldFeature[]
   palette: WorldPaletteColors
+  style: WorldStyle
   patches?: GroundPatch[]
 }
 

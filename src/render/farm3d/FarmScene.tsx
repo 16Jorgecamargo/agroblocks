@@ -10,6 +10,7 @@ import { Flat } from '@/render/farm3d/materials'
 import { resolveCrop } from '@/render/crops/cropShape'
 import { PlotTile } from '@/render/farm3d/PlotTile'
 import { WORLD_THEMES } from '@/render/world/worldThemes'
+import { SceneLighting } from '@/render/world/SceneLighting'
 import { RobotModel } from '@/render/farm3d/RobotModel'
 import { buildWorld } from '@/render/world/buildWorld'
 import { Butterflies } from '@/render/world/Butterflies'
@@ -55,7 +56,6 @@ export default function FarmScene({
       onCreated={() => onReady?.()}
       aria-hidden="true"
     >
-      <color attach="background" args={[PALETTE.sky]} />
       <CameraRig
         gridWidth={width}
         gridHeight={height}
@@ -67,17 +67,7 @@ export default function FarmScene({
       />
       <CellLocatorBridge width={width} height={height} />
       <DrawCallProbe />
-      <hemisphereLight args={['#f1f8ff', PALETTE.grassDark, 0.9]} />
-      <directionalLight
-        position={[10, 18, 8]}
-        intensity={1.5}
-        castShadow={!lowGraphics}
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-26}
-        shadow-camera-right={26}
-        shadow-camera-top={26}
-        shadow-camera-bottom={-26}
-      />
+      <SceneLighting style={world.style} shadows={!lowGraphics} shadowExtent={26} />
       <mesh position={[0, -0.01, 0]} receiveShadow>
         <boxGeometry args={[width + 0.6, 0.06, height + 0.6]} />
         <Flat color={PALETTE.grassDark} />
