@@ -39,4 +39,20 @@ describe('plan actors', () => {
     const jobs: Job[] = [{ id: 'p', kind: 'worker', task: 'pick', shirt: 0 }]
     expect(planActors(world, buildOccupancy(world), jobs, createRandom(4))).toEqual(planActors(world, buildOccupancy(world), jobs, createRandom(4)))
   })
+
+  it('never puts two workers on the same spot', () => {
+    for (const [width, height, seed] of [
+      [3, 2, 'orchard-02'],
+      [5, 3, 'orchard-03'],
+      [5, 3, 'orchard-01'],
+    ] as const) {
+      for (const density of ['full', 'light'] as const) {
+        const world = buildWorld({ layout: 'farm', gridWidth: width, gridHeight: height, seed, density, theme: 'orchard' })
+        const ends = (world.actors ?? []).flatMap((actor) => [actor.route[0], actor.route[actor.route.length - 1]].map((point) => ({ id: actor.id, point })))
+        ends.forEach((a, index) => ends.slice(index + 1).forEach((b) => {
+          if (a.id !== b.id) expect(Math.hypot(a.point.x - b.point.x, a.point.z - b.point.z), `${a.id} and ${b.id} in ${seed} ${width}x${height} ${density}`).toBeGreaterThanOrEqual(0.6)
+        }))
+      }
+    }
+  })
 })

@@ -16,6 +16,25 @@ const MIN_TRIP = 2
 const TRIES = 12
 const SNAP = 1.2
 const AROUND = 2.5
+const PERSONAL_SPACE = 0.6
+
+interface Claims {
+  targets: Set<string>
+  spots: Vec2[]
+}
+
+const targetKey = (spot: WorkSpot) => `${spot.target.x},${spot.target.z}`
+
+function free(spot: WorkSpot, claims: Claims): boolean {
+  return !claims.targets.has(targetKey(spot)) && claims.spots.every((point) => Math.hypot(point.x - spot.at.x, point.z - spot.at.z) >= PERSONAL_SPACE)
+}
+
+function claim(claims: Claims, ...spots: WorkSpot[]): void {
+  for (const spot of spots) {
+    claims.targets.add(targetKey(spot))
+    claims.spots.push(spot.at)
+  }
+}
 
 export function around(...points: Vec2[]): Rect {
   return {
@@ -93,16 +112,18 @@ function trip(person: WalkMask, spots: WorkSpot[], random: () => number): { from
   return null
 }
 
-function worker(job: Extract<Job, { kind: 'worker' }>, world: World, person: WalkMask, random: () => number): Actor | null {
-  const spots = workSpots(world, person, job.task, job.area)
+function worker(job: Extract<Job, { kind: 'worker' }>, world: World, person: WalkMask, random: () => number, claims: Claims): Actor | null {
+  const spots = workSpots(world, person, job.task, job.area).filter((spot) => free(spot, claims))
   if (spots.length === 0) return null
   const base = { id: job.id, kind: 'worker' as const, task: job.task, tint: shirt(job.shirt), speed: WALK_SPEED, pause: WORK_PAUSE }
   if ((job.stops ?? 1) === 1) {
     const spot = pick(spots, random)
+    claim(claims, spot)
     const y = groundHeight(world, spot.at)
     return y > 0 ? { ...base, route: [spot.at], facing: spot.facing, y } : { ...base, route: [spot.at], facing: spot.facing }
   }
   const found = trip(person, spots, random)
+  if (found) claim(claims, found.from, found.to)
   return found ? { ...base, route: found.route, facings: [found.from.facing, found.to.facing] } : null
 }
 
@@ -110,9 +131,10 @@ export function planActors(world: World, grid: OccupancyGrid, jobs: Job[], rando
   const person = walkMask(grid, 'person')
   const tractor = jobs.some((job) => job.kind === 'tractor') ? walkMask(grid, 'tractor') : null
   const actors: Actor[] = []
+  const claims: Claims = { targets: new Set(), spots: [] }
   for (const job of jobs) {
     if (job.kind === 'worker') {
-      const actor = worker(job, world, person, random)
+      const actor = worker(job, world, person, random, claims)
       if (actor) actors.push(actor)
       continue
     }
