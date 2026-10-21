@@ -75,6 +75,20 @@ const BASE_TRAILS: Record<WorldId, Vec2[]> = {
 }
 
 const DRAWN_TRAILS: Partial<Record<WorldId, Vec2[]>> = {
+  barnyard: points([
+    [-12, 8],
+    [-8.4, 8.6],
+    [-5, 7.4],
+    [-1.6, 6.2],
+    [1.6, 4.4],
+    [4.8, 2.6],
+    [7.4, 0],
+    [8.6, -3.4],
+    [7.2, -6.8],
+    [4, -8.6],
+    [0.4, -9.2],
+    [-3.2, -8.8],
+  ]),
   greenhouse: points([
     [-12, 6],
     [-8.6, 4.8],

@@ -76,7 +76,7 @@ export function stageMap(theme: WorldId, input: WorldInput, random: () => number
   const draft = new WorldDraft(random, { grid: null, paths: [road], river: null, keepOut: nodeZones, frontGuard: null, bounds: inset(WORLD_MAP_ISLAND, 0.6) })
   const parts = build({ draft, trail, road, full: input.density === 'full', random })
   const paths = [road, ...(parts.paths ?? [])]
-  woodland(draft, inset(WORLD_MAP_ISLAND, 1.1), random, { trees: look.trees, openSides: look.openSides ?? ['maxX', 'maxZ'], density: input.density, gaps: parts.gaps })
+  woodland(draft, inset(WORLD_MAP_ISLAND, 1.1), random, { trees: look.trees, openSides: look.openSides ?? ['maxX', 'maxZ'], density: input.density, gaps: parts.gaps, avoid: parts.blocks })
   edgeClutter(draft, parts.blocks, input.density, random, 3, parts.clutterModels)
   const mounds = reliefMounds(WORLD_STYLES[theme].relief, MAP_CENTER, inset(WORLD_MAP_ISLAND, 1.6), random, openGround(draft, paths, parts.patches))
   return world(theme, WORLD_MAP_ISLAND, true, trail, paths, draft, parts, mounds)
@@ -93,7 +93,7 @@ export function stageFarm(theme: WorldId, input: WorldInput, random: () => numbe
   const parts = build({ draft, trail: [], road, full: input.density === 'full', random, hw, hh, grid, core })
   const paths = [road, ...(parts.paths ?? [])]
   const gaps = [{ x: core.maxX, z: 0.2 }, ...(parts.gaps ?? [])]
-  woodland(draft, inset(core, -0.8), random, { trees: look.trees, openSides: ['maxX', 'maxZ'], density: input.density, gaps, depth: 3 })
+  woodland(draft, inset(core, -0.8), random, { trees: look.trees, openSides: ['maxX', 'maxZ'], density: input.density, gaps, depth: 3, avoid: parts.blocks })
   woodland(draft, inset(core, -6), random, { trees: look.trees, openSides: [], density: input.density, gaps: [{ x: core.maxX + 6, z: 0.2 }], depth: 5 })
   edgeClutter(draft, parts.blocks, input.density, random, 5, parts.clutterModels)
   const mounds = reliefMounds(WORLD_STYLES[theme].relief, inset(core, -0.5), inset(core, -10), random, openGround(draft, paths, parts.patches))

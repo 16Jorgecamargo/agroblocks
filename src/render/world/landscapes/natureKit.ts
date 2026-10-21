@@ -9,6 +9,7 @@ export interface WoodlandOptions {
   openSides?: ('minX' | 'maxX' | 'minZ' | 'maxZ')[]
   density: WorldDensity
   depth?: number
+  avoid?: Rect[]
 }
 
 const UNDERGROWTH: readonly ModelId[] = ['bush', 'bush-large', 'bush', 'bush-large', 'fern']
@@ -112,6 +113,7 @@ export function woodland(draft: WorldDraft, rect: Rect, random: () => number, op
       for (let tries = 0; tries < 4; tries += 1) {
         const reach = random() * (tree ? 1.8 : 2.4)
         const spot = { x: center.x + Math.cos(angle + tries * 1.3) * reach, z: center.z + Math.sin(angle + tries * 1.3) * reach }
+        if ((options.avoid ?? []).some((rect) => spot.x > rect.minX - 0.7 && spot.x < rect.maxX + 0.7 && spot.z > rect.minZ - 0.7 && spot.z < rect.maxZ + 0.7)) continue
         if (draft.place(model, spot, random() * Math.PI * 2, scale)) break
       }
     }
