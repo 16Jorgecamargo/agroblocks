@@ -1,6 +1,7 @@
 import { BoxGeometry, BufferGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry } from 'three'
 import { cornfieldObjects } from '@/render/world/features/cornfieldObjects'
 import { gardenObjects } from '@/render/world/features/gardenObjects'
+import { orchardObjects } from '@/render/world/features/orchardObjects'
 import { compose, mergeParts, part, type Triple } from '@/render/world/features/parts'
 import type { FeatureKind, WorldFeature } from '@/render/world/worldTypes'
 
@@ -100,6 +101,7 @@ export { compose, mergeParts, part }
 const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
   ...cornfieldObjects,
   ...gardenObjects,
+  ...orchardObjects,
   cornStalk,
   fruitTree,
   greenhouse,
