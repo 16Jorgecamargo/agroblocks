@@ -3,6 +3,7 @@ import { barnyardLandscape } from '@/render/world/landscapes/barnyardLandscape'
 import { cornfieldLandscape } from '@/render/world/landscapes/cornfieldLandscape'
 import { gardenLandscape } from '@/render/world/landscapes/gardenLandscape'
 import { greenhouseLandscape } from '@/render/world/landscapes/greenhouseLandscape'
+import { homesteadLandscape } from '@/render/world/landscapes/homesteadLandscape'
 import { orchardLandscape } from '@/render/world/landscapes/orchardLandscape'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 
@@ -14,4 +15,5 @@ export const LANDSCAPES: Partial<Record<WorldId, Landscape>> = {
   orchard: orchardLandscape,
   greenhouse: greenhouseLandscape,
   barnyard: barnyardLandscape,
+  homestead: homesteadLandscape,
 }

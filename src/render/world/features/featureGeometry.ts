@@ -3,6 +3,7 @@ import { barnyardObjects } from '@/render/world/features/barnyardObjects'
 import { cornfieldObjects } from '@/render/world/features/cornfieldObjects'
 import { gardenObjects } from '@/render/world/features/gardenObjects'
 import { greenhouseGlass as greenhouseBayGlass, greenhouseObjects } from '@/render/world/features/greenhouseObjects'
+import { homesteadObjects } from '@/render/world/features/homesteadObjects'
 import { orchardObjects } from '@/render/world/features/orchardObjects'
 import { compose, mergeParts, part, type Triple } from '@/render/world/features/parts'
 import type { FeatureKind, WorldFeature } from '@/render/world/worldTypes'
@@ -106,6 +107,7 @@ const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
   ...orchardObjects,
   ...greenhouseObjects,
   ...barnyardObjects,
+  ...homesteadObjects,
   cornStalk,
   fruitTree,
   greenhouse,

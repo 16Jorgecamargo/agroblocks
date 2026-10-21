@@ -52,7 +52,7 @@ export interface WorldInput {
   theme?: WorldId | null
 }
 
-export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence', 'grainBin', 'grainDryer', 'cornWagon', 'scarecrow', 'toolShed', 'compostBins', 'wateringCan', 'chicken', 'packingShed', 'crateStack', 'orchardLadder', 'greenhouseBay', 'supportShed', 'waterTank', 'sprinkler', 'feedShed', 'baleStack'] as const
+export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence', 'grainBin', 'grainDryer', 'cornWagon', 'scarecrow', 'toolShed', 'compostBins', 'wateringCan', 'chicken', 'packingShed', 'crateStack', 'orchardLadder', 'greenhouseBay', 'supportShed', 'waterTank', 'sprinkler', 'feedShed', 'baleStack', 'farmhouse'] as const
 
 export type FeatureKind = (typeof FEATURE_KINDS)[number]
 
