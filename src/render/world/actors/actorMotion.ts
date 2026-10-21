@@ -41,14 +41,14 @@ export function actorPose(actor: Actor, time: number): ActorPose {
   const period = 2 * (travel + pause)
   const t = ((local % period) + period) % period
   const lap = Math.floor(local / period) * 2 * length
-  if (t < pause) return { x: start.x, z: start.z, heading: actor.facing ?? directionAt(actor.route, 0) + Math.PI, moving: false, cycle: t * 3, travelled: lap }
+  if (t < pause) return { x: start.x, z: start.z, heading: actor.facings?.[0] ?? actor.facing ?? directionAt(actor.route, 0) + Math.PI, moving: false, cycle: t * 3, travelled: lap }
   if (t < pause + travel) {
     const fraction = (t - pause) / travel
     const point = pointAlong(actor.route, fraction)
     return { x: point.x, z: point.z, heading: directionAt(actor.route, fraction), moving: true, cycle: fraction * length * STRIDE, travelled: lap + fraction * length }
   }
   const end = actor.route[actor.route.length - 1]
-  if (t < 2 * pause + travel) return { x: end.x, z: end.z, heading: actor.facing ?? directionAt(actor.route, 1), moving: false, cycle: (t - pause - travel) * 3, travelled: lap + length }
+  if (t < 2 * pause + travel) return { x: end.x, z: end.z, heading: actor.facings?.[1] ?? actor.facing ?? directionAt(actor.route, 1), moving: false, cycle: (t - pause - travel) * 3, travelled: lap + length }
   const fraction = 1 - (t - 2 * pause - travel) / travel
   const point = pointAlong(actor.route, fraction)
   return { x: point.x, z: point.z, heading: directionAt(actor.route, fraction) + Math.PI, moving: true, cycle: (1 - fraction) * length * STRIDE, travelled: lap + length + (1 - fraction) * length }

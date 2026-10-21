@@ -39,4 +39,10 @@ describe('actor motion', () => {
     }
     expect(actorOffset(walker)).not.toBe(actorOffset({ ...walker, id: 'other' }))
   })
+
+  it('faces the work at each end while pausing there', () => {
+    const actor = { ...walker, facings: [1, -2] as [number, number] }
+    expect(actorPose(actor, 1 - actorOffset(actor)).heading).toBe(1)
+    expect(actorPose(actor, 7 - actorOffset(actor)).heading).toBe(-2)
+  })
 })

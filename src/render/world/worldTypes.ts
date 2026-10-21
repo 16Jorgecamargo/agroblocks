@@ -129,4 +129,5 @@ export interface Actor {
   facing?: number
   pause?: number
   y?: number
+  facings?: [number, number]
 }
