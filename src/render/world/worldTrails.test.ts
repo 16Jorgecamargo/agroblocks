@@ -43,7 +43,7 @@ describe('world map landscapes', () => {
     expect(count('garden', 'vegetableBed')).toBeGreaterThanOrEqual(12)
     expect(count('cornfield', 'cornStalk')).toBeGreaterThanOrEqual(80)
     expect(count('orchard', 'fruitTree')).toBeGreaterThanOrEqual(12)
-    expect(count('greenhouse', 'greenhouse')).toBeGreaterThanOrEqual(3)
+    expect(count('greenhouse', 'greenhouseBay')).toBeGreaterThanOrEqual(3)
     expect(map('barnyard').animals.length).toBeGreaterThanOrEqual(6)
     expect(new Set(map('homestead').features.map((feature) => feature.kind)).size).toBeGreaterThanOrEqual(3)
   })

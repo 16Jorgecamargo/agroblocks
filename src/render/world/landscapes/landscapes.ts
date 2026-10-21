@@ -1,6 +1,7 @@
 import type { WorldId } from '@/game/worlds/worldTypes'
 import { cornfieldLandscape } from '@/render/world/landscapes/cornfieldLandscape'
 import { gardenLandscape } from '@/render/world/landscapes/gardenLandscape'
+import { greenhouseLandscape } from '@/render/world/landscapes/greenhouseLandscape'
 import { orchardLandscape } from '@/render/world/landscapes/orchardLandscape'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
 
@@ -10,4 +11,5 @@ export const LANDSCAPES: Partial<Record<WorldId, Landscape>> = {
   garden: gardenLandscape,
   cornfield: cornfieldLandscape,
   orchard: orchardLandscape,
+  greenhouse: greenhouseLandscape,
 }
