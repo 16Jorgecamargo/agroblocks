@@ -33,7 +33,7 @@ function inside(point: Vec2, rect: Rect): boolean {
   return point.x >= rect.minX && point.x <= rect.maxX && point.z >= rect.minZ && point.z <= rect.maxZ
 }
 
-export function cropBlock(draft: WorldDraft, block: Block, feature: FeatureKind, [stepX, stepZ]: [number, number], random: () => number, options: { tints?: string[]; jitter?: number } = {}): GroundPatch {
+export function cropBlock(draft: WorldDraft, block: Block, feature: FeatureKind, [stepX, stepZ]: [number, number], random: () => number, options: { tints?: string[]; jitter?: number; scale?: number } = {}): GroundPatch {
   const { rect, color, height } = block
   const jitter = options.jitter ?? 0.1
   for (let z = rect.minZ + stepZ / 2; z < rect.maxZ; z += stepZ) {
@@ -44,7 +44,7 @@ export function cropBlock(draft: WorldDraft, block: Block, feature: FeatureKind,
       }
       const tint = options.tints ? pick(options.tints, random) : undefined
       const rotation = feature === 'cornStalk' ? random() * 0.4 - 0.2 : random() * Math.PI * 2
-      draft.placeFeature(feature, point, rotation, 1, tint, height ?? 0)
+      draft.placeFeature(feature, point, rotation, options.scale ?? 1, tint, height ?? 0)
     }
   }
   return height === undefined ? { rect, color } : { rect, color, height }
@@ -134,7 +134,7 @@ export const CELL = 1.2
 const TRAIL_CLEARANCE = 1.05
 const MIN_PARCEL_CELLS = 4
 
-function trailDistance(rect: Rect, trail: Vec2[]): number {
+export function trailDistance(rect: Rect, trail: Vec2[]): number {
   let best = Number.POSITIVE_INFINITY
   for (let index = 1; index < trail.length; index += 1) {
     const a = trail[index - 1]

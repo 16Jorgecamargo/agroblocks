@@ -34,7 +34,7 @@ export const greenhouseLandscape: Landscape = {
       landmark(draft, 'waterTank', { x: -10.6, z: -9.6 }, 0)
       for (let index = 0; index < 2; index += 1) landmark(draft, 'greenhouseBay', { x: 11.6, z: 7 + index * BAY }, Math.PI / 2)
       patches.push({ rect: { minX: 10.2, maxX: 13, minZ: 5.2, maxZ: 11.8 }, color: GRAVEL })
-      return { patches, blocks: [...beds, inset({ minX: -9.4, maxX: 8.6, minZ: -10.8, maxZ: -8 }, 0)] }
+      return { patches, blocks: [...beds, inset({ minX: -9.4, maxX: 8.6, minZ: -10.8, maxZ: -8 }, 0)], paths: [{ points: [{ x: 7.4, z: -7.9 }, { x: 6.2, z: -5.8 }, { x: 5.1, z: -4.2 }], width: 0.9 }] }
     }),
   farm: (input, random) =>
     composeFarm('greenhouse', input, random, ({ draft, hw, hh }) => {

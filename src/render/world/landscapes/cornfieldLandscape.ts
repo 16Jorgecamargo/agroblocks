@@ -1,6 +1,8 @@
 import { rectPolygon } from '@/render/world/geometry'
 import { borderBelt, cropBlock, edgeClutter, landmark, openGround, reliefMounds, WORLD_MAP_ISLAND } from '@/render/world/landscapes/landscapeKit'
 import type { Landscape } from '@/render/world/landscapes/landscapeTypes'
+import { fillOpenGround } from '@/render/world/landscapes/scaffold'
+import { FRONT_CLEARANCE } from '@/render/world/worldCatalog'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'
@@ -59,6 +61,8 @@ function map(input: WorldInput, random: () => number): World {
   binCluster(draft, center(yard), 0)
   draft.forceFeature('cornWagon', { x: 2.4, z: 6 }, 0, 1)
   draft.forceFeature('scarecrow', { x: 6.4, z: 1.2 }, 0.4, 1)
+  const mounds = reliefMounds(STYLE.relief, { minX: 0, maxX: 0, minZ: 0, maxZ: 0 }, inset(WORLD_MAP_ISLAND, 1.6), random, openGround(draft, [road, lane], patches))
+  const ground = fillOpenGround('cornfield', draft, [road, lane], patches, inset(WORLD_MAP_ISLAND, 1.6), [], mounds, random)
   borderBelt(draft, 'windbreak', inset(WORLD_MAP_ISLAND, 0.8), random, [{ x: 15.5, z: 6 }])
   edgeClutter(draft, [...blocks, yard], input.density, random, 5)
 
@@ -76,8 +80,9 @@ function map(input: WorldInput, random: () => number): World {
     features: draft.features,
     palette: STYLE.palette,
     style: STYLE,
-    patches,
-    mounds: reliefMounds(STYLE.relief, { minX: 0, maxX: 0, minZ: 0, maxZ: 0 }, inset(WORLD_MAP_ISLAND, 1.6), random, openGround(draft, [road, lane], patches)),
+    patches: ground.patches,
+    waters: ground.waters,
+    mounds,
   }
 }
 
@@ -107,6 +112,7 @@ function farm(input: WorldInput, random: () => number): World {
   for (let x = stubble.minX + 0.9; x < stubble.maxX - 0.4; x += full ? 2.2 : 3.6) draft.forceFeature('hayBale', { x, z: (stubble.minZ + stubble.maxZ) / 2 + (random() - 0.5) * 0.5 }, random() * 0.5, 1)
   draft.forceFeature('cornWagon', { x: hw + 4.2, z: 2 }, -0.3, 1)
   draft.forceFeature('scarecrow', { x: hw + 3, z: -hh - 1.2 }, 0.6, 1)
+  const filled = fillOpenGround('cornfield', draft, [road], patches, inset(core, 0.8), [inset(grid, -FRONT_CLEARANCE)], [], random)
   borderBelt(draft, 'windbreak', core, random, [exit])
   edgeClutter(draft, [...blocks, yard, stubble], input.density, random, 6)
   const ground = expand(core, 12)
@@ -125,8 +131,9 @@ function farm(input: WorldInput, random: () => number): World {
     features: draft.features,
     palette: STYLE.palette,
     style: STYLE,
-    patches,
-    mounds: reliefMounds(STYLE.relief, expand(core, 0.5), expand(core, 10), random, openGround(draft, [road], patches)),
+    patches: filled.patches,
+    waters: filled.waters,
+    mounds: reliefMounds(STYLE.relief, expand(core, 0.5), expand(core, 10), random, openGround(draft, [road], filled.patches)),
   }
 }
 

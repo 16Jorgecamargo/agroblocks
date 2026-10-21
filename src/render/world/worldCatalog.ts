@@ -82,6 +82,9 @@ export const FEATURE_FOOTPRINTS: Record<FeatureKind, number> = {
   feedShed: 1.5,
   baleStack: 1.0,
   farmhouse: 1.8,
+  tractor: 0.9,
+  wheelbarrow: 0.45,
+  pier: 0.5,
 }
 
 export const TALL_FEATURES: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['greenhouse', 'fruitTree', 'grainBin', 'grainDryer', 'toolShed', 'packingShed', 'greenhouseBay', 'supportShed', 'waterTank', 'feedShed', 'farmhouse'])

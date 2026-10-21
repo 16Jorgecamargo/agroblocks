@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { DoubleSide } from 'three'
+import { groundDetail } from '@/render/world/groundDetail'
 import { ribbonGeometry } from '@/render/world/ribbon'
 import { WORLD_COLORS } from '@/render/world/worldPalette'
 import type { World } from '@/render/world/worldTypes'
@@ -15,6 +16,7 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
   const paths = useMemo(() => world.paths.map((path) => ribbonGeometry(path.points, path.width)), [world])
   const bank = useMemo(() => (world.river ? ribbonGeometry(world.river.points, world.river.width + BANK_EXTRA) : null), [world])
   const water = useMemo(() => (world.river ? ribbonGeometry(world.river.points, world.river.width) : null), [world])
+  const detail = useMemo(() => groundDetail(world), [world])
   const { ground } = world
   const width = ground.maxX - ground.minX
   const depth = ground.maxZ - ground.minZ
@@ -67,6 +69,26 @@ export function WorldTerrain({ world, withGround = true }: { world: World; withG
           <meshStandardMaterial color={world.palette.path} roughness={1} side={DoubleSide} />
         </mesh>
       ))}
+      {detail.texture && (
+        <mesh geometry={detail.texture} receiveShadow>
+          <meshStandardMaterial vertexColors roughness={1} flatShading />
+        </mesh>
+      )}
+      {detail.ruts && (
+        <mesh geometry={detail.ruts} position={[0, PATH_HEIGHT + 0.006, 0]} receiveShadow>
+          <meshStandardMaterial vertexColors roughness={1} side={DoubleSide} />
+        </mesh>
+      )}
+      {detail.bank && (
+        <mesh geometry={detail.bank} receiveShadow>
+          <meshStandardMaterial vertexColors roughness={1} side={DoubleSide} />
+        </mesh>
+      )}
+      {detail.water && (
+        <mesh geometry={detail.water}>
+          <meshStandardMaterial vertexColors roughness={0.25} metalness={0} side={DoubleSide} />
+        </mesh>
+      )}
       {bank && (
         <mesh geometry={bank} position={[0, BANK_HEIGHT, 0]} receiveShadow>
           <meshStandardMaterial color={WORLD_COLORS.bank} roughness={1} side={DoubleSide} />

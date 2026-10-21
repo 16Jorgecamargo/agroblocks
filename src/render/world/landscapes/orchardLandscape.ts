@@ -39,7 +39,7 @@ export const orchardLandscape: Landscape = {
       ]
       const patches = blocks.map(([rect, height, tint]) => terrace(draft, rect, height, tint, random))
       patches.push(packingYard(draft, { x: -9, z: 2.6 }, [{ x: -6.6, z: 4.6 }]))
-      return { patches, blocks: blocks.map(([rect]) => rect), butterflies: blocks.map(([rect]) => ({ x: (rect.minX + rect.maxX) / 2, z: (rect.minZ + rect.maxZ) / 2 })) }
+      return { patches, blocks: blocks.map(([rect]) => rect), butterflies: blocks.map(([rect]) => ({ x: (rect.minX + rect.maxX) / 2, z: (rect.minZ + rect.maxZ) / 2 })), paths: [{ points: [{ x: -8.4, z: 4.6 }, { x: -8.1, z: 6.2 }, { x: -7.9, z: 7.2 }], width: 0.9 }] }
     }),
   farm: (input, random) =>
     composeFarm('orchard', input, random, ({ draft, hw, hh }) => {

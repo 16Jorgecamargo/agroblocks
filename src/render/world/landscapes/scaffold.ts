@@ -2,11 +2,14 @@ import type { WorldId } from '@/game/worlds/worldTypes'
 import type { ModelId } from '@/render/models/manifest'
 import { rectPolygon } from '@/render/world/geometry'
 import { borderBelt, edgeClutter, openGround, reliefMounds, WORLD_MAP_ISLAND } from '@/render/world/landscapes/landscapeKit'
-import { FOREST_MODELS } from '@/render/world/worldCatalog'
+import { FOREST_MODELS, FRONT_CLEARANCE } from '@/render/world/worldCatalog'
+import { fillLots } from '@/render/world/landscapes/fillLots'
+import { freeLots } from '@/render/world/landscapes/freeLots'
+import { LOT_RECIPES } from '@/render/world/landscapes/lotRecipes'
 import { WorldDraft } from '@/render/world/worldDraft'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
 import { WORLD_TRAILS } from '@/render/world/worldTrails'
-import type { AnimalSpawn, GroundPatch, Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
+import type { AnimalSpawn, GroundPatch, Mound, Polyline, Rect, Vec2, World, WorldInput } from '@/render/world/worldTypes'
 
 export interface SceneParts {
   patches: GroundPatch[]
@@ -50,6 +53,12 @@ export function nearestGap(rect: Rect, toward: Vec2): Vec2 {
   return { x: Math.min(rect.maxX, Math.max(rect.minX, toward.x)), z: Math.min(rect.maxZ, Math.max(rect.minZ, toward.z)) }
 }
 
+export function fillOpenGround(theme: WorldId, draft: WorldDraft, paths: Polyline[], patches: GroundPatch[], area: Rect, blocked: Rect[], mounds: Mound[], random: () => number): { patches: GroundPatch[]; waters: Vec2[][] } {
+  const occupied = [...patches, ...blocked.map((rect) => ({ rect, color: '' })), ...mounds.map((mound) => ({ rect: inset({ minX: mound.x, maxX: mound.x, minZ: mound.z, maxZ: mound.z }, -mound.radius), color: '' }))]
+  const filled = fillLots(draft, freeLots(draft, paths, occupied, area), LOT_RECIPES[theme], WORLD_STYLES[theme].palette.grass, random)
+  return { patches: [...patches, ...filled.patches], waters: [...filled.ponds, ...filled.canals] }
+}
+
 export function composeMap(theme: WorldId, input: WorldInput, random: () => number, build: (context: MapContext) => SceneParts, roadWidth = 1.2): World {
   const style = WORLD_STYLES[theme]
   const trail = WORLD_TRAILS[theme]
@@ -57,12 +66,15 @@ export function composeMap(theme: WorldId, input: WorldInput, random: () => numb
   const nodeZones = trail.map((node) => rectPolygon({ minX: node.x - NODE_CLEARANCE, maxX: node.x + NODE_CLEARANCE, minZ: node.z - NODE_CLEARANCE, maxZ: node.z + NODE_CLEARANCE }))
   const draft = new WorldDraft(random, { grid: null, paths: [road], river: null, keepOut: nodeZones, frontGuard: null, bounds: inset(WORLD_MAP_ISLAND, 0.6) })
   const parts = build({ draft, trail, full: input.density === 'full', random })
+  const paths = [road, ...(parts.paths ?? [])]
+  const mounds = reliefMounds(style.relief, MAP_CENTER, inset(WORLD_MAP_ISLAND, 1.6), random, openGround(draft, paths, parts.patches))
+  const ground = fillOpenGround(theme, draft, paths, parts.patches, inset(WORLD_MAP_ISLAND, 1.6), [], mounds, random)
   borderBelt(draft, style.border, inset(WORLD_MAP_ISLAND, 0.8), random)
   edgeClutter(draft, parts.blocks, input.density, random, 5, parts.clutterModels)
   return {
     ground: WORLD_MAP_ISLAND,
     island: true,
-    paths: [road, ...(parts.paths ?? [])],
+    paths,
     river: null,
     trail,
     props: draft.props,
@@ -73,8 +85,9 @@ export function composeMap(theme: WorldId, input: WorldInput, random: () => numb
     features: draft.features,
     palette: style.palette,
     style,
-    patches: parts.patches,
-    mounds: reliefMounds(style.relief, MAP_CENTER, inset(WORLD_MAP_ISLAND, 1.6), random, openGround(draft, [road, ...(parts.paths ?? [])], parts.patches)),
+    patches: ground.patches,
+    waters: ground.waters,
+    mounds,
   }
 }
 
@@ -88,19 +101,20 @@ export function composeFarm(theme: WorldId, input: WorldInput, random: () => num
   const road: Polyline = { points: [{ x: hw + 1.4, z: 0 }, { x: hw + 5, z: 0.5 }, exit, { x: core.maxX + 4, z: 0.2 }], width: 1.3 }
   const draft = new WorldDraft(random, { grid, paths: [road], river: null, keepOut: [], frontGuard: grid })
   const parts = build({ draft, trail: [], full: input.density === 'full', random, hw, hh, grid, core, road })
+  const paths = [road, ...(parts.paths ?? [])]
+  const ground = fillOpenGround(theme, draft, paths, parts.patches, inset(core, 0.8), [inset(grid, -FRONT_CLEARANCE)], [], random)
   borderBelt(draft, style.border, core, random, [exit])
   edgeClutter(draft, parts.blocks, input.density, random, 6, parts.clutterModels)
   const fringe = inset(core, -1.6)
   const outskirts = inset(core, -11)
-  const paths = [road, ...(parts.paths ?? [])]
-  const mounds = reliefMounds(style.relief, inset(core, -0.5), inset(core, -10), random, openGround(draft, paths, parts.patches))
+  const mounds = reliefMounds(style.relief, inset(core, -0.5), inset(core, -10), random, openGround(draft, paths, ground.patches))
   const offHills = (point: Vec2) => mounds.every((mound) => Math.hypot(mound.x - point.x, mound.z - point.z) > mound.radius + 0.6)
   const offRoad = (point: Vec2) => (point.x < fringe.minX || point.x > fringe.maxX || point.z < fringe.minZ || point.z > fringe.maxZ) && Math.abs(point.z - 0.3) > 2.2 && offHills(point)
   draft.scatter(FOREST_MODELS, input.density === 'full' ? 70 : 35, outskirts, [0.85, 1.15], offRoad)
   return {
     ground: inset(core, -12),
     island: false,
-    paths: [road, ...(parts.paths ?? [])],
+    paths,
     river: null,
     trail: [],
     props: draft.props,
@@ -111,7 +125,8 @@ export function composeFarm(theme: WorldId, input: WorldInput, random: () => num
     features: draft.features,
     palette: style.palette,
     style,
-    patches: parts.patches,
+    patches: ground.patches,
+    waters: ground.waters,
     mounds,
   }
 }

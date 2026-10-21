@@ -98,3 +98,22 @@ export function crossings(path: Polyline, river: Polyline): { point: Vec2; angle
   }
   return found
 }
+
+export function offsetPolyline(line: Vec2[], distance: number): Vec2[] {
+  const normals = line.slice(1).map((point, index) => {
+    const dx = point.x - line[index].x
+    const dz = point.z - line[index].z
+    const length = Math.hypot(dx, dz) || 1
+    return { x: dz / length, z: -dx / length }
+  })
+  return line.map((point, index) => {
+    const before = normals[Math.max(0, index - 1)]
+    const after = normals[Math.min(normals.length - 1, index)]
+    const sumX = before.x + after.x
+    const sumZ = before.z + after.z
+    const length = Math.hypot(sumX, sumZ) || 1
+    const normal = { x: sumX / length, z: sumZ / length }
+    const miter = distance / Math.max(0.3, normal.x * after.x + normal.z * after.z)
+    return { x: point.x + normal.x * miter, z: point.z + normal.z * miter }
+  })
+}

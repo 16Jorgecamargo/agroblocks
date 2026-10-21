@@ -49,7 +49,7 @@ export const homesteadLandscape: Landscape = {
       ]
       const cows = pen(draft, { minX: 10.2, maxX: 13.8, minZ: 10.4, maxZ: 13.8 }, { x: 8.5, z: 8.7 }, random)
       patches.push(cows.patch)
-      return { patches, blocks: [corn, fruit, beds, cows.patch.rect], animals: cows.animals, pasture: cows.area, birds: [center(corn)], butterflies: [center(beds)] }
+      return { patches, blocks: [corn, fruit, beds, cows.patch.rect], animals: cows.animals, pasture: cows.area, birds: [center(corn)], butterflies: [center(beds)], paths: [{ points: [{ x: -1.4, z: 0 }, { x: -2.8, z: 1.6 }, { x: -4, z: 2.9 }], width: 0.9 }] }
     }),
   farm: (input, random) =>
     composeFarm('homestead', input, random, ({ draft, hw, hh, full }) => {

@@ -29,7 +29,7 @@ describe('cornfield map', () => {
     const world = map()
     const blocks = (world.patches ?? []).filter((patch) => (patch.rect.maxX - patch.rect.minX) * (patch.rect.maxZ - patch.rect.minZ) >= 20)
     expect(blocks.length).toBeGreaterThanOrEqual(2)
-    const corn = ofKind(world, 'cornStalk')
+    const corn = ofKind(world, 'cornStalk').filter((stalk) => stalk.scale === 1)
     expect(corn.length).toBeGreaterThan(100)
     for (const stalk of corn) expect(blocks.some(({ rect }) => stalk.x >= rect.minX && stalk.x <= rect.maxX && stalk.z >= rect.minZ && stalk.z <= rect.maxZ)).toBe(true)
   })
@@ -98,7 +98,7 @@ describe('cornfield mission farm', () => {
     expect(middle.x + middle.z).toBeLessThan(0)
     const blocks = (world.patches ?? []).filter((patch) => (patch.rect.maxX - patch.rect.minX) * (patch.rect.maxZ - patch.rect.minZ) >= 18)
     expect(blocks.length).toBeGreaterThanOrEqual(2)
-    for (const stalk of ofKind(world, 'cornStalk')) expect(blocks.some(({ rect }) => stalk.x >= rect.minX && stalk.x <= rect.maxX && stalk.z >= rect.minZ && stalk.z <= rect.maxZ)).toBe(true)
+    for (const stalk of ofKind(world, 'cornStalk').filter((item) => item.scale === 1)) expect(blocks.some(({ rect }) => stalk.x >= rect.minX && stalk.x <= rect.maxX && stalk.z >= rect.minZ && stalk.z <= rect.maxZ)).toBe(true)
   })
 
   it('is a new place, not the base farm', () => {

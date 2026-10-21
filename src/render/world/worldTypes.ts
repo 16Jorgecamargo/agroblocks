@@ -52,7 +52,7 @@ export interface WorldInput {
   theme?: WorldId | null
 }
 
-export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence', 'grainBin', 'grainDryer', 'cornWagon', 'scarecrow', 'toolShed', 'compostBins', 'wateringCan', 'chicken', 'packingShed', 'crateStack', 'orchardLadder', 'greenhouseBay', 'supportShed', 'waterTank', 'sprinkler', 'feedShed', 'baleStack', 'farmhouse'] as const
+export const FEATURE_KINDS = ['cornStalk', 'fruitTree', 'greenhouse', 'vegetableBed', 'hayBale', 'trough', 'hedge', 'stoneWall', 'meshFence', 'grainBin', 'grainDryer', 'cornWagon', 'scarecrow', 'toolShed', 'compostBins', 'wateringCan', 'chicken', 'packingShed', 'crateStack', 'orchardLadder', 'greenhouseBay', 'supportShed', 'waterTank', 'sprinkler', 'feedShed', 'baleStack', 'farmhouse', 'tractor', 'wheelbarrow', 'pier'] as const
 
 export type FeatureKind = (typeof FEATURE_KINDS)[number]
 
@@ -88,12 +88,16 @@ export interface World {
   patches?: GroundPatch[]
   mounds?: Mound[]
   birds?: Vec2[]
+  waters?: Vec2[][]
 }
+
+export type GroundTexture = 'furrows' | 'stripes'
 
 export interface GroundPatch {
   rect: Rect
   color: string
   height?: number
+  texture?: GroundTexture
 }
 
 export interface Mound {

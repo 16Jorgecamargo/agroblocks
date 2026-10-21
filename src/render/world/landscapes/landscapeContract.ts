@@ -3,7 +3,7 @@ import { MISSIONS } from '@/data/missions'
 import type { WorldId } from '@/game/worlds/worldTypes'
 import type { ModelId } from '@/render/models/manifest'
 import { buildWorld, gridSizeOf } from '@/render/world/buildWorld'
-import { distanceToPolyline, rectDistance } from '@/render/world/geometry'
+import { distanceToPolyline, pointInPolygon, rectDistance } from '@/render/world/geometry'
 import { CLUTTER_CEILING } from '@/render/world/landscapes/landscapeKit'
 import { FEATURE_FOOTPRINTS, FRONT_CLEARANCE, GRID_CLEARANCE, isClutter, TALL_FEATURES, TALL_MODELS, TREE_MODELS } from '@/render/world/worldCatalog'
 import { WORLD_STYLES } from '@/render/world/worldStyles'
@@ -32,10 +32,30 @@ function checkCommon(world: World, expected: LandscapeExpectations, minBlocks: n
   const blocks = (world.patches ?? []).filter((patch) => area(patch.rect) >= 12)
   expect(blocks.length).toBeGreaterThanOrEqual(minBlocks)
   for (const feature of world.features.filter((item) => expected.crops.includes(item.kind))) {
-    expect(blocks.some((patch) => within(feature, patch.rect)), `${feature.kind} at ${feature.x},${feature.z} on a block`).toBe(true)
+    expect((world.patches ?? []).some((patch) => within(feature, patch.rect)), `${feature.kind} at ${feature.x},${feature.z} on a block`).toBe(true)
   }
   expect(world.props.filter((prop) => isClutter(prop.model)).length).toBeLessThanOrEqual(ceiling)
   expect(world.style).toEqual(WORLD_STYLES[expected.world])
+}
+
+export function openGroundUse(world: World): number {
+  let open = 0
+  let used = 0
+  for (let x = -13.75; x <= 13.75; x += 0.5) {
+    for (let z = -13.75; z <= 13.75; z += 0.5) {
+      const point = { x, z }
+      if (world.paths.some((path) => distanceToPolyline(point, path.points) < path.width / 2 + 0.6)) continue
+      open += 1
+      const busy =
+        (world.patches ?? []).some((patch) => within(point, patch.rect)) ||
+        (world.waters ?? []).some((water) => pointInPolygon(point, water)) ||
+        world.props.some((prop) => !isClutter(prop.model) && Math.hypot(prop.x - x, prop.z - z) < 1.2) ||
+        world.features.some((feature) => Math.hypot(feature.x - x, feature.z - z) < 1.2) ||
+        (world.mounds ?? []).some((mound) => Math.hypot(mound.x - x, mound.z - z) < mound.radius)
+      if (busy) used += 1
+    }
+  }
+  return used / open
 }
 
 export function describeLandscape(expected: LandscapeExpectations): void {
@@ -44,6 +64,32 @@ export function describeLandscape(expected: LandscapeExpectations): void {
   const farm = (width: number, height: number, density: WorldDensity = 'full') => buildWorld({ layout: 'farm', gridWidth: width, gridHeight: height, seed: `${expected.world}-01`, density, theme: expected.world })
 
   it('map: landmark, blocks, clutter and style', () => checkCommon(map(), expected, expected.minBlocks.map, CLUTTER_CEILING.map))
+
+  it('map: gives most of the open ground a purpose instead of empty grass', () => {
+    const world = map()
+    expect(openGroundUse(world)).toBeGreaterThanOrEqual(0.55)
+    expect(world.waters?.length ?? 0).toBeGreaterThanOrEqual(1)
+    expect(world.features.some((feature) => feature.kind === 'tractor' || feature.kind === 'wheelbarrow')).toBe(true)
+  })
+
+  it('map: a farm road links the landmark to the trail without crossing fields', () => {
+    const world = map()
+    const lanes = world.paths.slice(1)
+    expect(lanes.length).toBeGreaterThanOrEqual(1)
+    const fields = (world.patches ?? []).filter((patch) => patch.texture || world.features.some((feature) => expected.crops.includes(feature.kind) && within(feature, patch.rect)))
+    for (const lane of lanes) {
+      for (let index = 1; index < lane.points.length; index += 1) {
+        const a = lane.points[index - 1]
+        const b = lane.points[index]
+        for (let t = 0.05; t < 1; t += 0.05) {
+          const point = { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t }
+          for (const field of fields) expect(within(point, field.rect), `lane through a field at ${point.x},${point.z}`).toBe(false)
+        }
+      }
+    }
+    const reach = (lane: (typeof lanes)[number]) => Math.min(...[lane.points[0], lane.points[lane.points.length - 1]].flatMap((end) => world.trail.map((node) => Math.hypot(node.x - end.x, node.z - end.z))))
+    expect(Math.min(...lanes.map(reach)), 'a lane reaches the trail').toBeLessThanOrEqual(1.5)
+  })
 
   it('map: keeps the trail and its nodes clear', () => {
     const world = map()

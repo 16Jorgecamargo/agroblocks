@@ -44,6 +44,7 @@ export const barnyardLandscape: Landscape = {
         animals: [...left.animals, ...right.animals, ...east.animals, ...west.animals],
         pasture: left.area,
         butterflies: [center(left.patch.rect), center(right.patch.rect)],
+        paths: [{ points: [{ x: 0.8, z: 6.1 }, { x: 0.4, z: 3.9 }, { x: 0, z: 1.9 }], width: 0.9 }, { points: [{ x: 3.6, z: 8.2 }, { x: 5, z: 7.5 }], width: 0.9 }],
       }
     }),
   farm: (input, random) =>

@@ -1,4 +1,4 @@
-import { distanceToPolyline, pointAlong, pointInPolygon, rectDistance, rectPolygon, segmentIntersection } from '@/render/world/geometry'
+import { offsetPolyline, distanceToPolyline, pointAlong, pointInPolygon, rectDistance, rectPolygon, segmentIntersection } from '@/render/world/geometry'
 
 describe('world geometry', () => {
   it('measures distance to a polyline', () => {
@@ -21,5 +21,17 @@ describe('world geometry', () => {
 
   it('walks along a polyline by fraction', () => {
     expect(pointAlong([{ x: 0, z: 0 }, { x: 4, z: 0 }], 0.25)).toEqual({ x: 1, z: 0 })
+  })
+})
+
+describe('offsetPolyline', () => {
+  it('shifts a path sideways by a fixed distance', () => {
+    const line = [{ x: 0, z: 0 }, { x: 4, z: 0 }, { x: 4, z: 4 }]
+    const left = offsetPolyline(line, 0.5)
+    expect(left).toHaveLength(3)
+    const probes = [left[0], left[2], ...left.slice(1).map((point, index) => ({ x: (point.x + left[index].x) / 2, z: (point.z + left[index].z) / 2 }))]
+    for (const point of probes) expect(distanceToPolyline(point, line)).toBeCloseTo(0.5, 1)
+    expect(left[0].z).toBeCloseTo(-0.5)
+    expect(offsetPolyline(line, -0.5)[0].z).toBeCloseTo(0.5)
   })
 })

@@ -73,7 +73,7 @@ export const gardenLandscape: Landscape = {
         [11.6, -1.4],
       ]) draft.placeFeature('fruitTree', { x, z }, random() * Math.PI * 2, 0.85, '#e0473c')
       patches.push(flowerMeadow(draft, { minX: 3.4, maxX: 6.4, minZ: -1.4, maxZ: 1.2 }, random))
-      return { patches, blocks: [...beds, run], butterflies: beds.map(center), clutterModels: FLOWERS }
+      return { patches, blocks: [...beds, run], butterflies: beds.map(center), clutterModels: FLOWERS, paths: [{ points: [{ x: -3.2, z: 5.2 }, { x: -2.4, z: 6.6 }, { x: -1.8, z: 7.2 }], width: 0.9 }] }
     }),
   farm: (input, random) =>
     composeFarm('garden', input, random, ({ draft, hw, hh }) => {
