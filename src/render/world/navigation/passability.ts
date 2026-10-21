@@ -23,12 +23,12 @@ function disc(grid: OccupancyGrid, radius: number): [number, number][] {
   return offsets
 }
 
-export function walkMask(grid: OccupancyGrid, agent: AgentKind): WalkMask {
+export function walkMask(grid: OccupancyGrid, agent: AgentKind, clearance = CLEARANCE[agent]): WalkMask {
   const passable = new Uint8Array(OCCUPANTS.length)
   OCCUPANTS.forEach((occupant, index) => {
     passable[index] = PASSABLE[agent].has(occupant) ? 1 : 0
   })
-  const offsets = disc(grid, CLEARANCE[agent])
+  const offsets = disc(grid, clearance)
   const open = new Uint8Array(grid.cells.length)
   for (let row = 0; row < grid.rows; row += 1) {
     for (let column = 0; column < grid.columns; column += 1) {
