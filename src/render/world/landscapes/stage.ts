@@ -77,7 +77,7 @@ export function stageMap(theme: WorldId, input: WorldInput, random: () => number
   const parts = build({ draft, trail, road, full: input.density === 'full', random })
   const paths = [road, ...(parts.paths ?? [])]
   woodland(draft, inset(WORLD_MAP_ISLAND, 1.1), random, { trees: look.trees, openSides: look.openSides ?? ['maxX', 'maxZ'], density: input.density, gaps: parts.gaps })
-  edgeClutter(draft, parts.blocks, input.density, random, 4, parts.clutterModels)
+  edgeClutter(draft, parts.blocks, input.density, random, 3, parts.clutterModels)
   const mounds = reliefMounds(WORLD_STYLES[theme].relief, MAP_CENTER, inset(WORLD_MAP_ISLAND, 1.6), random, openGround(draft, paths, parts.patches))
   return world(theme, WORLD_MAP_ISLAND, true, trail, paths, draft, parts, mounds)
 }
