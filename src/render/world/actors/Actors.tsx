@@ -2,14 +2,15 @@ import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Color, Euler, Matrix4, Quaternion, Vector3, type BufferGeometry, type InstancedMesh } from 'three'
 import { hashString } from '@/render/seededRandom'
-import { armGeometry, DRIVER_SEAT, hatGeometry, headGeometry, legGeometry, skinTones, TASK_TOOL, toolGeometry, torsoGeometry, tractorBodyGeometry, TRACTOR_WHEELS, wheelGeometry, type ToolKind } from '@/render/world/actors/actorGeometry'
+import { armGeometry, DRIVER_SEAT, hatGeometry, headGeometry, legGeometry, skinTones, streamGeometry, TASK_TOOL, toolGeometry, torsoGeometry, tractorBodyGeometry, TRACTOR_WHEELS, wheelGeometry, type ToolKind } from '@/render/world/actors/actorGeometry'
 import { actorPose, type ActorPose } from '@/render/world/actors/actorMotion'
-import { armMatrices, bodyMatrix, handMatrix, hoeMatrix, legMatrices, limbs } from '@/render/world/actors/workerPose'
+import { armMatrices, bodyMatrix, canMatrix, handMatrix, hoeMatrix, legMatrices, limbs, spoutMatrix } from '@/render/world/actors/workerPose'
 import type { Actor, ActorTask } from '@/render/world/worldTypes'
 
 const TOOL_KINDS: ToolKind[] = ['hoe', 'can', 'basket', 'bucket', 'crate']
 const LEFT_HANDED: ReadonlySet<ToolKind> = new Set<ToolKind>(['basket', 'bucket'])
 const CRATE_AT = new Matrix4().makeTranslation(0, 0.6, 0.26)
+const HIDDEN = new Matrix4().makeScale(0, 0, 0)
 const SEAT = new Matrix4().makeTranslation(DRIVER_SEAT.x, DRIVER_SEAT.y, DRIVER_SEAT.z)
 
 interface Person {
@@ -38,6 +39,7 @@ export function Actors({ actors, active, shadows = true }: { actors: Actor[]; ac
       hat: hatGeometry(),
       tractor: tractorBodyGeometry(),
       wheel: wheelGeometry(),
+      stream: streamGeometry(),
       tools: Object.fromEntries(TOOL_KINDS.map((kind) => [kind, toolGeometry(kind)])) as Record<ToolKind, BufferGeometry>,
     }),
     [],
@@ -87,8 +89,9 @@ export function Actors({ actors, active, shadows = true }: { actors: Actor[]; ac
       head?.setMatrixAt(index, body)
       hat?.setMatrixAt(index, body)
       if (person.tool) {
-        const matrix = person.tool === 'crate' ? body.clone().multiply(CRATE_AT) : person.tool === 'hoe' ? hoeMatrix(body, motion) : handMatrix(arms[LEFT_HANDED.has(person.tool) ? 0 : 1])
+        const matrix = person.tool === 'crate' ? body.clone().multiply(CRATE_AT) : person.tool === 'hoe' ? hoeMatrix(body, motion) : person.tool === 'can' ? canMatrix(body, motion) : handMatrix(arms[LEFT_HANDED.has(person.tool) ? 0 : 1])
         meshes.current[`tool-${person.tool}`]?.setMatrixAt(toolIndex[person.tool], matrix)
+        if (person.tool === 'can') meshes.current.stream?.setMatrixAt(toolIndex.can, spoutMatrix(matrix, motion) ?? HIDDEN)
         toolIndex[person.tool] += 1
       }
     })
@@ -124,6 +127,7 @@ export function Actors({ actors, active, shadows = true }: { actors: Actor[]; ac
       {TOOL_KINDS.map((kind) => (
         <Instanced key={kind} geometry={geometries.tools[kind]} count={toolCounts[kind]} meshRef={bind(`tool-${kind}`)} shadows={shadows} />
       ))}
+      <Instanced geometry={geometries.stream} count={toolCounts.can} meshRef={bind('stream')} shadows={false} />
       <Instanced geometry={geometries.tractor} count={tractors.length} meshRef={bind('tractor')} shadows={shadows} />
       <Instanced geometry={geometries.wheel} count={tractors.length * TRACTOR_WHEELS.length} meshRef={bind('wheel')} shadows={shadows} />
     </group>

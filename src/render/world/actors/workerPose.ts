@@ -1,5 +1,5 @@
 import { Euler, Matrix4, Quaternion, Vector3 } from 'three'
-import { ARM_LENGTH, HIP, HIP_SPREAD, SHOULDER, SHOULDER_SPREAD } from '@/render/world/actors/actorGeometry'
+import { ARM_LENGTH, CAN_SPOUT, HIP, HIP_SPREAD, SHOULDER, SHOULDER_SPREAD, STREAM_LENGTH } from '@/render/world/actors/actorGeometry'
 import type { ActorPose } from '@/render/world/actors/actorMotion'
 import type { ActorTask } from '@/render/world/worldTypes'
 
@@ -10,6 +10,7 @@ export interface Limbs {
   seated: boolean
   armRoll?: number
   handle?: number
+  pour?: number
 }
 
 const HOE_RAISED = -2.15
@@ -18,6 +19,9 @@ const HOE_DRAG = -0.66
 const HOE_GRIP_ROLL = 0.56
 const HOE_CARRY_ARM = -0.5
 const HOE_CARRY_HANDLE = 2.5
+
+const WATER_ARM = -0.85
+const WATER_POUR = 0.95
 
 function ease(t: number): number {
   return 0.5 - 0.5 * Math.cos(Math.PI * t)
@@ -52,7 +56,7 @@ export function limbs(task: ActorTask, pose: ActorPose): Limbs {
     const stroke = -0.55 - 0.75 * (0.5 + 0.5 * Math.sin(pose.cycle * 0.8))
     return { legs: [0.12, -0.12], arms: [stroke, stroke], bob: 0, seated: false }
   }
-  if (task === 'water') return { legs: [0, 0], arms: [0.08, -1.0 + Math.sin(pose.cycle * 0.6) * 0.06], bob: 0, seated: false }
+  if (task === 'water') return { legs: [0.1, -0.1], arms: [0.08, WATER_ARM], bob: 0, seated: false, pour: WATER_POUR + Math.sin(pose.cycle * 0.6) * 0.08 }
   if (task === 'pick') return { legs: [0, 0], arms: [-2.3 + 0.35 * Math.sin(pose.cycle + 2), -2.6 + 0.35 * Math.sin(pose.cycle)], bob: 0, seated: false }
   if (task === 'feed') return { legs: [0, 0], arms: [-0.55, -0.3 - 1.4 * Math.max(0, Math.sin(pose.cycle * 0.8))], bob: 0, seated: false }
   if (task === 'carry') return { legs: [0, 0], arms: [-1.15, -1.15], bob: 0, seated: false }
@@ -88,4 +92,19 @@ export function hoeMatrix(body: Matrix4, limbs: Limbs): Matrix4 {
 
 export function handMatrix(arm: Matrix4): Matrix4 {
   return arm.clone().multiply(new Matrix4().makeTranslation(0, -ARM_LENGTH, 0))
+}
+
+export function canMatrix(body: Matrix4, limbs: Limbs): Matrix4 {
+  const hand = new Vector3(0, -ARM_LENGTH, 0).applyMatrix4(armMatrices(body, limbs)[1])
+  const turn = new Quaternion().setFromRotationMatrix(new Matrix4().extractRotation(body))
+  const tilt = new Quaternion().setFromEuler(new Euler(limbs.pour ?? 0, 0, 0))
+  return new Matrix4().compose(hand, turn.multiply(tilt), new Vector3(1, 1, 1))
+}
+
+export function spoutMatrix(can: Matrix4, limbs: Limbs): Matrix4 | null {
+  if (!limbs.pour) return null
+  const tip = CAN_SPOUT.tip.clone().applyMatrix4(can)
+  const ahead = new Vector3(0, 0, 1).transformDirection(can)
+  const yaw = new Quaternion().setFromAxisAngle(UP, Math.atan2(ahead.x, ahead.z))
+  return new Matrix4().compose(tip, yaw, new Vector3(1, Math.max(0.01, tip.y / STREAM_LENGTH), 1))
 }

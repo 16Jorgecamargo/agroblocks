@@ -1,4 +1,4 @@
-import { BoxGeometry, type BufferGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry } from 'three'
+import { BoxGeometry, type BufferGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry, Vector3 } from 'three'
 import { compose, mergeParts, part } from '@/render/world/features/parts'
 import type { ActorTask } from '@/render/world/worldTypes'
 
@@ -14,6 +14,25 @@ const WHITE = '#ffffff'
 const PANTS = '#4c6fa8'
 const BOOTS = '#5a3d28'
 const STRAW = '#e2c46a'
+
+const SPOUT_TILT = 1.05
+const SPOUT_LENGTH = 0.2
+const SPOUT_BASE = new Vector3(0, -0.15, 0.08)
+const SPOUT_DIRECTION = new Vector3(0, Math.cos(SPOUT_TILT), Math.sin(SPOUT_TILT))
+
+export const CAN_SPOUT = { tip: SPOUT_BASE.clone().addScaledVector(SPOUT_DIRECTION, SPOUT_LENGTH), direction: SPOUT_DIRECTION.clone() }
+
+export const STREAM_LENGTH = 0.4
+
+export function streamGeometry(): BufferGeometry {
+  const parts: BufferGeometry[] = []
+  for (let index = 0; index < 7; index += 1) {
+    const t = index / 6
+    parts.push(part(new SphereGeometry(0.018 + t * 0.008, 5, 4), '#7cc4f0', compose([Math.sin(index * 2.3) * 0.015 * t, -STREAM_LENGTH * t, 0.02 * t], [0, 0, 0], [1, 1.6, 1])))
+  }
+  parts.push(part(new CylinderGeometry(0.07, 0.07, 0.005, 8), '#9fd4f2', compose([0, -STREAM_LENGTH, 0.02])))
+  return mergeParts(parts)
+}
 
 export type ToolKind = 'hoe' | 'can' | 'basket' | 'bucket' | 'crate'
 
@@ -46,8 +65,12 @@ const TOOLS: Record<ToolKind, () => BufferGeometry[]> = {
     part(new BoxGeometry(0.17, 0.025, 0.13), '#7d868e', compose([0, -HOE_HANDLE, -0.07])),
   ],
   can: () => [
-    part(new CylinderGeometry(0.08, 0.09, 0.15, 7), '#4f9a3a', compose([0, -0.1, 0.03])),
-    part(new CylinderGeometry(0.012, 0.02, 0.18, 5), '#3f7f2e', compose([0, -0.07, 0.15], [1.1, 0, 0])),
+    part(new BoxGeometry(0.03, 0.03, 0.14), '#3f7f2e', compose([0, 0, 0])),
+    part(new BoxGeometry(0.03, 0.05, 0.03), '#3f7f2e', compose([0, -0.025, -0.06])),
+    part(new BoxGeometry(0.03, 0.05, 0.03), '#3f7f2e', compose([0, -0.025, 0.06])),
+    part(new CylinderGeometry(0.08, 0.09, 0.16, 8), '#4f9a3a', compose([0, -0.12, 0])),
+    part(new CylinderGeometry(0.012, 0.02, SPOUT_LENGTH, 5), '#3f7f2e', compose([0, SPOUT_BASE.y + SPOUT_DIRECTION.y * SPOUT_LENGTH / 2, SPOUT_BASE.z + SPOUT_DIRECTION.z * SPOUT_LENGTH / 2], [SPOUT_TILT, 0, 0])),
+    part(new ConeGeometry(0.035, 0.04, 6), '#3f7f2e', compose([0, SPOUT_BASE.y + SPOUT_DIRECTION.y * SPOUT_LENGTH, SPOUT_BASE.z + SPOUT_DIRECTION.z * SPOUT_LENGTH], [SPOUT_TILT + Math.PI, 0, 0])),
   ],
   basket: () => [part(new CylinderGeometry(0.11, 0.08, 0.12, 8), '#c49a5a', compose([0, -0.08, 0.02])), part(new SphereGeometry(0.07, 6, 4), '#e0473c', compose([0, -0.02, 0.02], [0, 0, 0], [1.2, 0.5, 1.2]))],
   bucket: () => [part(new CylinderGeometry(0.08, 0.065, 0.13, 8), '#9aa3ab', compose([0, -0.1, 0])), part(new CylinderGeometry(0.072, 0.072, 0.02, 8), '#e2c46a', compose([0, -0.04, 0]))],
