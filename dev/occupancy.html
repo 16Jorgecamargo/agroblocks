@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Occupancy grid</title>
+    <style>
+      body { margin: 0; background: #131f29; color: #e9ece6; font: 14px system-ui, sans-serif; }
+      main { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; }
+      canvas { image-rendering: pixelated; max-width: 100%; height: auto; }
+      ul { display: flex; flex-wrap: wrap; gap: 12px; list-style: none; padding: 0; margin: 0; }
+      li span { display: inline-block; width: 12px; height: 12px; margin-right: 4px; vertical-align: middle; }
+    </style>
+  </head>
+  <body>
+    <main id="root"></main>
+    <script type="module" src="/dev/occupancy.tsx"></script>
+  </body>
+</html>
