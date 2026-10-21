@@ -18,13 +18,14 @@ A malha é invisível para o jogador. Só o código (e os testes) a usam.
 ## Não-objetivos
 
 - Mostrar a malha ao jogador.
-- Evitar colisão entre atores em movimento (pessoa contra pessoa, pessoa contra animal). Cada agente respeita o cenário, não os outros agentes. Os animais continuam com o espaçamento entre si que já têm.
+- Evitar colisão entre pessoas e tratores em movimento (pessoa contra pessoa, pessoa contra animal). Pessoas e tratores respeitam o cenário, não os outros agentes.
 - Pássaros e borboletas.
 - Mudar o desenho dos mundos.
 
 ## Anti-objetivos (seria falha mesmo funcionando)
 
 - Animação de trabalho num lugar sem o objeto correspondente (regar grama, alimentar sem cocho).
+- Um animal atravessando outro animal.
 - Qualquer agente atravessando construção, cerca, água, cocho, árvore, canteiro, a grade da missão ou um hexágono de missão da trilha (a estrada continua passável; os hexágonos são contornados).
 - Resultado diferente a cada visita (tudo continua determinístico pela semente).
 - Queda perceptível de desempenho: a malha é calculada uma vez ao montar a cena, nunca por quadro.
@@ -70,6 +71,7 @@ Gerados a partir dos objetos e checados na malha (a célula do pé tem de ser pa
 
 - A área do animal passa a ser a lista de células livres do piquete na malha do animal.
 - `nextTarget` sorteia só entre essas células e só aceita trajetos cuja linha não cruze célula proibida.
+- Animais não se atravessam: nascem sem sobrepor outro animal (folga pelo tamanho de cada espécie) e cada trajeto só é aceito se não passar por nenhum outro animal parado nem cruzar o trajeto em curso de outro, com essa mesma folga.
 
 ### Verificação
 
