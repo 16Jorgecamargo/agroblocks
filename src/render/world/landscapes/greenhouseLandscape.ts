@@ -18,7 +18,7 @@ const LEAFY: FeatureKind[] = ['cabbageBed', 'vegetableBed', 'herbBed', 'vegetabl
 const OUTDOOR: FeatureKind[] = ['vegetableBed', 'carrotBed', 'onionBed', 'cabbageBed', 'herbBed']
 const LOOK: StageLook = { trees: ['tree-b', 'tree-d', 'pine-round', 'tree-a', 'tree-b'], openSides: ['maxX', 'maxZ', 'minX'] }
 
-function bayRow(draft: WorldDraft, start: Vec2, count: number): GroundPatch {
+export function bayRow(draft: WorldDraft, start: Vec2, count: number): GroundPatch {
   for (let index = 0; index < count; index += 1) landmark(draft, 'greenhouseBay', { x: start.x + index * BAY, z: start.z }, 0)
   landmark(draft, 'supportShed', { x: start.x + count * BAY - 0.2, z: start.z }, 0)
   return { rect: { minX: start.x - 1.8, maxX: start.x + count * BAY + 1, minZ: start.z - 1.4, maxZ: start.z + 1.4 }, color: GRAVEL }

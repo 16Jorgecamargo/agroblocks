@@ -20,7 +20,7 @@ type Growth = 'young' | 'growing' | 'ripe'
 
 const HEIGHTS: Record<Growth, [number, number]> = { young: [0.42, 0.55], growing: [0.7, 0.82], ripe: [0.94, 1.06] }
 
-function cornField(draft: WorldDraft, rect: Rect, growth: Growth, full: boolean, random: () => number): GroundPatch {
+export function cornField(draft: WorldDraft, rect: Rect, growth: Growth, full: boolean, random: () => number): GroundPatch {
   const [stepX, stepZ] = full ? [0.62, 0.8] : [0.95, 1.15]
   const [low, high] = HEIGHTS[growth]
   for (let z = rect.minZ + stepZ / 2; z < rect.maxZ; z += stepZ) {
@@ -33,7 +33,7 @@ function cornField(draft: WorldDraft, rect: Rect, growth: Growth, full: boolean,
   return { rect, color: growth === 'young' ? YOUNG_SOIL : SOIL, texture: 'furrows' }
 }
 
-function stubbleField(draft: WorldDraft, rect: Rect, random: () => number): GroundPatch {
+export function stubbleField(draft: WorldDraft, rect: Rect, random: () => number): GroundPatch {
   const middle = center(rect)
   for (let x = rect.minX + 1.1; x < rect.maxX - 0.6; x += 2.3) draft.forceFeature('hayBale', { x, z: middle.z + (random() - 0.5) * 0.9 }, random() * 0.5, 1)
   return { rect, color: STUBBLE, texture: 'stripes' }
