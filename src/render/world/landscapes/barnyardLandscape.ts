@@ -125,6 +125,7 @@ export const barnyardLandscape: Landscape = {
         animals: [...cows.animals, ...sheep.animals, ...pigs.animals, ...horses.animals, ...field.animals],
         pasture: cows.area,
         butterflies: [center(field.patch.rect), center(home.rect)],
+        birds: [{ x: -9, z: -9 }, { x: 9, z: 9.6 }, { x: 0, z: -1 }],
         gaps: [{ x: -14.4, z: 8 }],
         actors: [
           station('barn-feeder', { x: -7.35, z: -11.0 }, { x: -7.35, z: -11.8 }, 'feed', 0),

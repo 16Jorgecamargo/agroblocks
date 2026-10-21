@@ -176,6 +176,7 @@ export const orchardLandscape: Landscape = {
         stains,
         waters: [pond.water],
         butterflies: [center(berries), { x: 9.4, z: 8 }, { x: -9.4, z: 6.1 }, { x: -2.6, z: -11.1 }],
+        birds: [{ x: -8.6, z: -9.4 }, { x: 9, z: 4.6 }, { x: -9, z: 2.6 }],
         clutterModels: FLOWERS,
         actors: [
           ...ladderPickers(draft, 'orchard', 3, 0),

@@ -128,6 +128,7 @@ export const gardenLandscape: Landscape = {
         stains,
         waters,
         butterflies: [center(trellis), center(herbs), { x: 11, z: 11.8 }, { x: -6, z: 10 }],
+        birds: [{ x: -8, z: -9 }, { x: 9, z: 9 }],
         clutterModels: FLOWERS,
         animals: spawnHerd(random, rectPolygon({ minX: 2.0, maxX: 5.8, minZ: 2.2, maxZ: 3.6 }), [['pug', 1]], 'garden-dog', 0.8),
         actors: [

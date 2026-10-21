@@ -1,4 +1,4 @@
-import { birdPosition, flockBounds } from '@/render/world/Birds'
+import { birdPosition, flockBounds, wingAngle } from '@/render/world/Birds'
 
 describe('birds', () => {
   it('keeps every bird inside the flock bounds along its whole orbit', () => {
@@ -16,5 +16,13 @@ describe('birds', () => {
     points.forEach((point, index) => {
       for (let time = 0; time < 20; time += 0.5) expect(bounds.containsPoint(birdPosition(point, index, time))).toBe(true)
     })
+  })
+
+  it('beats its wings up and down, with short glides in between', () => {
+    const angles = Array.from({ length: 400 }, (_, step) => wingAngle(0, step * 0.05))
+    expect(Math.max(...angles)).toBeGreaterThan(0.5)
+    expect(Math.min(...angles)).toBeLessThan(-0.5)
+    expect(angles.filter((angle) => angle === 0.12).length).toBeGreaterThan(10)
+    expect(wingAngle(0, 3)).not.toBe(wingAngle(1, 3))
   })
 })

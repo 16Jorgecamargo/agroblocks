@@ -122,6 +122,7 @@ export const greenhouseLandscape: Landscape = {
         stains,
         waters,
         butterflies: [center(loop), { x: -9, z: 11.1 }],
+        birds: [{ x: 8, z: -10 }, { x: -9, z: 9 }],
         clutterModels: FLOWERS,
         gaps: [{ x: -14.4, z: 6 }],
         actors: [
