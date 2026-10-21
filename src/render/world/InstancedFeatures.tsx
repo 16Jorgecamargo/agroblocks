@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { DoubleSide, Object3D, type InstancedMesh } from 'three'
-import { featureGeometry, featureGlass, groupFeatures, SWAYING } from '@/render/world/features/featureGeometry'
+import { featureGeometry, featureGlass, groupFeatures, PECKING, SPINNING, SWAYING } from '@/render/world/features/featureGeometry'
 import type { WorldFeature } from '@/render/world/worldTypes'
 
 const SWAY_SPEED = 1.3
@@ -14,12 +14,13 @@ function FeatureGroup({ features, ambient, shadows }: { features: WorldFeature[]
   const geometry = featureGeometry(kind, tint)
   const glassGeometry = featureGlass(kind)
   const dummy = useMemo(() => new Object3D(), [])
-  const sways = SWAYING.has(kind) && ambient
+  const motion = !ambient ? 'still' : SWAYING.has(kind) ? 'sway' : PECKING.has(kind) ? 'peck' : SPINNING.has(kind) ? 'spin' : 'still'
 
   const place = (time: number) => {
     features.forEach((feature, index) => {
       dummy.position.set(feature.x, feature.y ?? 0, feature.z)
-      dummy.rotation.set(0, feature.rotation, sways ? Math.sin(time + index * 0.7) * SWAY_ANGLE : 0)
+      const wave = Math.sin(time + index * 0.7)
+      dummy.rotation.set(0, feature.rotation + (motion === 'spin' ? time * 2 : 0), motion === 'sway' ? wave * SWAY_ANGLE : motion === 'peck' ? -Math.max(0, Math.sin(time * 2.3 + index * 1.7)) * 0.6 : 0)
       dummy.scale.setScalar(feature.scale)
       dummy.updateMatrix()
       solid.current?.setMatrixAt(index, dummy.matrix)
@@ -31,7 +32,7 @@ function FeatureGroup({ features, ambient, shadows }: { features: WorldFeature[]
 
   useLayoutEffect(() => place(0))
   useFrame(({ clock }) => {
-    if (sways) place(clock.elapsedTime * SWAY_SPEED)
+    if (motion !== 'still') place(clock.elapsedTime * SWAY_SPEED)
   })
 
   return (

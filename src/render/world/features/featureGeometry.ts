@@ -1,5 +1,6 @@
 import { BoxGeometry, BufferGeometry, ConeGeometry, CylinderGeometry, IcosahedronGeometry, SphereGeometry } from 'three'
 import { cornfieldObjects } from '@/render/world/features/cornfieldObjects'
+import { gardenObjects } from '@/render/world/features/gardenObjects'
 import { compose, mergeParts, part, type Triple } from '@/render/world/features/parts'
 import type { FeatureKind, WorldFeature } from '@/render/world/worldTypes'
 
@@ -98,6 +99,7 @@ export { compose, mergeParts, part }
 
 const BUILDERS: Record<FeatureKind, (tint: string) => BufferGeometry[]> = {
   ...cornfieldObjects,
+  ...gardenObjects,
   cornStalk,
   fruitTree,
   greenhouse,
@@ -144,3 +146,7 @@ export function groupFeatures(features: WorldFeature[]): Map<string, WorldFeatur
 }
 
 export const SWAYING: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['cornStalk', 'fruitTree'])
+
+export const PECKING: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['chicken'])
+
+export const SPINNING: ReadonlySet<FeatureKind> = new Set<FeatureKind>([])

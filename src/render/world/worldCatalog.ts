@@ -68,9 +68,13 @@ export const FEATURE_FOOTPRINTS: Record<FeatureKind, number> = {
   grainDryer: 1.3,
   cornWagon: 1.0,
   scarecrow: 0.4,
+  toolShed: 1.3,
+  compostBins: 0.9,
+  wateringCan: 0.25,
+  chicken: 0.25,
 }
 
-export const TALL_FEATURES: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['greenhouse', 'fruitTree', 'grainBin', 'grainDryer'])
+export const TALL_FEATURES: ReadonlySet<FeatureKind> = new Set<FeatureKind>(['greenhouse', 'fruitTree', 'grainBin', 'grainDryer', 'toolShed'])
 
 export const GRID_CLEARANCE = 1.2
 
