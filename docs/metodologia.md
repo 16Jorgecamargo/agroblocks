@@ -6,7 +6,7 @@ Estudantes do Ensino Médio costumam ter dificuldade em transformar a descriçã
 
 ## 2. Objetivos pedagógicos
 
-Ao final das seis fases, espera-se que o estudante consiga:
+O jogo tem um treinamento e seis mundos, um por conceito, com 10 missões cada. Ao final dos seis mundos, espera-se que o estudante consiga:
 
 1. Ordenar instruções para atingir um objetivo (sequenciamento).
 2. Identificar padrões e representá-los com laços de contagem (repetição).
@@ -19,39 +19,39 @@ Ao final das seis fases, espera-se que o estudante consiga:
 
 | Instrumento | Onde | Conteúdo |
 |---|---|---|
-| Pré-teste (forma A) | `#/avaliacao/pre`, antes da Fase 1 | 10 itens: 2 por conceito |
-| Pós-teste (forma B) | `#/avaliacao/pos`, após concluir a Fase 6 | 10 itens equivalentes, em pares com a forma A |
+| Prova inicial de cada mundo (forma A) | `#/avaliacao/<mundo>/pre`, antes da primeira missão do mundo | 10 itens só do conceito do mundo: 4 de montar, 3 de prever e 3 de consertar programas |
+| Prova final de cada mundo (forma B) | `#/avaliacao/<mundo>/pos`, depois da décima missão do mundo | 10 itens equivalentes, em pares com a forma A |
 | Registros de jogo | automáticos | cada execução, erros, dicas, recursos, eficiência |
 
-Conceitos avaliados: sequenciamento, repetição, condicionais, identificação de erros, interpretação de algoritmos. Cada item da forma A tem um par na forma B (`pairId`) com mesma estrutura e dificuldade e cenário diferente, para reduzir o efeito de memorização. Durante os testes o aluno não recebe retorno de acerto.
+Cada item da forma A tem um par na forma B (`pairId`) com mesma estrutura e dificuldade e cenário diferente, para reduzir o efeito de memorização. Durante as provas o aluno não recebe retorno de acerto. O mundo seguinte só abre depois da prova final do anterior, então cada conceito tem sua própria medida antes e depois da prática.
 
 ## 4. Indicadores coletados
 
-Por tentativa (`tentativas.csv`): missão, fase, conceito, número da tentativa, data/hora, resultado (sucesso, objetivo não cumprido, erro), código do erro, comandos executados, blocos usados, sementes/água/energia consumidas, dicas reveladas até o momento, estrelas de eficiência.
+Por tentativa (`agroblocks_tentativas_<data>.csv`): jogada, missão, mundo, número da missão no mundo, número da tentativa, data/hora, resultado (sucesso, objetivo não cumprido, erro), código do erro, comandos executados, blocos usados, dicas reveladas até o momento, estrelas de eficiência e pseudocódigo do programa.
 
-Por missão (`missoes.csv`): estado, tentativas, sucessos, erros, dicas, melhor resultado.
+Por avaliação (`agroblocks_avaliacoes_<data>.csv`): mundo, forma (pré ou pós), item, habilidade (montar, prever, consertar), resposta e se está correta.
 
-Por avaliação (`avaliacao.csv`): forma, item, par, conceito, resposta e se está correta.
+Por aluno (`agroblocks_alunos_<data>.csv`): missões concluídas, mundos concluídos e, por mundo, missões concluídas e acertos da prova inicial e da final.
 
 ## 5. Procedimento sugerido
 
 1. Obter autorização da escola e, para menores de idade, Termo de Consentimento dos responsáveis (TCLE) e Termo de Assentimento do estudante (TALE), conforme as normas do comitê de ética aplicável.
 2. Cada aluno informa nome completo e escola ao iniciar a fazenda. Os dados vão para o servidor do projeto (veja o README).
-3. Sessão 1: pré-teste + Treinamento + Fases 1–2.
-4. Sessões seguintes: Fases 3–6, no ritmo da turma.
-5. Última sessão: pós-teste.
+3. Primeira sessão: Treinamento e início da Horta (prova inicial + missões).
+4. Sessões seguintes: um mundo de cada vez, no ritmo da turma. Cada mundo começa com a prova inicial e termina com a prova final; não é preciso encaixar o mundo inteiro numa aula.
+5. O pesquisador acompanha pelo painel em que mundo cada aluno está.
 6. Abrir `#/painel` (senha do professor) e exportar os três CSV, que já trazem todos os alunos com nome e escola.
 7. Antes de outro aluno usar a mesma máquina, ele clica em "Iniciar nova fazenda" e se cadastra; os dados do anterior continuam no servidor.
 
 ## 6. Análise
 
-- Comparar acertos por conceito entre pré e pós (pares de itens). Para amostras pequenas, usar teste não paramétrico pareado (Wilcoxon) por conceito e relatar tamanhos de efeito.
+- Comparar, em cada mundo, os acertos da prova inicial e da final (pares de itens), também por habilidade. Para amostras pequenas, usar teste não paramétrico pareado (Wilcoxon) por conceito e relatar tamanhos de efeito.
 - Cruzar dados de uso (tentativas, erros mais frequentes, dicas) com os resultados do pós-teste de forma descritiva.
-- Relatar separadamente alunos que pularam o pré-teste ou não concluíram a Fase 6.
+- Relatar separadamente, por mundo, os alunos que não chegaram à prova final.
 
 ## 7. Dados de uso × evidências de aprendizagem
 
-Dados de uso mostram **o que aconteceu no jogo** (quantas tentativas, quais erros). Eles não mostram, sozinhos, que o aluno aprendeu: concluir uma fase pode resultar de tentativa e erro ou da dica com exemplo parcial. Evidência de aprendizagem exige instrumentos independentes do jogo (pré/pós-teste) e, idealmente, comparação com um grupo que não usou o jogo. O painel do aplicativo exibe essa ressalva e marca dados de demonstração como fictícios.
+Dados de uso mostram **o que aconteceu no jogo** (quantas tentativas, quais erros). Eles não mostram, sozinhos, que o aluno aprendeu: concluir uma missão pode resultar de tentativa e erro ou da dica com exemplo parcial. Evidência de aprendizagem exige instrumentos independentes do jogo (pré/pós-teste) e, idealmente, comparação com um grupo que não usou o jogo. O painel do aplicativo exibe essa ressalva e marca dados de demonstração como fictícios.
 
 ## 8. Limitações
 

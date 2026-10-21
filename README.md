@@ -6,10 +6,11 @@ Jogo educativo de automação agrícola e programação visual para o Ensino Mé
 
 ## Funcionalidades
 
-- Editor de blocos em português com liberação gradual por fase.
+- Editor de blocos em português com liberação gradual por mundo.
 - Motor de execução próprio: interpreta o programa do aluno sem `eval`, com pausa, continuação, passo a passo, parada, reinício, velocidade e limite de passos.
 - Simulação agrícola determinística (preparo, plantio, irrigação, crescimento, colheita, recursos e energia).
-- Treinamento guiado em 15 etapas: holofote na área real da tela com balão apontando, e antes de cada ação um vídeo gravado do próprio jogo, com uma mão fantasma, mostra como fazer (adicionar, encaixar e apagar blocos, executar e parar, passo a passo, dicas, console, pseudocódigo e corrigir erro) + 6 fases (sequência, repetição, condicionais, sensores, variáveis, depuração e eficiência).
+- Treinamento guiado em 15 etapas: holofote na área real da tela com balão apontando, e antes de cada ação um vídeo gravado do próprio jogo, com uma mão fantasma, mostra como fazer (adicionar, encaixar e apagar blocos, executar e parar, passo a passo, dicas, console, pseudocódigo e corrigir erro).
+- 6 mundos, um por conceito (sequência, repetição, condições, sensores, variáveis e eficiência), cada um com 10 missões e uma prova inicial e uma prova final próprias. Cada mundo é uma fazenda 3D low-poly com trilha de missões; o próximo mundo abre depois da prova final do anterior.
 - Feedback educativo com mensagens de erro explicativas, dicas graduais e pseudocódigo gerado dos blocos.
 - Tela de resultado que separa correção de eficiência e compara soluções corretas.
 - Cadastro do aluno (nome e escola), envio de cada jogada para o servidor e painel do professor com senha, gráficos, detalhe por aluno e exportação CSV.
@@ -42,7 +43,7 @@ Abra `http://localhost:5173`.
 
 ## Painel do professor e banco de dados
 
-Ao iniciar uma fazenda, o aluno informa nome completo e escola. Cada fazenda vira uma "jogada" enviada ao servidor (Vercel Functions em `api/`) e guardada no Upstash Redis: cadastro, tutorial (concluído, pulado e em qual etapa), fases, tentativas com pseudocódigo e respostas das avaliações. O envio acontece 2 s depois de cada mudança e é refeito sozinho se a internet cair.
+Ao iniciar uma fazenda, o aluno informa nome completo e escola. Cada fazenda vira uma "jogada" enviada ao servidor (Vercel Functions em `api/`) e guardada no Upstash Redis: cadastro, tutorial (concluído, pulado e em qual etapa), missões, tentativas com pseudocódigo e respostas das provas de cada mundo. O envio acontece 2 s depois de cada mudança e é refeito sozinho se a internet cair.
 
 O painel (`/#/painel` ou "Painel do professor" na tela inicial) pede a senha, conferida no servidor. Ele mostra todos os alunos com filtros por escola, nome e período, gráficos, tabela ordenável, detalhe de cada jogada, exportação CSV e dados de demonstração.
 
@@ -125,20 +126,25 @@ Veja `docs/decisions/`:
 7. Assets CC0 em GLB com fallback procedural.
 8. Mundo compartilhado gerado por função pura, com instancing.
 9. Robô, tomateiro e cercas procedurais com poses calculadas por funções puras.
+10. Treinamento guiado com vídeos do próprio jogo.
+11. Cadastro do aluno, envio ao servidor e painel do professor.
+12. Mundos de conceitos com 10 missões e provas por mundo.
 
-## Missões
+## Mundos e missões
 
-| # | Fase | Conceito |
+| Mundo | Conceito | Missões |
 |---|---|---|
-| 0 | Treinamento | interface (tutorial guiado) |
-| 1 | Primeira colheita | sequenciamento |
-| 2 | Plantação em série | repetição |
-| 3 | Irrigação inteligente | condicionais |
-| 4 | Colheita automatizada | sensores e laço enquanto |
-| 5 | Recursos limitados | variáveis |
-| 6 | Fazenda eficiente | depuração, laços aninhados, procedimentos |
+| Treinamento | interface (tutorial guiado) | 1 |
+| 1 Horta | sequência | 10 |
+| 2 Milharal | repetição | 10 |
+| 3 Pomar | condições | 10 |
+| 4 Estufa | sensores e laço enquanto | 10 |
+| 5 Celeiro | variáveis | 10 |
+| 6 Fazenda completa | eficiência, procedimentos e depuração | 10 |
 
-Cada missão é um objeto em `src/data/missions/` com mapa, recursos, blocos permitidos, objetivos, restrições, dicas e uma solução de referência validada por teste automatizado.
+As 10 missões de cada mundo seguem o mesmo ritmo: aprender (1–3), praticar (4–6), desafio (7–8), consertar um programa (9) e missão final (10). Antes da primeira missão o aluno faz a prova inicial do mundo e, depois da décima, a prova final, com 10 questões cada (4 de montar, 3 de prever e 3 de consertar programas).
+
+Cada missão é um objeto em `src/data/missions/<mundo>/` com mapa, recursos, blocos permitidos, objetivos, restrições, dicas e uma solução de referência validada por teste automatizado.
 
 ## Regras da simulação (resumo)
 

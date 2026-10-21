@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 import { getMission } from '@/data/missions'
-import { openMission, saveWithProgram, seedStorage } from './helpers'
+import { missionSave, openMission, saveWithProgram, seedStorage } from './helpers'
 
 const generated = JSON.parse(readFileSync('src/render/models/manifest.generated.json', 'utf8')) as { models: unknown[] }
 const firstHarvest = getMission('garden-04')
@@ -32,7 +32,7 @@ test('the 3D farm loads only local assets, including any GLB models, without err
     const font = url.startsWith('https://fonts.googleapis.com') || url.startsWith('https://fonts.gstatic.com')
     if (!local && !font) external.push(url)
   })
-  await seedStorage(page, { settings: { motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' }, save: missionSave('garden-04') })
   await openMission(page, 'garden-04')
   await expect(page.locator('.farm-view canvas')).toBeVisible()
   await page.waitForTimeout(2500)
@@ -85,7 +85,7 @@ test('the mission map and the home screen render their 3D worlds without errors'
 test('the legend opens as a paged dialog with one 3D preview and closes', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await seedStorage(page, { settings: { motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' }, save: missionSave('garden-04') })
   await openMission(page, 'garden-04')
   await page.getByRole('button', { name: 'Legenda' }).click()
   const dialog = page.getByRole('dialog', { name: 'Legenda' })
@@ -127,7 +127,7 @@ test('screens fill the window without page scroll or overscroll bounce', async (
 })
 
 test('farm view tool buttons animate, and the rotate arrows spin with the camera', async ({ page }) => {
-  await seedStorage(page, { settings: { motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' }, save: missionSave('garden-04') })
   await openMission(page, 'garden-04')
   const right = page.getByRole('button', { name: 'Girar câmera para a direita' })
   await right.click()

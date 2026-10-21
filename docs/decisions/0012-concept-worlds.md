@@ -1,0 +1,7 @@
+# 0012 — Mundos de conceitos com 10 missões e provas por mundo
+
+**Contexto:** havia uma missão por conceito e uma prova geral antes e depois do jogo. Uma missão é pouca prática, e a prova única misturava os conceitos, então não dava para saber o ganho em cada um.
+
+**Decisão:** cada conceito vira um mundo com 10 missões no ritmo aprender (1–3), praticar (4–6), desafio (7–8), consertar (9) e final (10). Cada mundo tem prova inicial e prova final próprias, com 10 itens pareados (forma A e B) e separados por habilidade (montar, prever, consertar). O próximo mundo abre só depois da prova final do anterior. O treinamento continua sendo uma missão única, fora dos mundos. O save passou para a versão 2, com provas por mundo e migração do formato antigo; o servidor recusa jogadas no formato antigo. Na tela de missões cada mundo é uma fazenda 3D low-poly com trilha própria, câmera que segue a missão escolhida e setas e bolinhas para trocar de mundo. A missão usa o cenário do mundo dela. O painel do professor agrupa missões e provas por mundo.
+
+**Consequências:** o professor vê o ganho de cada conceito separadamente; o jogo tem 61 missões, então o painel resume por mundo e detalha por missão só no aluno; dados salvos no formato antigo são migrados, mas as provas gerais antigas não entram nas provas por mundo; nos testes de ponta a ponta, abrir uma missão exige um save em que ela esteja liberada e com a prova inicial feita.

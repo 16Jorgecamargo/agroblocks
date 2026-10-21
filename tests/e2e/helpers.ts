@@ -2,14 +2,15 @@ import { expect, type Locator, type Page } from '@playwright/test'
 import type { Program } from '@/blocks/interpreter/ast'
 import { programToWorkspaceJson } from '@/blocks/serializer/programToWorkspaceJson'
 import { MISSIONS } from '@/data/missions'
-import { createInitialSave, recordAttempt, storeProgram } from '@/game/progress/progression'
+import { createInitialSave, recordAttempt, storeAssessment, storeProgram } from '@/game/progress/progression'
 import type { SaveData } from '@/game/progress/types'
+import type { WorldId } from '@/game/worlds/worldTypes'
 import { SAVE_KEY } from '@/services/storage/saveStorage'
 import { DEFAULT_SETTINGS, SETTINGS_KEY, type Settings } from '@/services/storage/settingsStorage'
 
 const refs = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
 
-export function saveWithProgram(missionId: string, program: Program, completed: string[] = []): SaveData {
+export function missionSave(missionId: string, completed: string[] = []): SaveData {
   let save = createInitialSave(refs, '2026-10-14T12:00:00.000Z')
   for (const id of completed) {
     save = recordAttempt(
@@ -28,7 +29,15 @@ export function saveWithProgram(missionId: string, program: Program, completed: 
       refs,
     )
   }
-  return storeProgram(save, missionId, JSON.stringify(programToWorkspaceJson(program)))
+  const world = MISSIONS.find((mission) => mission.id === missionId)?.world ?? null
+  if (world) save = storeAssessment(save, { world, form: 'pre', startedAt: save.createdAt, completedAt: save.createdAt, skipped: false, answers: {} }, refs)
+  const progress = save.missions[missionId]
+  if (progress?.status === 'locked') save = { ...save, missions: { ...save.missions, [missionId]: { ...progress, status: 'available' } } }
+  return save
+}
+
+export function saveWithProgram(missionId: string, program: Program, completed: string[] = []): SaveData {
+  return storeProgram(missionSave(missionId, completed), missionId, JSON.stringify(programToWorkspaceJson(program)))
 }
 
 export async function seedStorage(page: Page, options: { settings?: Partial<Settings>; save?: SaveData }): Promise<void> {
@@ -96,8 +105,8 @@ export async function registerStudent(page: Page, name = 'Ana Souza', school = '
   await dialog.getByRole('button', { name: 'Começar' }).click()
 }
 
-export async function takePreTest(page: Page): Promise<void> {
-  await expect(page).toHaveURL(/#\/avaliacao\/pre$/)
+export async function takeWorldTest(page: Page, world: WorldId, form: 'pre' | 'post'): Promise<void> {
+  await expect(page).toHaveURL(new RegExp(`#/avaliacao/${world}/${form === 'pre' ? 'pre' : 'pos'}$`))
   await page.getByRole('button', { name: 'Começar' }).click()
   for (let question = 0; question < 10; question += 1) {
     await expect(page.getByText(`Questão ${question + 1} de 10`)).toBeVisible()
@@ -105,7 +114,7 @@ export async function takePreTest(page: Page): Promise<void> {
     await page.getByRole('radio').first().check()
     await page.getByRole('button', { name: /Próxima|Concluir/ }).click()
   }
-  await page.getByRole('link', { name: /Começar o treinamento|Continuar jogando/ }).click()
+  await page.getByRole('link', { name: /^Começar |^Ir para |^Ver missões$/ }).click()
 }
 
 export function withStudent(save: SaveData, name: string, school: string, runId: string): SaveData {

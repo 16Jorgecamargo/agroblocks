@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { act, program } from '@/blocks/interpreter/programBuilder'
 import { getMission } from '@/data/missions'
-import { openMission, registerStudent, takePreTest, saveWithProgram, seedStorage } from './helpers'
+import { missionSave, openMission, registerStudent, saveWithProgram, seedStorage } from './helpers'
 
 const firstHarvest = getMission('garden-04')
 if (!firstHarvest) throw new Error('mission missing')
@@ -13,7 +13,6 @@ test('starts a new farm from the home screen at the guided training', async ({ p
   await expect(page.getByRole('button', { name: /Continuar missão/ })).toBeDisabled()
   await page.getByRole('button', { name: 'Iniciar nova fazenda' }).click()
   await registerStudent(page)
-  await takePreTest(page)
   await expect(page).toHaveURL(/#\/jogar\/m0-training$/)
   await expect(page.getByRole('dialog', { name: 'Bem-vindo ao treinamento' })).toBeVisible()
   await page.getByRole('button', { name: 'Começar treinamento' }).click()
@@ -43,15 +42,15 @@ test('step mode executes one instruction per click', async ({ page }) => {
 })
 
 test('completes a phase, shows the result and advances to the next phase', async ({ page }) => {
-  await seedStorage(page, { save: saveWithProgram('garden-04', firstHarvest.referenceSolution) })
+  await seedStorage(page, { save: saveWithProgram('garden-04', firstHarvest.referenceSolution, ['garden-01', 'garden-02', 'garden-03']) })
   await openMission(page, 'garden-04')
   await page.getByRole('button', { name: 'Executar' }).click()
   await expect(page.getByRole('log')).toContainText('Missão cumprida!')
   await expect(page).toHaveURL(/#\/resultado\/garden-04$/)
   await expect(page.getByRole('heading', { name: 'Missão concluída!' })).toBeVisible()
   await expect(page.getByRole('group', { name: 'Comandos executados' })).toContainText('8')
-  await page.getByRole('link', { name: 'Próxima fase' }).click()
-  await expect(page).toHaveURL(/#\/jogar\/cornfield-02$/)
+  await page.getByRole('link', { name: 'Próxima missão' }).click()
+  await expect(page).toHaveURL(/#\/jogar\/garden-05$/)
 })
 
 test('reloading the page keeps progress and the saved program', async ({ page }) => {
@@ -63,7 +62,7 @@ test('reloading the page keeps progress and the saved program', async ({ page })
   await page.reload()
   const continueButton = page.getByRole('button', { name: /Continuar missão/ })
   await expect(continueButton).toBeEnabled()
-  await expect(continueButton).toContainText('Fase 2 - Plantação em série')
+  await expect(continueButton).toContainText('Horta · Missão 1 - Primeiros passos')
   await page.goto('/#/jogar/garden-04')
   await page.getByRole('button', { name: 'Começar' }).click()
   await page.getByRole('tab', { name: 'Pseudocódigo' }).click()
@@ -73,7 +72,7 @@ test('reloading the page keeps progress and the saved program', async ({ page })
 test('renders the 3D farm without runtime errors', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await seedStorage(page, { settings: { motion: 'full' } })
+  await seedStorage(page, { settings: { motion: 'full' }, save: missionSave('garden-04') })
   await openMission(page, 'garden-04')
   await expect(page.locator('.farm-view canvas')).toBeVisible()
   await page.waitForTimeout(1500)
