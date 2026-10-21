@@ -1,4 +1,4 @@
-import { createGrid, markCircle, markRect, markSegment } from '@/render/world/navigation/occupancy'
+import { createGrid, markCircle, markRect, markSegment, occupantAt } from '@/render/world/navigation/occupancy'
 import { isOpen, walkMask } from '@/render/world/navigation/passability'
 
 describe('walk masks', () => {
@@ -34,5 +34,14 @@ describe('walk masks', () => {
     expect(isOpen(animal, { x: 0, z: 0 })).toBe(false)
     expect(isOpen(animal, { x: 0, z: 1.9 })).toBe(false)
     expect(isOpen(animal, { x: -2, z: -2 })).toBe(true)
+  })
+
+  it('closes a 0.3 gap that a person of radius 0.2 cannot fit through', () => {
+    const grid = createGrid({ minX: -3, maxX: 3, minZ: -3, maxZ: 3 })
+    markRect(grid, { x: -1.15, z: 0 }, 2, 2, 0, 'crop')
+    markRect(grid, { x: 1.15, z: 0 }, 2, 2, 0, 'crop')
+    const gap = { x: 0, z: 0 }
+    expect(occupantAt(grid, gap)).toBe('free')
+    expect(isOpen(walkMask(grid, 'person'), gap)).toBe(false)
   })
 })

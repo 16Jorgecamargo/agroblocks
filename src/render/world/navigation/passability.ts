@@ -17,9 +17,9 @@ export const PASSABLE: Record<AgentKind, ReadonlySet<Occupant>> = {
 export const CLEARANCE: Record<AgentKind, number> = { person: 0.2, tractor: 0.8, animal: 0.35 }
 
 function disc(grid: OccupancyGrid, radius: number): [number, number][] {
-  const reach = Math.ceil(radius / grid.cell)
+  const reach = Math.ceil(radius / grid.cell + 0.5)
   const offsets: [number, number][] = []
-  for (let dz = -reach; dz <= reach; dz += 1) for (let dx = -reach; dx <= reach; dx += 1) if (Math.hypot(dx, dz) * grid.cell <= radius + 1e-9) offsets.push([dx, dz])
+  for (let dz = -reach; dz <= reach; dz += 1) for (let dx = -reach; dx <= reach; dx += 1) if (Math.hypot(Math.max(Math.abs(dx) - 0.5, 0), Math.max(Math.abs(dz) - 0.5, 0)) * grid.cell < radius) offsets.push([dx, dz])
   return offsets
 }
 
