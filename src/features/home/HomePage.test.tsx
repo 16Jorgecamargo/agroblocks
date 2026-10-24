@@ -52,7 +52,7 @@ describe('HomePage', () => {
     renderHome()
     const continueButton = screen.getByRole('button', { name: /Continuar missão/ })
     expect(continueButton).toBeEnabled()
-    expect(continueButton).toHaveTextContent('Horta · Missão 2 - Hora de plantar')
+    expect(continueButton).toHaveTextContent('Horta · Missão 2 - Primeira colheita')
     expect(screen.getByText(`1 de ${MISSIONS.length - 1} missões concluídas`)).toBeInTheDocument()
   })
 

@@ -1,50 +1,38 @@
 import { act, ifThen, program, repeat, sensor } from '@/blocks/interpreter/programBuilder'
-import { rowCells } from '@/data/missions/helpers'
+import { ORCHARD_BLOCKS } from '@/data/missions/blockSets'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
+import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
 export const orchard04: MissionDefinition = {
   id: 'orchard-04',
-  order: 24,
+  order: 14,
   world: 'orchard',
   slot: 4,
-  title: 'Irrigação inteligente',
+  title: 'Consertar a pergunta',
   concept: 'conditionals',
   difficulty: 2,
   briefing: {
-    conceptIntro:
-      'Condicionais: o bloco "se" deixa o robô decidir. Ele só executa os comandos de dentro quando a condição é verdadeira. Com "senão" você diz o que fazer quando ela é falsa.',
-    goalText: 'Deixe os 6 canteiros com solo molhado sem regar nenhum que já esteja molhado.',
-    demo: program([act('moveForward'), ifThen(sensor('isSoilDry'), [act('water')])]),
+    conceptIntro: 'Um "se" com a pergunta errada faz o robô agir na hora errada.',
+    goalText: 'Este programa tem um erro. Execute, descubra qual sensor está errado e conserte para colher as maduras.',
   },
-  map: { cells: ['X X X X X X X X', '. s sw s sw sw s #', 'X X X X X X X X'] },
-  robot: { x: 0, y: 1, facing: 'E' },
-  resources: { seeds: null, water: 4, energy: null, seedCapacity: null, waterCapacity: 4 },
-  growTicks: 20,
-  rules: { forbidWaterWet: true },
-  allowedBlocks: [
-    'robot_move_forward',
-    'robot_turn_left',
-    'robot_turn_right',
-    'farm_water',
-    'farm_harvest',
-    'sensor_soil_dry',
-    'controls_repeat_ext',
-    'controls_if',
-  ],
-  objectives: [{ kind: 'cellsWet', cells: rowCells(1, 1, 6) }],
-  constraints: [{ kind: 'maxWaterUsed', value: 3 }],
-  efficiency: { referenceActions: 9, referenceBlocks: 5 },
+  map: { cells: ['. m g m g'] },
+  robot: { x: 0, y: 0, facing: 'E' },
+  resources: UNLIMITED_RESOURCES,
+  growTicks: 99,
+  rules: {},
+  allowedBlocks: ORCHARD_BLOCKS,
+  initialProgram: program([repeat(4, [act('moveForward'), ifThen(sensor('isSoilDry'), [act('harvest')])])]),
+  objectives: [{ kind: 'harvestAtLeast', count: 2 }],
+  efficiency: { referenceActions: 6, referenceBlocks: 5 },
   hints: [
-    'Nem todo canteiro precisa de água. O robô precisa olhar antes de agir.',
-    'A condição que importa é: o solo está seco?',
-    'Use o bloco "se" (Controle) com o sensor "o solo está seco?" (Sensores).',
-    'Exemplo parcial: repita 6 vezes: mover para frente, se o solo está seco?: ...',
+    'Execute e veja em qual árvore o robô para.',
+    'O "se" pergunta sobre o solo, mas o que importa aqui é a fruta.',
+    'Só o sensor está errado.',
+    'Troque "o solo está seco?" por "a planta está madura?".',
   ],
-  solutionExplanation:
-    'Em cada canteiro o robô perguntou "o solo está seco?". Só quando a resposta foi sim ele regou. Assim a água foi usada apenas onde era necessária.',
-  referenceSolution: program([repeat(6, [act('moveForward'), ifThen(sensor('isSoilDry'), [act('water')])])]),
+  solutionExplanation: 'Todas as árvores tinham solo seco, então o "se" deixava o robô colher frutas verdes. A pergunta certa é sobre a fruta.',
+  referenceSolution: program([repeat(4, [act('moveForward'), ifThen(sensor('isPlantMature'), [act('harvest')])])]),
   commonMistakes: {
-    WATER_WASTED: 'Este canteiro já estava molhado. Verifique com o sensor antes de regar.',
-    NO_WATER: 'A água acabou porque o robô regou canteiros que não precisavam.',
+    PLANT_NOT_MATURE: 'A fruta ainda está verde. Confira a pergunta do "se".',
   },
 }

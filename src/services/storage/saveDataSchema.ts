@@ -44,8 +44,7 @@ const tutorial = z.object({ status: z.enum(['completed', 'skipped']), step: z.nu
 
 const worldAssessments = z.object({ pre: assessmentResponse.nullable(), post: assessmentResponse.nullable() })
 
-export const saveDataSchema = z.object({
-  version: z.literal(2),
+const saveFields = {
   runId: z.string().nullable().default(null),
   student: student.nullable().default(null),
   tutorial: tutorial.nullable().default(null),
@@ -53,7 +52,11 @@ export const saveDataSchema = z.object({
   missions: z.record(z.string(), missionProgress),
   attempts: z.array(attemptRecord),
   assessments: z.partialRecord(z.enum(WORLD_IDS), worldAssessments),
-})
+}
+
+export const saveDataSchema = z.object({ version: z.literal(3), ...saveFields })
+
+export const tenMissionSaveSchema = z.object({ version: z.literal(2), ...saveFields })
 
 export const legacySaveSchema = z.object({
   version: z.literal(1),

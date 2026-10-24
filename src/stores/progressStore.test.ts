@@ -6,7 +6,7 @@ describe('progressStore', () => {
 
   it('records attempts, persists them and returns the record', () => {
     const record = useProgressStore.getState().recordAttempt({
-      missionId: 'garden-04',
+      missionId: 'garden-02',
       timestamp: '2026-10-14T12:00:00.000Z',
       outcome: 'success',
       errorCode: null,
@@ -20,13 +20,13 @@ describe('progressStore', () => {
     expect(useProgressStore.getState().save.missions['cornfield-01'].status).toBe('locked')
     useProgressStore.getState().storeAssessment({ world: 'garden', form: 'post', startedAt: 's', completedAt: 'c', skipped: false, answers: {} })
     expect(useProgressStore.getState().save.missions['cornfield-01'].status).toBe('available')
-    expect(window.localStorage.getItem(SAVE_KEY)).toContain('garden-04')
+    expect(window.localStorage.getItem(SAVE_KEY)).toContain('garden-02')
   })
 
   it('resets everything', () => {
-    useProgressStore.getState().registerHint('garden-04')
+    useProgressStore.getState().registerHint('garden-02')
     useProgressStore.getState().resetProgress()
-    expect(useProgressStore.getState().save.missions['garden-04'].hintsUsed).toBe(0)
+    expect(useProgressStore.getState().save.missions['garden-02'].hintsUsed).toBe(0)
   })
 })
 
@@ -36,21 +36,21 @@ describe('progress store runs', () => {
   beforeEach(() => useProgressStore.getState().resetProgress())
 
   it('starts a fresh run with a new id and the student', () => {
-    useProgressStore.getState().registerHint('garden-04')
+    useProgressStore.getState().registerHint('garden-02')
     useProgressStore.getState().startRun(ana)
     const first = useProgressStore.getState().save
     expect(first.student).toEqual(ana)
     expect(first.runId).toMatch(/^[0-9a-f-]{36}$/)
-    expect(first.missions['garden-04'].hintsUsed).toBe(0)
+    expect(first.missions['garden-02'].hintsUsed).toBe(0)
     useProgressStore.getState().startRun(ana)
     expect(useProgressStore.getState().save.runId).not.toBe(first.runId)
   })
 
   it('registers a student on an existing save without losing progress', () => {
-    useProgressStore.getState().registerHint('garden-04')
+    useProgressStore.getState().registerHint('garden-02')
     useProgressStore.getState().registerStudent(ana)
     const save = useProgressStore.getState().save
-    expect(save.missions['garden-04'].hintsUsed).toBe(1)
+    expect(save.missions['garden-02'].hintsUsed).toBe(1)
     expect(save.runId).not.toBeNull()
     const runId = save.runId
     useProgressStore.getState().registerStudent({ name: 'Ana Maria Souza', school: 'Escola Azul' })

@@ -4,6 +4,7 @@ import { itemsFor } from '@/data/assessment/items'
 import { MISSIONS } from '@/data/missions'
 import { missionsOfWorld } from '@/data/worlds'
 import { AssessmentPage } from '@/features/assessment/AssessmentPage'
+import { ITEMS_PER_FORM } from '@/game/assessment/types'
 import { isWorldOpen } from '@/game/progress/progression'
 import type { WorldId } from '@/game/worlds/worldTypes'
 import { useProgressStore } from '@/stores/progressStore'
@@ -55,19 +56,21 @@ const refs = MISSIONS.map(({ id, order, world }) => ({ id, order, world }))
 describe('AssessmentPage', () => {
   beforeEach(() => useProgressStore.getState().resetProgress())
 
-  it('runs the Horta pre-test one question at a time without feedback and stores answers', async () => {
+  it('runs the Horta pre-test one question at a time, stores answers and gives feedback at the end', async () => {
     renderAt('/avaliacao/garden/pre')
     expect(screen.getByRole('heading', { level: 1, name: 'Prova inicial · Horta' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Pular/ })).not.toBeInTheDocument()
     expect(screen.getByText(/É normal não saber várias respostas/)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     expect(screen.getByRole('button', { name: 'Próxima' })).toBeDisabled()
+    expect(screen.queryByText(/Resposta certa/)).not.toBeInTheDocument()
     await answerAll('garden', 'pre', true)
     expect(await screen.findByRole('heading', { name: 'Obrigado!' })).toBeInTheDocument()
-    expect(screen.queryByText(/correta|errada/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Você acertou 5 de 5' })).toBeInTheDocument()
+    for (const item of itemsFor('garden', 'pre')) expect(screen.getByText(item.explanation)).toBeInTheDocument()
     expect(screen.getByText('Suas respostas foram salvas e enviadas ao seu professor.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Começar Horta' })).toHaveAttribute('href', '/jogar/garden-01')
-    expect(Object.keys(useProgressStore.getState().save.assessments.garden.pre?.answers ?? {})).toHaveLength(10)
+    expect(Object.keys(useProgressStore.getState().save.assessments.garden.pre?.answers ?? {})).toHaveLength(ITEMS_PER_FORM)
   })
 
   it('runs the Milharal pre-test and opens its first mission', async () => {
@@ -75,14 +78,16 @@ describe('AssessmentPage', () => {
     renderAt('/avaliacao/cornfield/pre')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     await answerAll('cornfield', 'pre', false)
+    expect(await screen.findByRole('heading', { name: 'Você acertou 0 de 5' })).toBeInTheDocument()
+    expect(screen.getAllByText(/^Sua resposta:/)).toHaveLength(ITEMS_PER_FORM)
     expect(await screen.findByRole('link', { name: 'Começar Milharal' })).toHaveAttribute('href', '/jogar/cornfield-01')
-    expect(Object.keys(useProgressStore.getState().save.assessments.cornfield.pre?.answers ?? {})).toHaveLength(10)
+    expect(Object.keys(useProgressStore.getState().save.assessments.cornfield.pre?.answers ?? {})).toHaveLength(ITEMS_PER_FORM)
   })
 
-  it('locks the post-test until the ten missions are done', () => {
+  it('locks the post-test until the five missions are done', () => {
     storeTest('garden', 'pre')
     renderAt('/avaliacao/garden/pos')
-    expect(screen.getByText('Conclua as 10 missões de Horta para fazer a prova final.')).toBeInTheDocument()
+    expect(screen.getByText('Conclua as 5 missões de Horta para fazer a prova final.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Começar' })).not.toBeInTheDocument()
   })
 

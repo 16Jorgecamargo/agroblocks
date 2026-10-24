@@ -5,7 +5,7 @@ import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
 export const greenhouse01: MissionDefinition = {
   id: 'greenhouse-01',
-  order: 31,
+  order: 16,
   world: 'greenhouse',
   slot: 1,
   title: 'Até a parede',

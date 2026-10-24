@@ -16,8 +16,8 @@ describe('StudentDetail', () => {
     expect(dialog).toHaveTextContent('Tutorial: Concluído')
     expect(dialog).toHaveTextContent(/Tutorial: Pulado na etapa \d+ de 15/)
     expect(within(dialog).getAllByText('Pseudocódigo').length).toBeGreaterThan(0)
-    expect(within(dialog).getAllByRole('heading', { name: 'Horta · 10 de 10' }).length).toBeGreaterThan(0)
-    expect(dialog).toHaveTextContent(/Prova inicial: \d+ de 10/)
+    expect(within(dialog).getAllByRole('heading', { name: 'Horta · 5 de 5' }).length).toBeGreaterThan(0)
+    expect(dialog).toHaveTextContent(/Prova inicial: \d+ de 5/)
     expect(within(dialog).getAllByText('✓').length).toBeGreaterThan(0)
   })
 

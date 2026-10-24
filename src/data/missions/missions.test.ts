@@ -1,7 +1,7 @@
 import { MISSIONS, getMission } from '@/data/missions'
 import { playMission } from '@/game/testing/playMission'
 import { getWorld } from '@/data/worlds'
-import type { WorldId } from '@/game/worlds/worldTypes'
+import { MISSIONS_PER_WORLD, type WorldId } from '@/game/worlds/worldTypes'
 import { programBlockTypes } from '@/blocks/analysis/programBlockTypes'
 import { act, program, repeat, ifThen, sensor } from '@/blocks/interpreter/programBuilder'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
@@ -20,7 +20,7 @@ describe('missions', () => {
     expect(MISSIONS[0].id).toBe('m0-training')
     for (const item of MISSIONS.filter((mission) => mission.world !== null)) {
       const world = getWorld(item.world as WorldId)
-      expect(item.order).toBe((world.order - 1) * 10 + (item.slot as number))
+      expect(item.order).toBe((world.order - 1) * MISSIONS_PER_WORLD + (item.slot as number))
       expect(item.id).toBe(`${item.world}-${String(item.slot).padStart(2, '0')}`)
       expect(item.concept).toBe(world.concept)
     }
@@ -49,7 +49,7 @@ describe('missions', () => {
   })
 
   it('mission 1 fails when the robot harvests before turning', () => {
-    const result = play(mission('garden-04'), program([repeat(3, [act('moveForward')]), act('harvest')]))
+    const result = play(mission('garden-02'), program([repeat(3, [act('moveForward')]), act('harvest')]))
     expect(result.outcome.status === 'failed' && result.outcome.error.code).toBe('NOTHING_TO_HARVEST')
   })
 
@@ -59,25 +59,25 @@ describe('missions', () => {
   })
 
   it('mission 3 forbids watering wet soil', () => {
-    const result = play(mission('orchard-04'), program([repeat(6, [act('moveForward'), act('water')])]))
+    const result = play(mission('orchard-02'), program([repeat(6, [act('moveForward'), act('water')])]))
     expect(result.outcome.status === 'failed' && result.outcome.error.code).toBe('WATER_WASTED')
   })
 
   it('mission 4 forbids harvesting immature plants', () => {
-    const result = play(mission('greenhouse-03'), program([repeat(6, [act('moveForward'), act('harvest')])]))
+    const result = play(mission('greenhouse-02'), program([repeat(6, [act('moveForward'), act('harvest')])]))
     expect(result.outcome.status === 'failed' && result.outcome.error.code).toBe('PLANT_NOT_MATURE')
   })
 
   it('mission 5 runs out of water without visiting the reservoir', () => {
     const result = play(
-      mission('barnyard-05'),
+      mission('barnyard-02'),
       program([repeat(6, [act('moveForward'), act('plant'), act('water')])]),
     )
     expect(result.outcome.status === 'failed' && result.outcome.error.code).toBe('NO_WATER')
   })
 
   it('mission 6 initial program contains a bug that occupies a planted plot', () => {
-    const item = mission('homestead-10')
+    const item = mission('homestead-05')
     if (!item.initialProgram) throw new Error('mission 6 needs an initial program')
     const result = play(item, item.initialProgram)
     expect(result.outcome.status === 'failed' && result.outcome.error.code).toBe('PLOT_OCCUPIED')
@@ -95,12 +95,12 @@ describe('missions', () => {
   )
 
   it('the moved first, row planting and irrigation missions offer a demonstration', () => {
-    expect(MISSIONS.filter((item) => item.briefing.demo).map((item) => item.id)).toEqual(['garden-04', 'cornfield-02', 'orchard-04'])
+    expect(MISSIONS.filter((item) => item.briefing.demo).map((item) => item.id)).toEqual(['garden-02', 'cornfield-02', 'orchard-02'])
   })
 
   it('mission 3 checking the sensor without else is still valid', () => {
     const result = play(
-      mission('orchard-04'),
+      mission('orchard-02'),
       program([repeat(6, [act('moveForward'), ifThen(sensor('isSoilDry'), [act('water')])])]),
     )
     expect(result.validation.success).toBe(true)

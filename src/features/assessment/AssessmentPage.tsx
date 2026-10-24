@@ -7,11 +7,11 @@ import { itemsFor } from "@/data/assessment/items";
 import { MISSIONS } from "@/data/missions";
 import { getWorld, missionsOfWorld, WORLDS } from "@/data/worlds";
 import { MiniGrid } from "@/features/assessment/MiniGrid";
-import { percent, scoreBySkill } from "@/game/assessment/scoring";
-import { ASSESSMENT_SKILLS, SKILL_LABELS } from "@/game/assessment/types";
+import { percent, scoreBySkill, scoreResponse } from "@/game/assessment/scoring";
+import { ASSESSMENT_SKILLS, ITEMS_PER_FORM, SKILL_LABELS, type AssessmentItem } from "@/game/assessment/types";
 import { isWorldOpen, worldStep } from "@/game/progress/progression";
 import type { AssessmentForm, AssessmentResponse } from "@/game/progress/types";
-import { WORLD_IDS, type WorldId } from "@/game/worlds/worldTypes";
+import { MISSIONS_PER_WORLD, WORLD_IDS, type WorldId } from "@/game/worlds/worldTypes";
 import { BADGE_POP, pageVariants } from "@/motion/presets";
 import { useProgressStore } from "@/stores/progressStore";
 import "./AssessmentPage.css";
@@ -58,6 +58,40 @@ function Comparison({
         ))}
       </tbody>
     </table>
+  );
+}
+
+function Feedback({ items, response }: { items: AssessmentItem[]; response: AssessmentResponse }) {
+  const score = scoreResponse(response);
+  return (
+    <section className="assessment__feedback" aria-labelledby="feedback-title">
+      <h3 id="feedback-title" className="assessment__score">
+        {score ? `Você acertou ${score.correct} de ${score.total}` : "Prova pulada"}
+      </h3>
+      <ol className="assessment__review">
+        {items.map((item, itemIndex) => {
+          const chosen = response.answers[item.id];
+          const right = chosen === item.correctIndex;
+          return (
+            <li key={item.id} className={`assessment__review-item ${right ? "is-right" : "is-wrong"}`}>
+              <p className="assessment__review-head">
+                <span className="assessment__review-mark" aria-hidden="true">
+                  {right ? "✓" : "✗"}
+                </span>
+                {`Questão ${itemIndex + 1} · ${right ? "Certa" : "Errada"}`}
+              </p>
+              <p className="assessment__review-prompt">{item.prompt}</p>
+              {item.code && <pre className="assessment__code">{item.code}</pre>}
+              {!right && <p className="assessment__review-answer">{`Sua resposta: ${chosen === undefined ? "sem resposta" : item.options[chosen]}`}</p>}
+              <p className="assessment__review-answer">
+                <strong>Resposta certa:</strong> {item.options[item.correctIndex]}
+              </p>
+              <p className="assessment__review-why">{item.explanation}</p>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
   );
 }
 
@@ -112,6 +146,7 @@ export function AssessmentPage() {
         <section className="card assessment__card">
           <h2>Obrigado!</h2>
           <p>Suas respostas foram salvas e enviadas ao seu professor.</p>
+          {existing && <Feedback items={items} response={existing} />}
           {form === "post" && existing && <Comparison worldName={world.name} pre={tests?.pre ?? null} post={existing} />}
           <Link to={next.to} className="button button--primary">
             {next.label}
@@ -123,7 +158,7 @@ export function AssessmentPage() {
       return (
         <section className="card assessment__card">
           <h2>Ainda não disponível</h2>
-          <p>{`Conclua as 10 missões de ${world.name} para fazer a prova final.`}</p>
+          <p>{`Conclua as ${MISSIONS_PER_WORLD} missões de ${world.name} para fazer a prova final.`}</p>
           <Link to="/missoes" className="button">
             Ver missões
           </Link>
@@ -134,15 +169,15 @@ export function AssessmentPage() {
       return (
         <section className="card assessment__card">
           <h2>{title}</h2>
-          <p>{`São 10 questões curtas sobre ${world.conceptLabel.toLowerCase()}: montar, prever e consertar programas.`}</p>
+          <p>{`São ${ITEMS_PER_FORM} questões curtas de programação sobre ${world.conceptLabel.toLowerCase()}: montar, prever e consertar algoritmos.`}</p>
           <ul>
             {form === "pre" ? (
               <li>É normal não saber várias respostas: marque a que achar mais certa.</li>
             ) : (
-              <li>Você terminou as 10 missões deste mundo. Vamos ver o quanto aprendeu.</li>
+              <li>{`Você terminou as ${MISSIONS_PER_WORLD} missões deste mundo. Vamos ver o quanto aprendeu.`}</li>
             )}
             <li>Não vale nota e não há tempo limite.</li>
-            <li>Você não verá se acertou durante a prova.</li>
+            <li>No fim você vê o que acertou e a explicação de cada questão.</li>
             <li>Suas respostas vão para o seu professor, junto com o seu nome.</li>
           </ul>
           <div className="assessment__actions">

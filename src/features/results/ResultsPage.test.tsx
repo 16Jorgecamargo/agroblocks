@@ -18,13 +18,13 @@ describe('ResultsPage', () => {
   beforeEach(() => useProgressStore.getState().resetProgress())
 
   it('redirects to the mission when there is no success yet', () => {
-    renderAt('/resultado/garden-04')
+    renderAt('/resultado/garden-02')
     expect(screen.getByText('jogando')).toBeInTheDocument()
   })
 
   it('shows real attempt data, separates correctness from efficiency and links forward', () => {
     useProgressStore.getState().recordAttempt({
-      missionId: 'garden-04',
+      missionId: 'garden-02',
       timestamp: '2026-10-14T12:00:00.000Z',
       outcome: 'error',
       errorCode: 'HIT_OBSTACLE',
@@ -35,7 +35,7 @@ describe('ResultsPage', () => {
       pseudocode: '',
     })
     useProgressStore.getState().recordAttempt({
-      missionId: 'garden-04',
+      missionId: 'garden-02',
       timestamp: '2026-10-14T12:01:00.000Z',
       outcome: 'success',
       errorCode: null,
@@ -45,22 +45,22 @@ describe('ResultsPage', () => {
       efficiencyStars: 1,
       pseudocode: 'quando executar:\n    mover para frente',
     })
-    renderAt('/resultado/garden-04')
+    renderAt('/resultado/garden-02')
     expect(screen.getByRole('heading', { name: 'Missão concluída!' })).toBeInTheDocument()
     expect(screen.getByLabelText('Comandos executados')).toHaveTextContent('12')
     expect(screen.getByLabelText('Tentativas')).toHaveTextContent('2')
     expect(screen.getByText('Solução correta')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Eficiência 1 de 3' })).toBeInTheDocument()
     expect(screen.getByText('Sequenciamento')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Próxima missão' })).toHaveAttribute('href', '/jogar/garden-05')
-    expect(screen.getByRole('link', { name: 'Tentar novamente' })).toHaveAttribute('href', '/jogar/garden-04')
+    expect(screen.getByRole('link', { name: 'Próxima missão' })).toHaveAttribute('href', '/jogar/garden-03')
+    expect(screen.getByRole('link', { name: 'Tentar novamente' })).toHaveAttribute('href', '/jogar/garden-02')
     const actions = screen.getByRole('group', { name: 'Próximos passos' })
     expect([...actions.querySelectorAll('button, a')].map((item) => item.textContent?.trim())).toEqual(['Ver solução', 'Tentar novamente', 'Próxima missão'])
   })
 
   it('reveals how it works with the robot steps when asking to see the solution', async () => {
     useProgressStore.getState().recordAttempt({
-      missionId: 'garden-04',
+      missionId: 'garden-02',
       timestamp: '2026-10-14T12:01:00.000Z',
       outcome: 'success',
       errorCode: null,
@@ -70,7 +70,7 @@ describe('ResultsPage', () => {
       efficiencyStars: 1,
       pseudocode: 'quando executar:\n    mover para frente',
     })
-    renderAt('/resultado/garden-04')
+    renderAt('/resultado/garden-02')
     expect(screen.queryByRole('heading', { name: 'Como funciona?' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Ver solução' }))
     expect(await screen.findByRole('heading', { name: 'Como funciona?' })).toBeInTheDocument()

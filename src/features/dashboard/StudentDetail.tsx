@@ -4,6 +4,7 @@ import { MISSIONS } from '@/data/missions'
 import { WORLDS } from '@/data/worlds'
 import { describePlot, formatDate, PlotCell } from '@/features/dashboard/ClassField'
 import { scoreAssessment, tutorialLabel, type Plot, type StudentRow } from '@/features/dashboard/dashboardModel'
+import { ITEMS_PER_FORM } from '@/game/assessment/types'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { ERROR_TEXT } from '@/game/rules/errors'
 import type { WorldId } from '@/game/worlds/worldTypes'
@@ -119,7 +120,7 @@ function Answers({ response, label }: { response: RunSnapshot['assessments']['ga
   return (
     <details className="run__answers">
       <summary>
-        {label}: {scoreAssessment(response)} de 10
+        {label}: {scoreAssessment(response)} de {ITEMS_PER_FORM}
       </summary>
       <ol>
         {itemsFor(response.world, response.form).map((item) => {

@@ -59,7 +59,7 @@ export interface WorldAssessments {
 }
 
 export interface SaveData {
-  version: 2
+  version: 3
   runId: string | null
   student: StudentInfo | null
   tutorial: TutorialRecord | null

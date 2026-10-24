@@ -7,7 +7,8 @@ import { assessmentPath } from '@/features/assessment/assessmentPath'
 import { objectiveCells } from '@/features/gameplay/gameplayLogic'
 import type { NodeState, TrailNode } from '@/features/mission-select/trailNodes'
 import type { MissionProgress } from '@/game/progress/types'
-import { ROLE_LABELS, roleForSlot, type WorldDefinition } from '@/game/worlds/worldTypes'
+import { ITEMS_PER_FORM } from '@/game/assessment/types'
+import { MISSIONS_PER_WORLD, ROLE_LABELS, roleForSlot, type WorldDefinition } from '@/game/worlds/worldTypes'
 import { createInitialState } from '@/game/world/createInitialState'
 import { cardFlip } from '@/motion/presets'
 import { Grid2D } from '@/render/grid2d/Grid2D'
@@ -34,14 +35,14 @@ function TestCard({ world, node, state }: Omit<TrailCardProps, 'progress'>) {
     <motion.section className="mission-detail card" aria-label={title} variants={cardFlip} initial="hidden" animate="visible" exit="exit">
       <span className="mission-detail__role">{form === 'pre' ? 'Antes das missões' : 'Depois das missões'}</span>
       <h2 className="mission-detail__title">{title}</h2>
-      <p>{`10 perguntas sobre ${world.conceptLabel.toLowerCase()}.`}</p>
+      <p>{`${ITEMS_PER_FORM} perguntas sobre ${world.conceptLabel.toLowerCase()}.`}</p>
       {state === 'done' && (
         <p className="mission-detail__status mission-detail__status--completed">
           <Icon name="check" size={16} /> Prova feita
         </p>
       )}
       {state === 'locked' && (
-        <p className="mission-detail__lock">{form === 'pre' ? `Conclua o mundo anterior para abrir ${world.name}.` : `Conclua as 10 missões de ${world.name} primeiro.`}</p>
+        <p className="mission-detail__lock">{form === 'pre' ? `Conclua o mundo anterior para abrir ${world.name}.` : `Conclua as ${MISSIONS_PER_WORLD} missões de ${world.name} primeiro.`}</p>
       )}
       {state === 'locked' ? (
         <GameButton tone="primary" size="lg" icon="flag" className="mission-detail__start" disabled>

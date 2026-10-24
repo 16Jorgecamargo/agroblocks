@@ -38,24 +38,24 @@ describe('SettingsDialog', () => {
   })
 
   it('asks for confirmation before resetting progress', async () => {
-    useProgressStore.getState().registerHint('garden-04')
+    useProgressStore.getState().registerHint('garden-02')
     renderDialog()
     fireEvent.click(await screen.findByRole('button', { name: 'Reiniciar progresso' }))
-    expect(useProgressStore.getState().save.missions['garden-04'].hintsUsed).toBe(1)
+    expect(useProgressStore.getState().save.missions['garden-02'].hintsUsed).toBe(1)
     fireEvent.click(await screen.findByRole('button', { name: 'Sim, apagar tudo' }))
-    expect(useProgressStore.getState().save.missions['garden-04'].hintsUsed).toBe(0)
+    expect(useProgressStore.getState().save.missions['garden-02'].hintsUsed).toBe(0)
   })
 
   it('starts a new run for the same student when progress is reset', async () => {
     useProgressStore.getState().startRun({ name: 'Ana Souza', school: 'Escola Azul' })
     const runId = useProgressStore.getState().save.runId
-    useProgressStore.getState().registerHint('garden-04')
+    useProgressStore.getState().registerHint('garden-02')
     renderDialog()
     fireEvent.click(await screen.findByRole('button', { name: 'Reiniciar progresso' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Sim, apagar tudo' }))
     const save = useProgressStore.getState().save
     expect(save.student?.name).toBe('Ana Souza')
     expect(save.runId).not.toBe(runId)
-    expect(save.missions['garden-04'].hintsUsed).toBe(0)
+    expect(save.missions['garden-02'].hintsUsed).toBe(0)
   })
 })

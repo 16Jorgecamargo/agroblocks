@@ -20,7 +20,7 @@ vi.mock('@/blocks/editor/BlocklyEditor', async () => {
   return {
     BlocklyEditor: ({ onChange }: { onChange: (json: unknown) => void }) => {
       useEffect(() => {
-        const mission = getMission('garden-04')
+        const mission = getMission('garden-02')
         if (mission) onChange(programToWorkspaceJson(mission.referenceSolution))
       }, [onChange])
       return (
@@ -61,7 +61,7 @@ describe('GameplayPage', () => {
     vi.useFakeTimers()
     useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, motion: 'reduced' } })
     useProgressStore.getState().resetProgress()
-    openMission('garden-04')
+    openMission('garden-02')
   })
 
   afterEach(() => {
@@ -70,14 +70,14 @@ describe('GameplayPage', () => {
 
   it('swaps the side panel at once when changing tabs, without an empty gap', () => {
     useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, motion: 'full' } })
-    renderAt('/jogar/garden-04')
+    renderAt('/jogar/garden-02')
     fireEvent.click(screen.getByRole('tab', { name: 'Dicas' }))
     const panels = screen.getAllByRole('tabpanel', { hidden: true }).filter((panel) => panel.id.startsWith('side-panel'))
     expect(panels.map((panel) => panel.id)).toEqual(['side-panel-hints'])
   })
 
   it('widens the farm and narrows the program while running, then restores the layout', () => {
-    renderAt('/jogar/garden-04')
+    renderAt('/jogar/garden-02')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     const body = document.querySelector('.gameplay__body') as HTMLElement
     expect(body).toHaveAttribute('data-running', 'false')
@@ -88,11 +88,11 @@ describe('GameplayPage', () => {
   })
 
   it('blocks running over the block limit without recording an attempt', () => {
-    const mission = getMissionForTest('garden-04')
+    const mission = getMissionForTest('garden-02')
     const original = mission.rules
     mission.rules = { ...original, maxBlocks: 2 }
     try {
-      renderAt('/jogar/garden-04')
+      renderAt('/jogar/garden-02')
       expect(screen.getAllByText('Limite: 2 blocos').length).toBeGreaterThan(0)
       fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
       fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
@@ -107,19 +107,19 @@ describe('GameplayPage', () => {
   })
 
   it('redirects locked missions to the mission map', () => {
-    renderAt('/jogar/homestead-10')
+    renderAt('/jogar/homestead-05')
     expect(screen.getByText('Mapa de missões')).toBeInTheDocument()
   })
 
   it('runs the student program, updates the farm, records the attempt and opens the result', () => {
-    renderAt('/jogar/garden-04')
+    renderAt('/jogar/garden-02')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
     act(() => {
       vi.advanceTimersByTime(10000)
     })
     expect(screen.getByRole('log')).toHaveTextContent('Missão cumprida!')
-    expect(useProgressStore.getState().save.missions['garden-04'].status).toBe('completed')
+    expect(useProgressStore.getState().save.missions['garden-02'].status).toBe('completed')
     expect(useProgressStore.getState().save.attempts).toHaveLength(1)
     act(() => {
       vi.advanceTimersByTime(3000)
@@ -128,7 +128,7 @@ describe('GameplayPage', () => {
   })
 
   it('records the program that actually ran even if the workspace changes during the run', () => {
-    renderAt('/jogar/garden-04')
+    renderAt('/jogar/garden-02')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
     fireEvent.click(screen.getByRole('button', { name: 'Trocar programa' }))
@@ -142,7 +142,7 @@ describe('GameplayPage', () => {
   })
 
   it('shows the demonstration in its own dialog and leaves the program and console untouched', () => {
-    renderAt('/jogar/garden-04')
+    renderAt('/jogar/garden-02')
     fireEvent.click(screen.getByRole('button', { name: /Ver demonstração/ }))
     expect(screen.getByRole('dialog', { name: 'Demonstração' })).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Demonstração: o robô na fazenda' })).toBeInTheDocument()
@@ -169,7 +169,7 @@ describe('GameplayPage', () => {
   })
 
   it('stops a run and puts the farm back to its initial state', () => {
-    renderAt('/jogar/garden-04')
+    renderAt('/jogar/garden-02')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     const initial = screen.getByRole('grid', { name: 'Mapa da fazenda' }).innerHTML
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
@@ -183,7 +183,7 @@ describe('GameplayPage', () => {
 
   it('launches a harvest flight toward the harvest counter when a plant is harvested', () => {
     useSettingsStore.setState({ settings: { ...DEFAULT_SETTINGS, motion: 'full' } })
-    renderAt('/jogar/garden-04')
+    renderAt('/jogar/garden-02')
     fireEvent.click(screen.getByRole('button', { name: 'Começar' }))
     fireEvent.click(screen.getByRole('button', { name: 'Executar' }))
     act(() => {
@@ -229,7 +229,7 @@ describe('GameplayPage', () => {
     }))
     renderAt('/jogar/garden-02')
     expect(screen.queryByText(/^Prova /)).not.toBeInTheDocument()
-    expect(screen.getAllByRole('heading', { name: 'Horta · Missão 2 - Hora de plantar' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('heading', { name: 'Horta · Missão 2 - Primeira colheita' }).length).toBeGreaterThan(0)
   })
 
   it('records a skipped tutorial on the run', () => {

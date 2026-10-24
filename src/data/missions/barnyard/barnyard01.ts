@@ -6,7 +6,7 @@ import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
 export const barnyard01: MissionDefinition = {
   id: 'barnyard-01',
-  order: 41,
+  order: 21,
   world: 'barnyard',
   slot: 1,
   title: 'Guardar um número',

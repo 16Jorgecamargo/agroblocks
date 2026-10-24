@@ -36,11 +36,11 @@ describe('DashboardPage', () => {
     expect(within(table).getByRole('columnheader', { name: /Milharal/ })).toBeInTheDocument()
     const ana = within(table).getByText('Ana Souza').closest('tr') as HTMLElement
     expect(ana).toHaveTextContent('Tutorial: Concluído')
-    expect(ana.querySelector('[data-col="garden"]')).toHaveTextContent('10/10')
-    expect(ana.querySelector('[data-col="missions"]')).toHaveTextContent('60')
+    expect(ana.querySelector('[data-col="garden"]')).toHaveTextContent('5/5')
+    expect(ana.querySelector('[data-col="missions"]')).toHaveTextContent('30')
     const gabriela = within(table).getByText('Gabriela Nunes').closest('tr') as HTMLElement
-    expect(gabriela.querySelector('[data-col="garden"]')).toHaveTextContent('1/10')
-    expect(gabriela.querySelector('[data-col="homestead"]')).toHaveTextContent('0/10')
+    expect(gabriela.querySelector('[data-col="garden"]')).toHaveTextContent('1/5')
+    expect(gabriela.querySelector('[data-col="homestead"]')).toHaveTextContent('0/5')
     expect(screen.getByRole('heading', { name: 'Prova inicial e prova final por mundo' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Tentativas e dicas por mundo' })).toBeInTheDocument()
   })

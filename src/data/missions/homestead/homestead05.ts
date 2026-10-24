@@ -1,34 +1,65 @@
-import { act, call, ifThen, program, repeat, sensor } from '@/blocks/interpreter/programBuilder'
-import { HOMESTEAD_BLOCKS } from '@/data/missions/blockSets'
+import { act, call, program, repeat } from '@/blocks/interpreter/programBuilder'
+import { ALL_BLOCKS } from '@/blocks/blockTypes'
+import { rectCells } from '@/data/missions/helpers'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
-import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
+import type { Program } from '@/blocks/interpreter/ast'
+
+function farmProgram(secondTurn: 'turnLeft' | 'turnRight'): Program {
+  return program(
+    [
+      repeat(2, [
+        repeat(3, [call('cuidar'), act('moveForward')]),
+        call('cuidar'),
+        act('turnRight'),
+        act('moveForward'),
+        act('turnRight'),
+        repeat(3, [call('cuidar'), act('moveForward')]),
+        call('cuidar'),
+        act(secondTurn),
+        act('moveForward'),
+        act(secondTurn),
+      ]),
+    ],
+    { cuidar: [act('prepareSoil'), act('plant'), act('water')] },
+  )
+}
 
 export const homestead05: MissionDefinition = {
   id: 'homestead-05',
-  order: 55,
+  order: 30,
   world: 'homestead',
   slot: 5,
-  title: 'Decidir dentro do procedimento',
+  title: 'Fazenda eficiente',
   concept: 'efficiency',
-  difficulty: 2,
+  difficulty: 3,
   briefing: {
-    conceptIntro: 'Um procedimento pode tomar decisões com "se".',
-    goalText: 'Crie um procedimento que planta se o canteiro estiver vazio ou colhe se a planta estiver madura, e use-o na fileira.',
+    conceptIntro:
+      'Depuração e eficiência: programas reais têm erros. Encontre o bug no programa pronto, corrija-o e use laços aninhados e procedimentos para escrever menos blocos.',
+    goalText: 'Prepare, plante e regue os 16 canteiros da área 4×4 sem acabar a energia.',
   },
-  map: { cells: ['. . m . m'] },
+  map: { cells: ['. . . .', '. . . .', '. . . .', '. . . .', 'R X X S'] },
   robot: { x: 0, y: 0, facing: 'E' },
-  resources: UNLIMITED_RESOURCES,
+  resources: { seeds: 16, water: 16, energy: 70, seedCapacity: 16, waterCapacity: 16 },
   growTicks: 99,
   rules: {},
-  allowedBlocks: HOMESTEAD_BLOCKS,
-  objectives: [{ kind: 'cellsInState', cells: [[1, 0], [3, 0]], state: 'seeded' }, { kind: 'harvestAtLeast', count: 2 }],
-  efficiency: { referenceActions: 10, referenceBlocks: 11 },
-  hints: [
-    'Na fileira há canteiros vazios e plantas maduras.',
-    'O procedimento decide o que fazer em cada casa.',
-    'Use "se/senão" dentro do procedimento.',
-    'cuidar: se vazio: preparar, plantar; senão: se madura: colher.',
+  allowedBlocks: ALL_BLOCKS,
+  initialProgram: farmProgram('turnRight'),
+  objectives: [
+    { kind: 'cellsInState', cells: rectCells(0, 0, 4, 4), state: 'seeded' },
+    { kind: 'cellsWet', cells: rectCells(0, 0, 4, 4) },
   ],
-  solutionExplanation: 'O procedimento esconde a decisão; o programa principal só anda e chama "cuidar".',
-  referenceSolution: program([repeat(4, [act('moveForward'), call('cuidar')])], { cuidar: [ifThen(sensor('isPlotEmpty'), [act('prepareSoil'), act('plant')], [ifThen(sensor('isPlantMature'), [act('harvest')])])] }),
+  efficiency: { referenceActions: 72, referenceBlocks: 19 },
+  hints: [
+    'O programa inicial quase funciona. Execute passo a passo e observe onde o robô sai do caminho.',
+    'Depois da segunda fileira o robô precisa descer, não subir. Qual virada está errada?',
+    'Compare as viradas das duas mudanças de fileira (Movimento).',
+    'A segunda mudança de fileira deve usar "virar à esquerda" duas vezes, com "mover para frente" no meio.',
+  ],
+  solutionExplanation:
+    'O procedimento "cuidar" reuniu preparar, plantar e regar. Laços aninhados percorreram as fileiras em zigue-zague. O bug estava na direção da segunda virada: com "virar à direita" o robô voltava para a fileira já plantada.',
+  referenceSolution: farmProgram('turnLeft'),
+  commonMistakes: {
+    PLOT_OCCUPIED: 'O robô voltou a um canteiro que já foi plantado. Confira a direção das viradas entre as fileiras.',
+    NO_ENERGY: 'A energia acabou. Evite passos desnecessários.',
+  },
 }

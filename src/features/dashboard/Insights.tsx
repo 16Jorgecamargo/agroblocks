@@ -1,6 +1,9 @@
 import type { DashboardModel } from '@/features/dashboard/dashboardModel'
+import { ITEMS_PER_FORM } from '@/game/assessment/types'
 
 const decimal = (value: number) => value.toLocaleString('pt-BR', { maximumFractionDigits: 1 })
+
+const share = (value: number) => (value / ITEMS_PER_FORM) * 100
 
 export function ErrorList({ errors }: { errors: DashboardModel['topErrors'] }) {
   if (errors.length === 0) return <p className="insight__empty">Nenhum programa parou com erro até agora.</p>
@@ -35,9 +38,9 @@ export function ScoreRanges({ rows }: { rows: DashboardModel['worldRows'] }) {
             <li key={row.name} className="scores__row">
               <span className="scores__school">{row.name}</span>
               <span className="scores__track" role="img" aria-label={text}>
-                {row.pre !== null && row.post !== null && <span className="scores__span" style={{ left: `${low * 10}%`, width: `${(high - low) * 10}%` }} />}
-                {row.pre !== null && <span className="scores__dot scores__dot--pre" style={{ left: `${row.pre * 10}%` }} />}
-                {row.post !== null && <span className="scores__dot scores__dot--post" style={{ left: `${row.post * 10}%` }} />}
+                {row.pre !== null && row.post !== null && <span className="scores__span" style={{ left: `${share(low)}%`, width: `${share(high - low)}%` }} />}
+                {row.pre !== null && <span className="scores__dot scores__dot--pre" style={{ left: `${share(row.pre)}%` }} />}
+                {row.post !== null && <span className="scores__dot scores__dot--post" style={{ left: `${share(row.post)}%` }} />}
               </span>
               <span className="scores__values" aria-hidden="true">
                 {row.pre === null ? '—' : decimal(row.pre)} → {row.post === null ? '—' : decimal(row.post)}
@@ -50,8 +53,8 @@ export function ScoreRanges({ rows }: { rows: DashboardModel['worldRows'] }) {
         <span />
         <span className="scores__axis">
           <span>0</span>
-          <span>5</span>
-          <span>10</span>
+          <span>{decimal(ITEMS_PER_FORM / 2)}</span>
+          <span>{ITEMS_PER_FORM}</span>
         </span>
         <span className="scores__values">acertos</span>
       </div>

@@ -5,7 +5,7 @@ import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
 export const homestead01: MissionDefinition = {
   id: 'homestead-01',
-  order: 51,
+  order: 26,
   world: 'homestead',
   slot: 1,
   title: 'Criar um procedimento',

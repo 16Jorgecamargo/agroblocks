@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import type { WorldDefinition, WorldId } from '@/game/worlds/worldTypes'
+import { MISSIONS_PER_WORLD, type WorldDefinition, type WorldId } from '@/game/worlds/worldTypes'
 
 export type WorldProgressState = 'concluído' | 'em andamento' | 'fechado'
 
@@ -21,7 +21,7 @@ export function WorldDots({ worlds, states, current, onSelect }: WorldDotsProps)
             <button
               type="button"
               className={`world-dots__dot world-dots__dot--${state === 'concluído' ? 'done' : state === 'em andamento' ? 'progress' : 'locked'}`}
-              style={{ '--progress': `${completed * 10}%` } as CSSProperties}
+              style={{ '--progress': `${(completed / MISSIONS_PER_WORLD) * 100}%` } as CSSProperties}
               aria-label={`${world.name}: ${state}`}
               aria-current={active ? 'true' : undefined}
               onClick={() => onSelect(world.id)}

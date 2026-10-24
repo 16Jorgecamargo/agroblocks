@@ -6,14 +6,13 @@ describe('visibleResources', () => {
     const table = Object.fromEntries(MISSIONS.map((mission) => [mission.id, visibleResources(mission)]))
     expect(table).toMatchObject({
       'm0-training': ['harvest'],
-      'garden-04': ['harvest'],
+      'garden-02': ['harvest'],
       'cornfield-02': ['seeds'],
-      'orchard-04': ['water'],
-      'greenhouse-03': ['harvest'],
-      'barnyard-05': ['seeds', 'water'],
-      'homestead-10': ['seeds', 'water', 'energy'],
-      'garden-03': ['seeds', 'water'],
-      'garden-08': ['seeds'],
+      'orchard-02': ['water'],
+      'greenhouse-02': ['harvest'],
+      'barnyard-02': ['seeds', 'water'],
+      'homestead-05': ['seeds', 'water', 'energy'],
+      'garden-03': ['seeds'],
     })
   })
 })

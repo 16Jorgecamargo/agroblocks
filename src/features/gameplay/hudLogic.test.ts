@@ -11,8 +11,8 @@ describe('hudLogic', () => {
   })
 
   it('derives maxima from capacities and initial values', () => {
-    const fifth = getMission('barnyard-05')
-    const sixth = getMission('homestead-10')
+    const fifth = getMission('barnyard-02')
+    const sixth = getMission('homestead-05')
     if (!fifth || !sixth) throw new Error('missing')
     expect(resourceMaxima(fifth)).toEqual({ seeds: 6, water: 3, energy: null })
     expect(resourceMaxima(sixth)).toEqual({ seeds: 16, water: 16, energy: 70 })

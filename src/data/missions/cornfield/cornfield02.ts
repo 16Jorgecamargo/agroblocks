@@ -4,7 +4,7 @@ import type { MissionDefinition } from '@/game/missions/missionTypes'
 
 export const cornfield02: MissionDefinition = {
   id: 'cornfield-02',
-  order: 12,
+  order: 7,
   world: 'cornfield',
   slot: 2,
   title: 'Plantação em série',

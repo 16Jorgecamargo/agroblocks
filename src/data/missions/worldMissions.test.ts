@@ -2,29 +2,29 @@ import { countProgramBlocks, programBlockTypes } from '@/blocks/analysis/program
 import { MISSIONS } from '@/data/missions'
 import { getWorld, missionsOfWorld, WORLDS } from '@/data/worlds'
 import { playMission } from '@/game/testing/playMission'
-import type { WorldId } from '@/game/worlds/worldTypes'
+import { MISSIONS_PER_WORLD, type WorldId } from '@/game/worlds/worldTypes'
 
 const READY_WORLDS: WorldId[] = ['garden', 'cornfield', 'orchard', 'greenhouse', 'barnyard', 'homestead']
-const MOVED = new Set(['garden-04', 'cornfield-02', 'orchard-04', 'greenhouse-03', 'barnyard-05', 'homestead-10'])
+const MOVED = new Set(['garden-02', 'cornfield-02', 'orchard-02', 'greenhouse-02', 'barnyard-02', 'homestead-05'])
 
 describe('world missions', () => {
-  it.each(READY_WORLDS)('%s has slots 1 to 10', (world) => {
-    expect(missionsOfWorld(world, MISSIONS).map((mission) => mission.slot)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  it.each(READY_WORLDS)('%s has slots 1 to 5', (world) => {
+    expect(missionsOfWorld(world, MISSIONS).map((mission) => mission.slot)).toEqual(Array.from({ length: MISSIONS_PER_WORLD }, (_, index) => index + 1))
   })
 
   it.each(READY_WORLDS)('%s mission 1 starts from a partial program', (world) => {
     expect(missionsOfWorld(world, MISSIONS)[0].initialProgram).toBeDefined()
   })
 
-  it.each(READY_WORLDS)('%s mission 9 starts from a program that fails', (world) => {
-    const debug = missionsOfWorld(world, MISSIONS)[8]
+  it.each(READY_WORLDS)('%s mission 4 starts from a program that fails', (world) => {
+    const debug = missionsOfWorld(world, MISSIONS)[3]
     if (!debug.initialProgram) throw new Error('debug mission without a starting program')
     const result = playMission(debug, debug.initialProgram)
     expect(result.outcome.status === 'completed' && result.validation.success).toBe(false)
   })
 
-  it.each(READY_WORLDS)('%s missions 7 and 8 have a limit', (world) => {
-    for (const mission of missionsOfWorld(world, MISSIONS).slice(6, 8)) {
+  it.each(READY_WORLDS)('%s mission 3 has a limit', (world) => {
+    for (const mission of missionsOfWorld(world, MISSIONS).slice(2, 3)) {
       const limited = mission.rules.maxBlocks !== undefined || (mission.constraints?.length ?? 0) > 0 || mission.rules.forbidWaterWet === true
       expect(limited).toBe(true)
     }

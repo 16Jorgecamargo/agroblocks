@@ -2,6 +2,7 @@ import { expect, type Locator, type Page } from '@playwright/test'
 import type { Program } from '@/blocks/interpreter/ast'
 import { programToWorkspaceJson } from '@/blocks/serializer/programToWorkspaceJson'
 import { MISSIONS } from '@/data/missions'
+import { ITEMS_PER_FORM } from '@/game/assessment/types'
 import { createInitialSave, recordAttempt, storeAssessment, storeProgram } from '@/game/progress/progression'
 import type { SaveData } from '@/game/progress/types'
 import type { WorldId } from '@/game/worlds/worldTypes'
@@ -108,12 +109,13 @@ export async function registerStudent(page: Page, name = 'Ana Souza', school = '
 export async function takeWorldTest(page: Page, world: WorldId, form: 'pre' | 'post'): Promise<void> {
   await expect(page).toHaveURL(new RegExp(`#/avaliacao/${world}/${form === 'pre' ? 'pre' : 'pos'}$`))
   await page.getByRole('button', { name: 'Começar' }).click()
-  for (let question = 0; question < 10; question += 1) {
-    await expect(page.getByText(`Questão ${question + 1} de 10`)).toBeVisible()
+  for (let question = 0; question < ITEMS_PER_FORM; question += 1) {
+    await expect(page.getByText(`Questão ${question + 1} de ${ITEMS_PER_FORM}`)).toBeVisible()
     await expect(page.getByRole('radio')).toHaveCount(4)
     await page.getByRole('radio').first().check()
     await page.getByRole('button', { name: /Próxima|Concluir/ }).click()
   }
+  await expect(page.getByRole('heading', { name: /^Você acertou \d de \d$/ })).toBeVisible()
   await page.getByRole('link', { name: /^Começar |^Ir para |^Ver missões$/ }).click()
 }
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { MISSIONS } from '@/data/missions'
+import { ITEMS_PER_FORM } from '@/game/assessment/types'
 import { ClassField } from '@/features/dashboard/ClassField'
 import { assessmentsCsv, attemptsCsv, studentsCsv } from '@/features/dashboard/dashboardCsv'
 import { buildDashboard, EMPTY_FILTERS, type DashboardFilters, type DashboardModel, type StudentRow } from '@/features/dashboard/dashboardModel'
@@ -74,7 +75,7 @@ function Summary({ model }: { model: DashboardModel }) {
               {summary.avgGain > 0 ? '+' : ''}
               {decimal(summary.avgGain)}
             </strong>
-            <span className="figure__note">ganho médio de acertos por mundo, de 0 a 10</span>
+            <span className="figure__note">{`ganho médio de acertos por mundo, de 0 a ${ITEMS_PER_FORM}`}</span>
           </>
         )}
       </div>
@@ -283,7 +284,7 @@ export function DashboardPage({ token, onUnauthorized, onLogout }: DashboardPage
                     <h2 id="scores-title" className="block__title">
                       Prova inicial e prova final por mundo
                     </h2>
-                    <p className="block__hint">Média de acertos, de 0 a 10.</p>
+                    <p className="block__hint">{`Média de acertos, de 0 a ${ITEMS_PER_FORM}.`}</p>
                     <ScoreRanges rows={model.worldRows} />
                   </section>
                 </div>

@@ -5,6 +5,8 @@ export const WORLD_IDS = ['garden', 'cornfield', 'orchard', 'greenhouse', 'barny
 
 export type WorldId = (typeof WORLD_IDS)[number]
 
+export const MISSIONS_PER_WORLD = 5
+
 export type MissionRole = 'learn' | 'practice' | 'challenge' | 'debug' | 'final'
 
 export const ROLE_LABELS: Record<MissionRole, string> = {
@@ -16,10 +18,10 @@ export const ROLE_LABELS: Record<MissionRole, string> = {
 }
 
 export function roleForSlot(slot: number): MissionRole {
-  if (slot <= 3) return 'learn'
-  if (slot <= 6) return 'practice'
-  if (slot <= 8) return 'challenge'
-  if (slot === 9) return 'debug'
+  if (slot <= 1) return 'learn'
+  if (slot === 2) return 'practice'
+  if (slot === 3) return 'challenge'
+  if (slot === 4) return 'debug'
   return 'final'
 }
 

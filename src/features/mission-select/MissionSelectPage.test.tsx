@@ -26,9 +26,9 @@ describe('MissionSelectPage', () => {
   it('opens on the current world with its trail', () => {
     renderPage()
     expect(screen.getByText('Mundo 1: Horta')).toBeInTheDocument()
-    expect(screen.getByText('Sequência · 0 de 10 missões')).toBeInTheDocument()
+    expect(screen.getByText('Sequência · 0 de 5 missões')).toBeInTheDocument()
     const trail = screen.getByRole('list', { name: 'Trilha de Horta' })
-    expect(within(trail).getAllByRole('listitem')).toHaveLength(12)
+    expect(within(trail).getAllByRole('listitem')).toHaveLength(7)
     expect(screen.getByRole('button', { name: 'Mundo anterior' })).toBeDisabled()
   })
 
@@ -66,8 +66,8 @@ describe('MissionSelectPage', () => {
   it('disables locked missions', async () => {
     storeGardenPre()
     renderPage()
-    fireEvent.click(within(screen.getByRole('list', { name: 'Trilha de Horta' })).getByRole('button', { name: /^Missão 2 · Hora de plantar/ }))
-    const card = await screen.findByRole('region', { name: 'Missão 2 - Hora de plantar' })
+    fireEvent.click(within(screen.getByRole('list', { name: 'Trilha de Horta' })).getByRole('button', { name: /^Missão 2 · Primeira colheita/ }))
+    const card = await screen.findByRole('region', { name: 'Missão 2 - Primeira colheita' })
     expect(within(card).getByRole('button', { name: 'Jogar' })).toBeDisabled()
   })
 
@@ -87,6 +87,6 @@ describe('MissionSelectPage', () => {
     renderPage()
     const trail = screen.getByRole('list', { name: 'Trilha de Horta' })
     expect(within(trail).getByRole('button', { name: /^Missão 1 · Primeiros passos · Concluída · 2 de 3 estrelas/ })).toBeInTheDocument()
-    expect(screen.getByText('★ 2 de 30 estrelas')).toBeInTheDocument()
+    expect(screen.getByText('★ 2 de 15 estrelas')).toBeInTheDocument()
   })
 })

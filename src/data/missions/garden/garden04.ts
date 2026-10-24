@@ -1,4 +1,5 @@
 import { act, program } from '@/blocks/interpreter/programBuilder'
+import { GARDEN_BLOCKS } from '@/data/missions/blockSets'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
@@ -7,43 +8,31 @@ export const garden04: MissionDefinition = {
   order: 4,
   world: 'garden',
   slot: 4,
-  title: 'Primeira colheita',
+  title: 'Consertar a curva',
   concept: 'sequencing',
-  difficulty: 1,
+  difficulty: 2,
   briefing: {
-    conceptIntro:
-      'Sequenciamento: a ordem das instruções muda o resultado. O robô não adivinha o caminho — ele executa exatamente o que você montar.',
-    goalText: 'Leve o robô até a planta madura no alto do mapa e colha.',
-    demo: program([act('moveForward'), act('turnLeft'), act('turnRight')]),
+    conceptIntro: 'Consertar um programa também é programar: execute, veja onde o robô errou e troque o bloco certo.',
+    goalText: 'Este programa tem um erro. Execute, descubra qual bloco está errado e conserte para colher a planta.',
   },
-  map: { cells: ['. . . . .', '. . . m .', '. . # . .', '. # . . .', '. . . . .'] },
-  robot: { x: 0, y: 4, facing: 'N' },
+  map: { cells: ['. . . m', '. # . .'] },
+  robot: { x: 0, y: 1, facing: 'E' },
   resources: UNLIMITED_RESOURCES,
-  growTicks: 3,
+  growTicks: 99,
   rules: {},
-  allowedBlocks: ['robot_move_forward', 'robot_turn_left', 'robot_turn_right', 'farm_harvest'],
+  allowedBlocks: GARDEN_BLOCKS,
+  initialProgram: program([act('turnRight'), act('moveForward'), act('turnRight'), act('moveForward'), act('moveForward'), act('moveForward'), act('harvest')]),
   objectives: [{ kind: 'harvestAtLeast', count: 1 }],
-  efficiency: { referenceActions: 8, referenceBlocks: 8 },
+  efficiency: { referenceActions: 7, referenceBlocks: 7 },
   hints: [
-    'Planeje o caminho inteiro antes de montar os blocos.',
-    'O robô começa virado para cima. Em que ponto ele precisa virar?',
-    'Você vai precisar de blocos de Movimento (mover e virar) e de "colher planta".',
-    'Comece com: mover para frente, mover para frente, mover para frente, virar à direita...',
+    'Execute uma vez e observe para onde o robô vai no primeiro passo.',
+    'A planta está acima do robô. Para subir, ele precisa virar para qual lado?',
+    'Só um bloco está errado.',
+    'Troque o primeiro "virar à direita" por "virar à esquerda".',
   ],
-  solutionExplanation:
-    'O algoritmo é uma sequência: três passos para cima, uma virada à direita, três passos para a direita e a colheita. Trocar a ordem de qualquer bloco leva o robô a outro lugar.',
-  referenceSolution: program([
-    act('moveForward'),
-    act('moveForward'),
-    act('moveForward'),
-    act('turnRight'),
-    act('moveForward'),
-    act('moveForward'),
-    act('moveForward'),
-    act('harvest'),
-  ]),
+  solutionExplanation: 'Virado para a direita, o robô sobe virando à esquerda. Uma única curva para o lado errado mandava o robô para fora da horta.',
+  referenceSolution: program([act('turnLeft'), act('moveForward'), act('turnRight'), act('moveForward'), act('moveForward'), act('moveForward'), act('harvest')]),
   commonMistakes: {
-    HIT_OBSTACLE: 'Há pedras no meio da fazenda. Suba pela coluna da esquerda antes de virar.',
-    NOTHING_TO_HARVEST: 'O robô colheu no lugar errado. Confira se ele chegou na planta antes do bloco "colher".',
+    OUT_OF_BOUNDS: 'O robô saiu da horta. Confira o lado da primeira curva.',
   },
 }

@@ -1,6 +1,8 @@
 import type { Facing } from '@/game/world/types'
 import type { WorldId } from '@/game/worlds/worldTypes'
 
+export const ITEMS_PER_FORM = 5
+
 export type AssessmentSkill = 'build' | 'predict' | 'debug'
 
 export const ASSESSMENT_SKILLS: AssessmentSkill[] = ['build', 'predict', 'debug']
@@ -21,4 +23,5 @@ export interface AssessmentItem {
   grid?: { width: number; height: number; robot: { x: number; y: number; facing: Facing } }
   options: string[]
   correctIndex: number
+  explanation: string
 }

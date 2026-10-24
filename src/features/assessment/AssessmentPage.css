@@ -130,3 +130,61 @@
   border: 2px solid #46e3ff;
   font-size: 12px;
 }
+
+.assessment__feedback {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.assessment__score {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.assessment__review {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.assessment__review-item {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 2px solid var(--color-border);
+  border-left-width: 6px;
+  border-radius: var(--radius-md);
+}
+
+.assessment__review-item.is-right {
+  border-left-color: var(--color-success);
+}
+
+.assessment__review-item.is-wrong {
+  border-left-color: var(--color-danger);
+}
+
+.assessment__review-item p {
+  margin: 0;
+}
+
+.assessment__review-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+.assessment__review-item.is-right .assessment__review-mark {
+  color: var(--color-success);
+}
+
+.assessment__review-item.is-wrong .assessment__review-mark {
+  color: var(--color-danger);
+}
+
+.assessment__review-why {
+  color: var(--color-text-muted);
+}

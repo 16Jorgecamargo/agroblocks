@@ -1,7 +1,8 @@
 import { createInitialSave, syncMissions } from '@/game/progress/progression'
 import type { MissionRef, SaveData } from '@/game/progress/types'
 import { readJson, writeJson } from '@/services/storage/jsonStorage'
-import { legacySaveSchema, saveDataSchema } from '@/services/storage/saveDataSchema'
+import { legacySaveSchema, saveDataSchema, tenMissionSaveSchema } from '@/services/storage/saveDataSchema'
+import { renameTenMissionId } from '@/services/storage/tenMissionIds'
 
 export const SAVE_KEY = 'agroblocks:v1'
 export const CORRUPT_KEY = 'agroblocks:corrupt'
@@ -32,6 +33,8 @@ export function migrateSave(raw: string, missions: MissionRef[], now: string): S
   } catch {
     return null
   }
+  const tenMissions = tenMissionSaveSchema.safeParse(parsed)
+  if (tenMissions.success) return migrateTenMissionSave(tenMissions.data, missions, now)
   const legacy = legacySaveSchema.safeParse(parsed)
   if (!legacy.success) return null
   const fresh = createInitialSave(missions, now)
@@ -39,6 +42,23 @@ export function migrateSave(raw: string, missions: MissionRef[], now: string): S
   const missionsState = training && fresh.missions['m0-training'] ? { ...fresh.missions, 'm0-training': { ...fresh.missions['m0-training'], ...training } } : fresh.missions
   return syncMissions(
     { ...fresh, runId: legacy.data.runId, student: legacy.data.student, tutorial: legacy.data.tutorial, createdAt: legacy.data.createdAt, missions: missionsState },
+    missions,
+  )
+}
+
+function migrateTenMissionSave(old: Omit<SaveData, 'version' | 'assessments'>, missions: MissionRef[], now: string): SaveData {
+  const fresh = createInitialSave(missions, now)
+  const missionsState = { ...fresh.missions }
+  for (const [id, progress] of Object.entries(old.missions)) {
+    const renamed = renameTenMissionId(id)
+    if (renamed && missionsState[renamed]) missionsState[renamed] = progress
+  }
+  const attempts = old.attempts.flatMap((attempt) => {
+    const renamed = renameTenMissionId(attempt.missionId)
+    return renamed ? [{ ...attempt, missionId: renamed, id: `${renamed}-${attempt.attemptNumber}` }] : []
+  })
+  return syncMissions(
+    { ...fresh, runId: old.runId, student: old.student, tutorial: old.tutorial, createdAt: old.createdAt, missions: missionsState, attempts },
     missions,
   )
 }

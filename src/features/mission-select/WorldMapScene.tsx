@@ -4,7 +4,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Vector3, type OrthographicCamera } from 'three'
 import { Icon } from '@/components/icons/Icon'
 import { nodeKey, type NodeState, type TrailNode } from '@/features/mission-select/trailNodes'
-import type { WorldId } from '@/game/worlds/worldTypes'
+import { MISSIONS_PER_WORLD, type WorldId } from '@/game/worlds/worldTypes'
 import { SPRINGS } from '@/motion/springs'
 import { CANVAS_RESIZE } from '@/render/canvasResize'
 import { DrawCallProbe } from '@/render/DrawCallProbe'
@@ -47,7 +47,7 @@ function LabelProjector({ labels, trail }: { labels: RefObject<(HTMLButtonElemen
       const element = labels.current?.[index]
       if (!element) return
       point.set(x, 1.1, z).project(camera)
-      element.style.transform = `translate(-50%, -100%) translate(${((point.x + 1) / 2) * size.width}px, ${((1 - point.y) / 2) * size.height}px)`
+      element.style.transform = `translate3d(${Math.round(((point.x + 1) / 2) * size.width)}px, ${Math.round(((1 - point.y) / 2) * size.height)}px, 0) translate(-50%, -100%)`
     })
   })
   return null
@@ -79,6 +79,7 @@ function MapCamera({ focus, pan, instant }: { focus: Vec2; pan: RefObject<Pan>; 
     camera.updateProjectionMatrix()
     camera.position.set(next.x + Math.sin(CAMERA_ANGLE) * CAMERA_DISTANCE, CAMERA_DISTANCE * 0.82, next.z + Math.cos(CAMERA_ANGLE) * CAMERA_DISTANCE)
     camera.lookAt(next.x, 0, next.z)
+    camera.updateMatrixWorld()
   })
   return null
 }
@@ -90,6 +91,11 @@ function screenToGround(dx: number, dy: number, zoom: number): Pan {
   return { x: -(dx * right.x) * scale + dy * forward.x * scale * 1.4, z: -(dx * right.z) * scale + dy * forward.z * scale * 1.4 }
 }
 
+function spreadAlong(trail: Vec2[], count: number): Vec2[] {
+  if (count <= 1 || trail.length <= count) return trail.slice(0, count)
+  return Array.from({ length: count }, (_, index) => trail[Math.round((index * (trail.length - 1)) / (count - 1))])
+}
+
 function labelText(node: TrailNode): string {
   if (node.kind === 'mission') return node.mission.title
   return node.kind === 'preTest' ? 'Prova inicial' : 'Prova final'
@@ -97,13 +103,14 @@ function labelText(node: TrailNode): string {
 
 export default function WorldMapScene({ world, nodes, states, stars, selected, onSelect, lowGraphics, ambient, onReady }: WorldMapSceneProps) {
   const map = useMemo(() => buildWorld({ layout: 'worldMap', gridWidth: 0, gridHeight: 0, seed: world, density: lowGraphics ? 'light' : 'full', theme: world }), [world, lowGraphics])
+  const spots = useMemo(() => spreadAlong(map.trail, nodes.length), [map.trail, nodes.length])
   const labels = useRef<(HTMLButtonElement | null)[]>([])
   const alive = ambient && !lowGraphics
   const pan = useRef<Pan>({ x: 0, z: 0 })
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null)
   const wrapper = useRef<HTMLDivElement>(null)
   const selectedIndex = Math.max(0, nodes.findIndex((node) => nodeKey(node) === selected))
-  const focus = map.trail[selectedIndex] ?? { x: 0, z: 0 }
+  const focus = spots[selectedIndex] ?? { x: 0, z: 0 }
 
   useEffect(() => {
     pan.current = { x: 0, z: 0 }
@@ -141,9 +148,9 @@ export default function WorldMapScene({ world, nodes, states, stars, selected, o
         aria-hidden="true"
       >
         <color attach="background" args={['#131f29']} />
-        <LabelProjector labels={labels} trail={map.trail} />
-        <DrawCallProbe />
         <MapCamera focus={focus} pan={pan} instant={!ambient} />
+        <LabelProjector labels={labels} trail={spots} />
+        <DrawCallProbe />
         <SceneLighting style={map.style} shadows={!lowGraphics} shadowExtent={14} background={false} />
         <WorldTerrain world={map} />
         <WorldProps world={map} shadows={!lowGraphics} ambient={alive} />
@@ -153,11 +160,11 @@ export default function WorldMapScene({ world, nodes, states, stars, selected, o
         <Herd animals={map.animals} active={alive} />
         <Actors actors={map.actors ?? []} active={alive} shadows={!lowGraphics} />
         {nodes.map((node, index) => {
-          const point = map.trail[index]
+          const point = spots[index]
           const key = nodeKey(node)
           const state = states[index]
           const active = key === selected
-          const final = node.kind === 'mission' && node.mission.slot === 10
+          const final = node.kind === 'mission' && node.mission.slot === MISSIONS_PER_WORLD
           return (
             <group key={key} position={[point.x, 0, point.z]}>
               <mesh
@@ -193,7 +200,7 @@ export default function WorldMapScene({ world, nodes, states, stars, selected, o
             <motion.span className="map-label__inner" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} transition={{ ...SPRINGS.marker, delay: index * 0.05 }}>
               <span className="map-label__hex">
                 {node.kind === 'mission' ? (
-                  <span className="map-label__number">{node.mission.slot === 10 ? '★' : node.mission.slot}</span>
+                  <span className="map-label__number">{node.mission.slot === MISSIONS_PER_WORLD ? '★' : node.mission.slot}</span>
                 ) : (
                   <Icon name="flag" size={14} />
                 )}

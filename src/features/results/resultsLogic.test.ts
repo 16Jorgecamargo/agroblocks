@@ -38,7 +38,7 @@ describe('resultsLogic', () => {
   it('points to the next mission of the world, then to the world post-test', () => {
     const save = createInitialSave(refs, 'now')
     const third = getMission('garden-03')
-    const last = getMission('garden-10')
+    const last = getMission('garden-05')
     if (!third || !last) throw new Error('missing')
     expect(nextStep(third, save)).toEqual({ label: 'Próxima missão', to: '/jogar/garden-04' })
     expect(nextStep(last, save)).toEqual({ label: 'Fazer a prova final', to: '/avaliacao/garden/pos' })

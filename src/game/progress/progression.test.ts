@@ -130,7 +130,7 @@ describe('progression', () => {
 })
 
 describe('student and tutorial', () => {
-  const refs: MissionRef[] = [{ id: 'm0-training', order: 0, world: null }, { id: 'garden-04', order: 1, world: 'garden' }]
+  const refs: MissionRef[] = [{ id: 'm0-training', order: 0, world: null }, { id: 'garden-02', order: 1, world: 'garden' }]
 
   it('starts with no run, student or tutorial outcome', () => {
     const save = createInitialSave(refs, '2026-10-16T10:00:00.000Z')
@@ -208,7 +208,7 @@ describe('worlds and their tests', () => {
 
   it('keeps the training available and starts with empty tests for every world', () => {
     const save = createInitialSave(REFS, 'now')
-    expect(save.version).toBe(2)
+    expect(save.version).toBe(3)
     expect(save.missions['m0-training'].status).toBe('available')
     expect(Object.keys(save.assessments)).toEqual([...WORLD_IDS])
     expect(save.assessments.homestead).toEqual({ pre: null, post: null })

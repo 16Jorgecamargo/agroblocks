@@ -22,14 +22,14 @@ describe('worlds', () => {
   })
 
   it('maps slots to roles', () => {
-    expect([1, 3, 4, 6, 7, 8, 9, 10].map(roleForSlot)).toEqual(['learn', 'learn', 'practice', 'practice', 'challenge', 'challenge', 'debug', 'final'])
+    expect([1, 2, 3, 4, 5].map(roleForSlot)).toEqual(['learn', 'practice', 'challenge', 'debug', 'final'])
   })
 
   it('labels missions by world and slot', () => {
-    const garden = getMission('garden-04')
+    const garden = getMission('garden-02')
     const training = getMission('m0-training')
     if (!garden || !training) throw new Error('missing mission')
-    expect(missionLabel(garden)).toBe('Horta · Missão 4')
+    expect(missionLabel(garden)).toBe('Horta · Missão 2')
     expect(missionLabel(training)).toBe('Treinamento')
   })
 })

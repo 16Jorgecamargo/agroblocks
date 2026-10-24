@@ -1,7 +1,8 @@
 import { itemsFor } from '@/data/assessment/items'
 import { WORLDS } from '@/data/worlds'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
-import type { WorldId } from '@/game/worlds/worldTypes'
+import { ITEMS_PER_FORM } from '@/game/assessment/types'
+import { MISSIONS_PER_WORLD, type WorldId } from '@/game/worlds/worldTypes'
 import type { RunSnapshot } from '@/shared/runSnapshot'
 import { studentKeyOf } from '@/shared/student'
 
@@ -15,12 +16,12 @@ interface DemoPerson {
 }
 
 const PEOPLE: readonly DemoPerson[] = [
-  { name: 'Ana Souza', school: 'E.E. Monteiro Lobato', reached: 60, pre: 4, post: 8, tutorial: 'completed' },
-  { name: 'Bruno Lima', school: 'E.E. Monteiro Lobato', reached: 44, pre: 3, post: 6, tutorial: 'completed' },
-  { name: 'Carla Mendes', school: 'E.E. Monteiro Lobato', reached: 6, pre: 5, post: 7, tutorial: 'skipped' },
-  { name: 'Diego Rocha', school: 'Colégio Estadual Rio Verde', reached: 37, pre: 2, post: 7, tutorial: 'completed' },
-  { name: 'Eduarda Alves', school: 'Colégio Estadual Rio Verde', reached: 13, pre: 6, post: 7, tutorial: null },
-  { name: 'Felipe Costa', school: 'Escola Técnica Agrícola', reached: 29, pre: 7, post: 10, tutorial: 'completed' },
+  { name: 'Ana Souza', school: 'E.E. Monteiro Lobato', reached: 30, pre: 2, post: 4, tutorial: 'completed' },
+  { name: 'Bruno Lima', school: 'E.E. Monteiro Lobato', reached: 22, pre: 1, post: 3, tutorial: 'completed' },
+  { name: 'Carla Mendes', school: 'E.E. Monteiro Lobato', reached: 3, pre: 2, post: 4, tutorial: 'skipped' },
+  { name: 'Diego Rocha', school: 'Colégio Estadual Rio Verde', reached: 18, pre: 1, post: 4, tutorial: 'completed' },
+  { name: 'Eduarda Alves', school: 'Colégio Estadual Rio Verde', reached: 6, pre: 3, post: 4, tutorial: null },
+  { name: 'Felipe Costa', school: 'Escola Técnica Agrícola', reached: 14, pre: 3, post: 5, tutorial: 'completed' },
   { name: 'Gabriela Nunes', school: 'Escola Técnica Agrícola', reached: 1, pre: null, post: null, tutorial: 'skipped' },
 ]
 
@@ -84,10 +85,10 @@ function demoRun(person: DemoPerson, index: number, missions: MissionDefinition[
     correct === null ? null : { world, form, startedAt: at(0), completedAt: at(0), skipped: false, answers: answers(world, form, correct) }
   const assessments = Object.fromEntries(
     WORLDS.map((world) => {
-      const entered = person.reached >= (world.order - 1) * 10
-      const finished = person.reached >= world.order * 10
-      const pre = person.pre === null ? null : Math.min(10, person.pre + ((world.order + index) % 3))
-      const post = person.post === null || pre === null ? null : Math.min(10, Math.max(pre, person.post + ((world.order + index) % 2)))
+      const entered = person.reached >= (world.order - 1) * MISSIONS_PER_WORLD
+      const finished = person.reached >= world.order * MISSIONS_PER_WORLD
+      const pre = person.pre === null ? null : Math.min(ITEMS_PER_FORM, person.pre + ((world.order + index) % 3))
+      const post = person.post === null || pre === null ? null : Math.min(ITEMS_PER_FORM, Math.max(pre, person.post + ((world.order + index) % 2)))
       return [world.id, { pre: entered ? response(world.id, 'pre', pre) : null, post: finished ? response(world.id, 'post', post) : null }]
     }),
   ) as RunSnapshot['assessments']

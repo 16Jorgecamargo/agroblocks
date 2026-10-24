@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react'
 import { tutorialLabel, type Plot, type StudentRow, type WorldCell, type WorldRow } from '@/features/dashboard/dashboardModel'
+import { ITEMS_PER_FORM } from '@/game/assessment/types'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 
 export type SortKey = 'name' | 'school' | 'runCount' | 'tutorial' | 'completedMissions' | 'worldsDone' | 'attempts' | 'hints' | 'errors' | 'lastSeen'
@@ -76,7 +77,7 @@ const NUMERIC: { key: SortKey; label: string; col: string }[] = [
 const TRAINING_ID = 'm0-training'
 
 function describeWorld(name: string, cell: WorldCell): string {
-  const tests = `prova inicial ${cell.pre === null ? 'não feita' : `${cell.pre} de 10`}, prova final ${cell.post === null ? 'não feita' : `${cell.post} de 10`}`
+  const tests = `prova inicial ${cell.pre === null ? 'não feita' : `${cell.pre} de ${ITEMS_PER_FORM}`}, prova final ${cell.post === null ? 'não feita' : `${cell.post} de ${ITEMS_PER_FORM}`}`
   return `${name}: ${cell.completed} de ${cell.total} missões, ${tests}`
 }
 

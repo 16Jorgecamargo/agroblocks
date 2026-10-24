@@ -1,4 +1,4 @@
-import { act, call, program, repeat } from '@/blocks/interpreter/programBuilder'
+import { act, call, not, program, sensor, whileDo } from '@/blocks/interpreter/programBuilder'
 import { HOMESTEAD_BLOCKS } from '@/data/missions/blockSets'
 import { rowCells } from '@/data/missions/helpers'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
@@ -6,30 +6,30 @@ import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
 export const homestead02: MissionDefinition = {
   id: 'homestead-02',
-  order: 52,
+  order: 27,
   world: 'homestead',
   slot: 2,
-  title: 'Cuidar da fileira',
+  title: 'Procedimento no laço',
   concept: 'efficiency',
-  difficulty: 1,
+  difficulty: 2,
   briefing: {
-    conceptIntro: 'Um procedimento pode ser chamado várias vezes, inclusive dentro de um repita.',
-    goalText: 'Use o procedimento "cuidar" num repita para cuidar dos 4 canteiros.',
+    conceptIntro: 'Procedimentos e laços enquanto trabalham juntos: o laço percorre e o procedimento cuida.',
+    goalText: 'Ande até a parede chamando "cuidar" em cada canteiro.',
   },
-  map: { cells: ['. . . . .'] },
+  map: { cells: ['. . . . #'] },
   robot: { x: 0, y: 0, facing: 'E' },
   resources: UNLIMITED_RESOURCES,
   growTicks: 99,
   rules: {},
   allowedBlocks: HOMESTEAD_BLOCKS,
-  objectives: [{ kind: 'cellsInState', cells: rowCells(0, 1, 4), state: 'seeded' }, { kind: 'cellsWet', cells: rowCells(0, 1, 4) }],
-  efficiency: { referenceActions: 16, referenceBlocks: 7 },
+  objectives: [{ kind: 'cellsInState', cells: rowCells(0, 1, 3), state: 'seeded' }, { kind: 'cellsWet', cells: rowCells(0, 1, 3) }],
+  efficiency: { referenceActions: 12, referenceBlocks: 9 },
   hints: [
-    'Crie o procedimento "cuidar" com os três cuidados.',
-    'No programa principal, ande e chame "cuidar".',
-    'Coloque isso dentro de um repita.',
-    'repita 4: mover, cuidar.',
+    'Você não precisa contar os canteiros.',
+    'Use "enquanto não há obstáculo à frente".',
+    'Dentro do laço: andar e chamar "cuidar".',
+    'enquanto não há obstáculo: mover, cuidar.',
   ],
-  solutionExplanation: 'O repita chama "cuidar" quatro vezes: 16 ações com poucos blocos.',
-  referenceSolution: program([repeat(4, [act('moveForward'), call('cuidar')])], { cuidar: [act('prepareSoil'), act('plant'), act('water')] }),
+  solutionExplanation: 'O laço enquanto e o procedimento juntos cuidam de uma fileira de qualquer tamanho.',
+  referenceSolution: program([whileDo(not(sensor('isObstacleAhead')), [act('moveForward'), call('cuidar')])], { cuidar: [act('prepareSoil'), act('plant'), act('water')] }),
 }

@@ -1,5 +1,4 @@
 import { act, program } from '@/blocks/interpreter/programBuilder'
-import { GARDEN_BLOCKS } from '@/data/missions/blockSets'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
@@ -8,30 +7,43 @@ export const garden02: MissionDefinition = {
   order: 2,
   world: 'garden',
   slot: 2,
-  title: 'Hora de plantar',
+  title: 'Primeira colheita',
   concept: 'sequencing',
   difficulty: 1,
   briefing: {
-    conceptIntro: 'Algumas ações dependem de outras: para plantar, o solo precisa estar preparado antes.',
-    goalText: 'Ande até o canteiro marcado, prepare o solo e plante uma semente.',
+    conceptIntro:
+      'Sequenciamento: a ordem das instruções muda o resultado. O robô não adivinha o caminho — ele executa exatamente o que você montar.',
+    goalText: 'Leve o robô até a planta madura no alto do mapa e colha.',
+    demo: program([act('moveForward'), act('turnLeft'), act('turnRight')]),
   },
-  map: { cells: ['X X X X', '. . . .', 'X X X X'] },
-  robot: { x: 0, y: 1, facing: 'E' },
+  map: { cells: ['. . . . .', '. . . m .', '. . # . .', '. # . . .', '. . . . .'] },
+  robot: { x: 0, y: 4, facing: 'N' },
   resources: UNLIMITED_RESOURCES,
-  growTicks: 99,
+  growTicks: 3,
   rules: {},
-  allowedBlocks: GARDEN_BLOCKS,
-  objectives: [{ kind: 'cellsInState', cells: [[2, 1]], state: 'seeded' }],
-  efficiency: { referenceActions: 4, referenceBlocks: 4 },
+  allowedBlocks: ['robot_move_forward', 'robot_turn_left', 'robot_turn_right', 'farm_harvest'],
+  objectives: [{ kind: 'harvestAtLeast', count: 1 }],
+  efficiency: { referenceActions: 8, referenceBlocks: 8 },
   hints: [
-    'Primeiro o robô precisa estar em cima do canteiro.',
-    'O canteiro fica duas casas à frente.',
-    'Plantar sem preparar o solo dá erro.',
-    'mover, mover, preparar solo, plantar semente.',
+    'Planeje o caminho inteiro antes de montar os blocos.',
+    'O robô começa virado para cima. Em que ponto ele precisa virar?',
+    'Você vai precisar de blocos de Movimento (mover e virar) e de "colher planta".',
+    'Comece com: mover para frente, mover para frente, mover para frente, virar à direita...',
   ],
-  solutionExplanation: 'Andar, preparar e plantar: se "plantar" vier antes de "preparar solo", o robô encontra terra dura e para com erro.',
-  referenceSolution: program([act('moveForward'), act('moveForward'), act('prepareSoil'), act('plant')]),
+  solutionExplanation:
+    'O algoritmo é uma sequência: três passos para cima, uma virada à direita, três passos para a direita e a colheita. Trocar a ordem de qualquer bloco leva o robô a outro lugar.',
+  referenceSolution: program([
+    act('moveForward'),
+    act('moveForward'),
+    act('moveForward'),
+    act('turnRight'),
+    act('moveForward'),
+    act('moveForward'),
+    act('moveForward'),
+    act('harvest'),
+  ]),
   commonMistakes: {
-    SOIL_NOT_READY: 'O solo ainda está duro. Coloque "preparar solo" antes de "plantar semente".',
+    HIT_OBSTACLE: 'Há pedras no meio da fazenda. Suba pela coluna da esquerda antes de virar.',
+    NOTHING_TO_HARVEST: 'O robô colheu no lugar errado. Confira se ele chegou na planta antes do bloco "colher".',
   },
 }

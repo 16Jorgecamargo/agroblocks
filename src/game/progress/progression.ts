@@ -69,7 +69,7 @@ export function createInitialSave(missions: MissionRef[], now: string): SaveData
   const ordered = sorted(missions)
   return refreshUnlocks(
     {
-      version: 2,
+      version: 3,
       runId: null,
       student: null,
       tutorial: null,

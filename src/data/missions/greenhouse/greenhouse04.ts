@@ -1,34 +1,38 @@
-import { act, ifThen, not, program, sensor, whileDo } from '@/blocks/interpreter/programBuilder'
+import { act, not, program, sensor, whileDo } from '@/blocks/interpreter/programBuilder'
 import { GREENHOUSE_BLOCKS } from '@/data/missions/blockSets'
 import type { MissionDefinition } from '@/game/missions/missionTypes'
 import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
 export const greenhouse04: MissionDefinition = {
   id: 'greenhouse-04',
-  order: 34,
+  order: 19,
   world: 'greenhouse',
   slot: 4,
-  title: 'Fileiras diferentes',
+  title: 'Consertar o laço',
   concept: 'sensors',
   difficulty: 2,
   briefing: {
-    conceptIntro: 'O mesmo enquanto serve para fileiras de qualquer tamanho.',
-    goalText: 'Colha as mudas maduras da fileira de cima e da de baixo. As fileiras têm tamanhos diferentes.',
+    conceptIntro: 'Se a condição do enquanto estiver invertida, o laço nem começa ou nunca para.',
+    goalText: 'Este programa tem um erro. Execute, descubra o problema do laço e conserte para colher a muda junto da parede.',
   },
-  map: { cells: ['. m m m #', 'X m m . X'] },
+  map: { cells: ['. . . m #'] },
   robot: { x: 0, y: 0, facing: 'E' },
   resources: UNLIMITED_RESOURCES,
   growTicks: 99,
   rules: {},
   allowedBlocks: GREENHOUSE_BLOCKS,
-  objectives: [{ kind: 'harvestAtLeast', count: 5 }],
-  efficiency: { referenceActions: 13, referenceBlocks: 17 },
+  initialProgram: program([whileDo(sensor('isObstacleAhead'), [act('moveForward')]), act('harvest')]),
+  objectives: [{ kind: 'harvestAtLeast', count: 1 }],
+  efficiency: { referenceActions: 4, referenceBlocks: 5 },
   hints: [
-    'Cada fileira termina num obstáculo.',
-    'No fim da fileira de cima, desça pela coluna livre.',
-    'Use o mesmo laço nas duas fileiras.',
-    'enquanto não há obstáculo: mover, se madura: colher; virar à direita, mover, virar à direita; repita o laço.',
+    'Execute: o robô andou?',
+    'O laço só roda enquanto a condição é verdadeira.',
+    'Falta um "não" na condição.',
+    'Use "enquanto não há obstáculo à frente".',
   ],
-  solutionExplanation: 'O enquanto não precisa saber o tamanho da fileira: para quando encontra o obstáculo.',
-  referenceSolution: program([whileDo(not(sensor('isObstacleAhead')), [act('moveForward'), ifThen(sensor('isPlantMature'), [act('harvest')])]), act('turnRight'), act('moveForward'), act('turnRight'), whileDo(not(sensor('isObstacleAhead')), [act('moveForward'), ifThen(sensor('isPlantMature'), [act('harvest')])])]),
+  solutionExplanation: 'Sem o "não", o laço só andaria se já houvesse obstáculo, então nunca começava. Com o "não", ele anda até a parede.',
+  referenceSolution: program([whileDo(not(sensor('isObstacleAhead')), [act('moveForward')]), act('harvest')]),
+  commonMistakes: {
+    NOTHING_TO_HARVEST: 'O robô ficou parado. Confira a condição do enquanto.',
+  },
 }

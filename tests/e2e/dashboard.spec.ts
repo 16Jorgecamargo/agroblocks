@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { getMission } from '@/data/missions'
 import { openMission, registerStudent, saveWithProgram, seedStorage, teacherLogin, withStudent } from './helpers'
 
-const firstHarvest = getMission('garden-04')
+const firstHarvest = getMission('garden-02')
 if (!firstHarvest) throw new Error('mission missing')
 
 test('a skipped tutorial reaches the dashboard behind the teacher password', async ({ page }) => {
@@ -26,11 +26,11 @@ test('a skipped tutorial reaches the dashboard behind the teacher password', asy
 })
 
 test('a completed phase and a new farm show up as two runs of the same student', async ({ page }) => {
-  const save = withStudent(saveWithProgram('garden-04', firstHarvest.referenceSolution, ['m0-training']), 'Dora Repetente', 'Escola Municipal Teste', 'e2e-run-dora-1')
+  const save = withStudent(saveWithProgram('garden-02', firstHarvest.referenceSolution, ['m0-training']), 'Dora Repetente', 'Escola Municipal Teste', 'e2e-run-dora-1')
   await seedStorage(page, { save })
-  await openMission(page, 'garden-04')
+  await openMission(page, 'garden-02')
   await page.getByRole('button', { name: 'Executar' }).click()
-  await expect(page).toHaveURL(/#\/resultado\/garden-04$/)
+  await expect(page).toHaveURL(/#\/resultado\/garden-02$/)
   await page.waitForTimeout(2600)
   await page.goto('/')
   await page.getByRole('button', { name: 'Iniciar nova fazenda' }).click()
@@ -44,7 +44,7 @@ test('a completed phase and a new farm show up as two runs of the same student',
   await expect(row).toHaveCount(1)
   await expect(row.locator('[data-col="runs"]')).toHaveText('2')
   await expect(row.locator('[data-col="missions"]')).toHaveText('1')
-  await expect(row.locator('[data-col="garden"]')).toContainText('1/10')
+  await expect(row.locator('[data-col="garden"]')).toContainText('1/5')
   await row.getByRole('button', { name: /Ver detalhes/ }).click()
   await expect(page.getByRole('dialog', { name: /dora/i }).getByRole('heading', { name: /^Jogada de / })).toHaveCount(2)
 })

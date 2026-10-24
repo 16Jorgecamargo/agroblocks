@@ -8,7 +8,7 @@ import { nodeKey, nodeState, trailNodes, type NodeState, type TrailNode } from '
 import { WorldDots, type WorldProgressState } from '@/features/mission-select/WorldDots'
 import { currentWorld, isWorldOpen, worldStep } from '@/game/progress/progression'
 import type { SaveData } from '@/game/progress/types'
-import type { WorldId } from '@/game/worlds/worldTypes'
+import { MISSIONS_PER_WORLD, type WorldId } from '@/game/worlds/worldTypes'
 import { useMotionPrefs } from '@/motion/useMotionPrefs'
 import { hasWebGL } from '@/render/hasWebGL'
 import { SceneWithSplash } from '@/render/SceneWithSplash'
@@ -78,7 +78,7 @@ export function MissionSelectPage() {
 
   return (
     <div className="chrome-page mission-select">
-      <PageHeader title="Seus desafios" subtitle="Cada mundo é uma fazenda. Siga a trilha e conclua as 10 missões para abrir o próximo." backTo="/" />
+      <PageHeader title="Seus desafios" subtitle={`Cada mundo é uma fazenda. Siga a trilha e conclua as ${MISSIONS_PER_WORLD} missões para abrir o próximo.`} backTo="/" />
       <div className="world-stage">
         {webgl && (
           <div className="world-stage__map">
@@ -106,10 +106,10 @@ export function MissionSelectPage() {
         </ol>
         <div className="world-stage__label">
           <strong>{`Mundo ${world.order}: ${world.name}`}</strong>
-          <span>{`${world.conceptLabel} · ${completedIn(save, worldId)} de 10 missões`}</span>
-          <span className="world-stage__stars">{`★ ${worldStars} de 30 estrelas`}</span>
+          <span>{`${world.conceptLabel} · ${completedIn(save, worldId)} de ${MISSIONS_PER_WORLD} missões`}</span>
+          <span className="world-stage__stars">{`★ ${worldStars} de ${MISSIONS_PER_WORLD * 3} estrelas`}</span>
           <span className="world-stage__bar" aria-hidden="true">
-            <i style={{ width: `${completedIn(save, worldId) * 10}%` }} />
+            <i style={{ width: `${(completedIn(save, worldId) / MISSIONS_PER_WORLD) * 100}%` }} />
           </span>
         </div>
         <button type="button" className="world-stage__nav world-stage__nav--prev" aria-label="Mundo anterior" disabled={!previous} onClick={() => previous && goTo(previous.id)}>

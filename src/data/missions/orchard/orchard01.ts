@@ -5,7 +5,7 @@ import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
 export const orchard01: MissionDefinition = {
   id: 'orchard-01',
-  order: 21,
+  order: 11,
   world: 'orchard',
   slot: 1,
   title: 'Só se estiver madura',

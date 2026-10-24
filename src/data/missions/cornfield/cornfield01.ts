@@ -5,7 +5,7 @@ import { UNLIMITED_RESOURCES } from '@/game/world/createInitialState'
 
 export const cornfield01: MissionDefinition = {
   id: 'cornfield-01',
-  order: 11,
+  order: 6,
   world: 'cornfield',
   slot: 1,
   title: 'Andar com repita',
