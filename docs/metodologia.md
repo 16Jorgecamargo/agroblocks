@@ -6,7 +6,7 @@ Estudantes do Ensino Médio costumam ter dificuldade em transformar a descriçã
 
 ## 2. Objetivos pedagógicos
 
-O jogo tem um treinamento e seis mundos, um por conceito, com 10 missões cada. Ao final dos seis mundos, espera-se que o estudante consiga:
+O jogo tem um treinamento e seis mundos, um por conceito, com 5 missões cada. Ao final dos seis mundos, espera-se que o estudante consiga:
 
 1. Ordenar instruções para atingir um objetivo (sequenciamento).
 2. Identificar padrões e representá-los com laços de contagem (repetição).
@@ -19,11 +19,11 @@ O jogo tem um treinamento e seis mundos, um por conceito, com 10 missões cada. 
 
 | Instrumento | Onde | Conteúdo |
 |---|---|---|
-| Prova inicial de cada mundo (forma A) | `#/avaliacao/<mundo>/pre`, antes da primeira missão do mundo | 10 itens só do conceito do mundo: 4 de montar, 3 de prever e 3 de consertar programas |
-| Prova final de cada mundo (forma B) | `#/avaliacao/<mundo>/pos`, depois da décima missão do mundo | 10 itens equivalentes, em pares com a forma A |
+| Prova inicial de cada mundo (forma A) | `#/avaliacao/<mundo>/pre`, antes da primeira missão do mundo | 5 itens de programação sobre o conceito do mundo, sem depender do jogo: 2 de montar, 2 de prever e 1 de consertar |
+| Prova final de cada mundo (forma B) | `#/avaliacao/<mundo>/pos`, depois da quinta missão do mundo | 5 itens equivalentes, em pares com a forma A |
 | Registros de jogo | automáticos | cada execução, erros, dicas, recursos, eficiência |
 
-Cada item da forma A tem um par na forma B (`pairId`) com mesma estrutura e dificuldade e cenário diferente, para reduzir o efeito de memorização. Durante as provas o aluno não recebe retorno de acerto. O mundo seguinte só abre depois da prova final do anterior, então cada conceito tem sua própria medida antes e depois da prática.
+Cada item da forma A tem um par na forma B (`pairId`) com mesma estrutura e dificuldade e cenário diferente, para reduzir o efeito de memorização. Durante as provas o aluno não recebe retorno de acerto; ao concluir, vê a pontuação, a resposta certa e a explicação de cada item. O mundo seguinte só abre depois da prova final do anterior, então cada conceito tem sua própria medida antes e depois da prática.
 
 ## 4. Indicadores coletados
 
