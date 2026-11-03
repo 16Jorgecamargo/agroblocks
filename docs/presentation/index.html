@@ -1,0 +1,1183 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AgroBlocks · Apresentação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" />
+<style>
+:root {
+  --night: #0f1a23;
+  --night-2: #16242f;
+  --night-3: #1f3241;
+  --line: rgb(255 255 255 / 0.12);
+  --text: #f3f7f1;
+  --muted: #a9b8b0;
+  --green: #3fa34d;
+  --green-deep: #183d2d;
+  --green-soft: #b9dca8;
+  --sun: #f2c14e;
+  --soil: #b9774a;
+  --sky: #5aa9e6;
+  --berry: #e0645c;
+  --violet: #8e6be8;
+  --display: 'Baloo 2', 'Inter', system-ui, sans-serif;
+  --sans: 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --quint: cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--night); color: var(--text); font-family: var(--sans); overflow: hidden; }
+
+.viewport { position: fixed; inset: 0; display: grid; place-items: center; }
+.stage { position: relative; width: 1600px; height: 900px; transform-origin: center; overflow: hidden; background: var(--night); border-radius: 18px; box-shadow: 0 30px 80px rgb(0 0 0 / 0.5); }
+
+.slide { position: absolute; inset: 0; padding: 84px 104px; visibility: hidden; display: flex; flex-direction: column; }
+.slide.is-active { visibility: visible; z-index: 2; animation: slideIn 0.9s var(--expo) both; }
+.slide.is-leaving { visibility: visible; z-index: 1; animation: slideOut 0.6s var(--quint) both; }
+.slide.is-back.is-active { animation-name: slideInBack; }
+.slide.is-back.is-leaving { animation-name: slideOutBack; }
+@keyframes slideIn { from { clip-path: inset(0 0 0 100%); transform: translateX(80px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+@keyframes slideOut { to { opacity: 0; transform: scale(0.94); filter: blur(6px); } }
+@keyframes slideInBack { from { clip-path: inset(0 100% 0 0); transform: translateX(-80px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+@keyframes slideOutBack { to { opacity: 0; transform: scale(1.04); filter: blur(6px); } }
+
+.bg-grid::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 64px 64px; mask-image: radial-gradient(ellipse at 70% 30%, #000 0%, transparent 70%); opacity: 0.5; pointer-events: none; }
+
+.kicker { font: 700 18px/1 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--sun); display: flex; align-items: center; gap: 14px; margin: 0 0 22px; }
+.kicker::before { content: ''; width: 40px; height: 3px; border-radius: 3px; background: currentColor; }
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.02; letter-spacing: -0.01em; }
+h2 { font-size: 76px; font-weight: 800; }
+h3 { font-size: 34px; font-weight: 700; }
+p { margin: 0; }
+.lead { font-size: 30px; line-height: 1.45; color: var(--muted); max-width: 1100px; }
+.lead strong { color: var(--text); }
+.hl { color: var(--sun); }
+.hl-green { color: var(--green-soft); }
+
+.slide [data-anim] { opacity: 0; }
+.slide.is-active [data-anim] { animation-duration: 0.9s; animation-timing-function: var(--expo); animation-fill-mode: both; animation-delay: calc(var(--d, 0) * 1s + 0.35s); }
+.slide.is-active [data-anim='rise'] { animation-name: rise; }
+.slide.is-active [data-anim='fade'] { animation-name: fade; }
+.slide.is-active [data-anim='pop'] { animation-name: pop; animation-timing-function: var(--spring); animation-duration: 0.7s; }
+.slide.is-active [data-anim='mask'] { animation-name: mask; animation-duration: 1.1s; }
+.slide.is-active [data-anim='blurzoom'] { animation-name: blurzoom; animation-duration: 1.4s; }
+.slide.is-active [data-anim='left'] { animation-name: fromLeft; }
+.slide.is-active [data-anim='decode'], .slide.is-active [data-anim='count'] { animation-name: fade; animation-duration: 0.2s; }
+.slide.is-active [data-anim='flip'] { animation-name: flipIn; animation-duration: 1s; }
+.slide.is-active [data-anim='drop'] { animation-name: drop; animation-timing-function: var(--spring); animation-duration: 0.8s; }
+@keyframes rise { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { 0% { opacity: 0; transform: scale(0.4); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes mask { from { opacity: 1; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
+@keyframes blurzoom { from { opacity: 0; filter: blur(24px); transform: scale(1.15); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes fromLeft { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: none; } }
+@keyframes flipIn { from { opacity: 0; transform: perspective(1200px) rotateX(-70deg); transform-origin: top; } to { opacity: 1; transform: none; } }
+@keyframes drop { from { opacity: 0; transform: translateY(-60px) scale(0.9); } to { opacity: 1; transform: none; } }
+
+.word { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.08em; }
+.word > span { display: inline-block; transform: translateY(110%); }
+.slide.is-active .word > span { animation: wordUp 0.9s var(--expo) both; animation-delay: calc(var(--d, 0) * 1s + var(--w, 0) * 0.06s + 0.35s); }
+@keyframes wordUp { to { transform: none; } }
+
+.cover { justify-content: flex-end; padding-bottom: 96px; }
+.cover-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slide.is-active .cover-bg { animation: coverIn 2.4s var(--expo) both; }
+@keyframes coverIn { from { opacity: 0; transform: scale(1.12); filter: blur(12px); } to { opacity: 1; transform: none; filter: none; } }
+.cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(15 26 35 / 0.9) 0%, rgb(15 26 35 / 0.62) 38%, rgb(15 26 35 / 0) 68%), linear-gradient(0deg, rgb(15 26 35 / 0.75) 0%, rgb(15 26 35 / 0) 45%); }
+.cover > *:not(.cover-bg) { position: relative; z-index: 1; }
+.cover-tag { display: inline-flex; margin-top: 18px; padding: 10px 22px; border-radius: 999px; background: var(--green); font: 700 26px/1 var(--display); color: #fff; box-shadow: 0 6px 0 var(--green-deep); }
+.cover-sub { margin-top: 34px; font-size: 30px; color: #dbe7df; max-width: 880px; line-height: 1.4; }
+.cover-meta { margin-top: 44px; display: flex; gap: 48px; font-size: 20px; color: var(--muted); }
+.cover-meta strong { display: block; color: var(--text); font-size: 24px; margin-top: 6px; }
+
+.split { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 72px; align-items: center; flex: 1; }
+.quote { font: 700 52px/1.15 var(--display); }
+.quote em { font-style: normal; color: var(--sun); }
+.pain { display: grid; gap: 18px; }
+.pain-item { display: grid; grid-template-columns: 64px 1fr; gap: 20px; align-items: center; padding: 22px 26px; border-radius: 20px; background: var(--night-2); border: 1px solid var(--line); font-size: 23px; line-height: 1.35; }
+.pain-item span { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; font: 800 30px/1 var(--display); color: var(--night); background: var(--c); }
+
+.statement { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.statement h2 { font-size: 88px; max-width: 1350px; }
+.statement .lead { margin-top: 36px; }
+
+.cards { display: grid; gap: 22px; margin-top: 44px; }
+.cards-3 { grid-template-columns: repeat(3, 1fr); }
+.cards-2 { grid-template-columns: repeat(2, 1fr); }
+.card { padding: 28px; border-radius: 22px; background: var(--night-2); border: 1px solid var(--line); }
+.card .num { width: 52px; height: 52px; border-radius: 16px; background: var(--c, var(--green)); color: var(--night); display: grid; place-items: center; font: 800 26px/1 var(--display); margin-bottom: 18px; }
+.card h3 { font-size: 28px; }
+.card p { margin-top: 10px; font-size: 20px; line-height: 1.42; color: var(--muted); }
+
+.section { justify-content: center; background: radial-gradient(ellipse at 80% 50%, var(--c, #1d4d34) 0%, var(--night) 60%); }
+.section-num { font: 800 300px/0.8 var(--display); color: transparent; -webkit-text-stroke: 3px rgb(255 255 255 / 0.18); position: absolute; right: 90px; bottom: 60px; }
+.section h2 { font-size: 120px; }
+.section .lead { margin-top: 28px; }
+.section-bar { width: 0; height: 8px; border-radius: 8px; background: var(--sun); margin-bottom: 40px; }
+.slide.is-active .section-bar { animation: grow 1.1s var(--expo) 0.3s both; }
+@keyframes grow { to { width: 220px; } }
+
+.timeline { position: relative; flex: 1; margin-top: 30px; }
+.timeline svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.timeline path { fill: none; stroke: var(--green); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 2400; stroke-dashoffset: 2400; }
+.slide.is-active .timeline path { animation: draw 2.4s var(--expo) 0.4s both; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.milestone { position: absolute; width: 250px; transform: translateX(-50%); text-align: center; }
+.milestone .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--sun); border: 6px solid var(--night); box-shadow: 0 0 0 3px var(--sun); margin: 0 auto 16px; }
+.milestone .date { font: 700 18px/1 var(--mono); color: var(--sun); }
+.milestone h3 { font-size: 28px; margin-top: 8px; }
+.milestone p { font-size: 18px; color: var(--muted); margin-top: 6px; line-height: 1.35; }
+
+.bullets { list-style: none; padding: 0; margin: 36px 0 0; display: grid; gap: 18px; }
+.bullets li { display: grid; grid-template-columns: 34px 1fr; gap: 16px; font-size: 25px; line-height: 1.4; color: #dbe7df; }
+.bullets li::before { content: ''; width: 18px; height: 18px; margin-top: 9px; border-radius: 6px; background: var(--green); transform: rotate(45deg); }
+.bullets b { color: var(--text); }
+
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.stat { padding: 26px; border-radius: 20px; background: var(--night-2); border: 1px solid var(--line); }
+.stat strong { display: block; font: 800 64px/1 var(--display); color: var(--sun); }
+.stat span { display: block; margin-top: 8px; font-size: 19px; color: var(--muted); }
+
+.palette { display: flex; gap: 16px; margin-top: 30px; }
+.swatch { width: 120px; }
+.swatch i { display: block; height: 120px; border-radius: 26px; background: var(--c); box-shadow: inset 0 -10px 0 rgb(0 0 0 / 0.18); }
+.swatch span { display: block; margin-top: 10px; font: 600 16px/1.3 var(--mono); color: var(--muted); }
+.type-sample { margin-top: 40px; display: grid; gap: 14px; }
+.type-sample div { display: flex; align-items: baseline; gap: 22px; }
+.type-sample small { width: 130px; font: 600 16px/1 var(--mono); color: var(--muted); }
+
+.explainer { display: grid; grid-template-columns: 2.05fr 1fr; gap: 30px; margin-top: 30px; align-items: start; }
+.explainer .shot { aspect-ratio: 16 / 9; }
+.explainer video, .shot video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.question > * { min-width: 0; }
+.explainer--demo { grid-template-columns: 2.6fr 1fr; gap: 26px; margin-top: 4px; }
+.clip-stage { position: relative; background: var(--night-2); }
+.clip-stage video { position: absolute; inset: 0; opacity: 0; transition: opacity 0.25s ease; }
+.clip-stage video.is-on { opacity: 1; z-index: 1; }
+.ex-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.ex-step { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; padding: 14px 16px; border-radius: 16px; background: var(--night-2); border: 1px solid var(--line); opacity: 0.45; transition: opacity 0.35s ease, border-color 0.35s ease, transform 0.35s var(--expo), background 0.35s ease; }
+.ex-step > b { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--line); color: var(--text); font: 800 22px/1 var(--display); transition: background 0.35s ease, color 0.35s ease; }
+.ex-step h3 { font-size: 23px; }
+.ex-step p { margin-top: 4px; font-size: 17px; line-height: 1.38; color: var(--muted); }
+.ex-step.is-done { opacity: 0.72; }
+.ex-step.is-done > b { background: var(--green); color: var(--night); }
+.ex-step.is-on { opacity: 1; border-color: #f6c212; background: rgb(246 194 18 / 0.08); transform: translateX(-6px); }
+.ex-step.is-on > b { background: #f6c212; color: var(--night); }
+.explainer--demo .ex-steps { gap: 9px; }
+.explainer--demo .ex-step { align-items: center; padding: 10px 14px; }
+.explainer--demo .ex-step h3 { font-size: 20px; line-height: 1.15; }
+.explainer--demo .url { margin-top: 16px; font-size: 19px; padding: 12px 16px; }
+.probs { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 22px; margin-top: 34px; align-items: start; }
+.prob-col { padding: 24px 24px 18px; border-radius: 22px; background: var(--night-2); border: 1px solid var(--line); border-top: 6px solid var(--c); }
+.prob-col h3 { font-size: 27px; color: var(--c); }
+.prob-col ul { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 12px; }
+.prob-col li { font-size: 17px; line-height: 1.38; color: var(--muted); padding-top: 12px; border-top: 1px solid var(--line); }
+.prob-col li:first-child { padding-top: 0; border-top: 0; }
+.prob-col li strong { display: block; font-size: 19px; color: var(--text); }
+.prob-col li em { font-style: normal; color: var(--c); font-weight: 700; }
+.worlds { display: grid; grid-template-columns: 1fr 400px; grid-template-rows: 1fr auto; gap: 20px 24px; margin-top: 26px; flex: 1; min-height: 0; }
+.world-stage { position: relative; border-radius: 24px; overflow: hidden; background: var(--night-2); border: 1px solid var(--line); box-shadow: 0 30px 60px rgb(0 0 0 / 0.45); }
+.world-stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; opacity: 0; transform: scale(1.12); filter: blur(14px) saturate(0.6); clip-path: inset(0 0 0 100% round 24px); transition: opacity 0.7s ease, transform 1.1s var(--expo), filter 0.9s ease, clip-path 0.9s var(--expo); }
+.world-stage video.is-on { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0 round 24px); z-index: 1; }
+.world-stage video.is-out { opacity: 0; transform: scale(0.94); filter: blur(10px); clip-path: inset(0 0 0 0 round 24px); }
+.world-stage::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(0deg, rgb(15 26 35 / 0.55) 0%, rgb(15 26 35 / 0) 30%); }
+.world-badge { position: absolute; left: 22px; bottom: 20px; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 10px; border-radius: 999px; background: rgb(15 26 35 / 0.82); backdrop-filter: blur(8px); font: 700 20px/1 var(--display); }
+.world-badge b { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--wc); color: var(--night); font-size: 22px; transition: background 0.5s ease; }
+.world-info { position: relative; }
+.world-card { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 30px 30px 28px; border-radius: 24px; background: var(--night-2); border: 1px solid var(--line); border-top: 8px solid var(--c); opacity: 0; pointer-events: none; transform: translateX(30px); transition: opacity 0.4s ease, transform 0.6s var(--expo); }
+.world-card.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.world-card > * { opacity: 0; transform: translateY(26px); }
+.world-card.is-on > * { animation: wordUp 0.8s var(--expo) both, fadeIn 0.6s ease both; }
+.world-card.is-on > *:nth-child(2) { animation-delay: 0.08s; }
+.world-card.is-on > *:nth-child(3) { animation-delay: 0.16s; }
+.world-card.is-on > *:nth-child(4) { animation-delay: 0.24s; }
+.world-card.is-on > *:nth-child(5) { animation-delay: 0.32s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.world-card .tag { font: 700 15px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c); }
+.world-card h3 { margin-top: 12px; font-size: 46px; line-height: 1.05; }
+.world-card .concept-chip { align-self: flex-start; margin-top: 14px; padding: 8px 16px; border-radius: 999px; background: var(--c); color: var(--night); font: 700 19px/1.1 var(--display); }
+.world-card h4 { margin-top: auto; font: 800 30px/1.1 var(--mono); color: var(--c); }
+.world-card p { margin-top: 12px; font-size: 21px; line-height: 1.45; color: var(--text); }
+.world-strip { grid-column: 1 / -1; position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.world-thumb { position: relative; height: 104px; border-radius: 16px; overflow: hidden; border: 2px solid transparent; cursor: pointer; background: var(--night-2); opacity: 0.55; transform: translateY(0); transition: opacity 0.4s ease, transform 0.5s var(--spring), border-color 0.4s ease; }
+.world-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s var(--expo); }
+.world-thumb span { position: absolute; left: 10px; bottom: 9px; padding: 5px 10px; border-radius: 9px; background: rgb(15 26 35 / 0.85); font: 700 16px/1 var(--display); white-space: nowrap; }
+.world-thumb span i { font-style: normal; color: var(--c); margin-right: 6px; }
+.world-thumb.is-on { opacity: 1; transform: translateY(-8px); border-color: var(--c); }
+.world-thumb.is-on img { transform: scale(1.08); }
+.world-thumb.is-done { opacity: 0.8; }
+.world-marker { position: absolute; left: 0; bottom: -12px; height: 5px; border-radius: 5px; background: var(--wc, var(--green)); width: calc((100% - 70px) / 6); transform: translateX(calc(var(--i, 0) * (100% + 14px))); transition: transform 0.7s var(--spring), background 0.5s ease; }
+.flip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 40px; }
+.flip { height: 250px; perspective: 1400px; cursor: pointer; }
+.flip-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.9s var(--spring); }
+.flip.is-flipped .flip-inner { transform: rotateY(180deg); }
+.flip-face { position: absolute; inset: 0; border-radius: 22px; padding: 28px; backface-visibility: hidden; display: flex; flex-direction: column; border: 1px solid var(--line); }
+.flip-front { background: var(--night-2); }
+.flip-back { background: var(--c, var(--green-deep)); transform: rotateY(180deg); color: #10221a; }
+.flip-front .tag { font: 700 15px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c); }
+.flip-front h3 { font-size: 34px; margin-top: auto; }
+.flip-front p { margin-top: 8px; font-size: 19px; color: var(--muted); }
+.flip-back h3 { font-size: 26px; }
+.flip-back p { margin-top: 10px; font-size: 19px; line-height: 1.42; }
+.flip-hint { margin-top: 18px; font-size: 17px; color: var(--muted); }
+
+.rhythm { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-top: 60px; position: relative; }
+.rhythm::before { content: ''; position: absolute; left: 6%; right: 6%; top: 68px; height: 4px; border-radius: 4px; background: var(--night-3); }
+.step { position: relative; text-align: center; }
+.hex { width: 136px; height: 150px; margin: 0 auto; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: var(--c); display: grid; place-items: center; font: 800 54px/1 var(--display); color: var(--night); }
+.step h3 { font-size: 30px; margin-top: 22px; }
+.step p { margin-top: 8px; font-size: 19px; color: var(--muted); line-height: 1.38; }
+
+.layers { display: grid; gap: 14px; margin-top: 10px; }
+.layer { display: grid; grid-template-columns: 300px 1fr; align-items: center; gap: 26px; padding: 20px 28px; border-radius: 18px; background: var(--night-2); border-left: 8px solid var(--c); }
+.layer h3 { font-size: 28px; }
+.layer p { font-size: 20px; color: var(--muted); line-height: 1.38; }
+.layer code { font: 600 17px/1 var(--mono); color: var(--green-soft); }
+
+.code { margin: 0; padding: 30px 34px; border-radius: 22px; background: #0a131a; border: 1px solid var(--line); font: 500 21px/1.6 var(--mono); color: #cfe3d6; white-space: pre; min-height: 410px; }
+.code .k { color: var(--violet); }
+.code .s { color: var(--sun); }
+.code .c { color: #6f8a7c; }
+.code .f { color: var(--sky); }
+.caret::after { content: '▍'; color: var(--green); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.pipeline { display: flex; align-items: center; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
+.pipe { padding: 14px 20px; border-radius: 14px; background: var(--night-2); border: 1px solid var(--line); font: 700 20px/1 var(--display); }
+.pipe-arrow { color: var(--sun); font-size: 26px; }
+
+.tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 36px; }
+.tool { padding: 22px 24px; border-radius: 20px; background: var(--night-2); border: 1px solid var(--line); display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: center; }
+.tool i { width: 56px; height: 56px; border-radius: 16px; background: var(--c); display: grid; place-items: center; font: 800 22px/1 var(--display); color: var(--night); font-style: normal; }
+.tool h3 { font-size: 25px; }
+.tool p { font-size: 16px; color: var(--muted); margin-top: 4px; line-height: 1.3; }
+
+.compare { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: 30px; font-size: 22px; }
+.compare th { text-align: left; font: 700 17px/1 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0 22px 6px; }
+.compare td { padding: 20px 22px; background: var(--night-2); }
+.compare td:first-child { border-radius: 16px 0 0 16px; font: 700 26px/1 var(--display); }
+.compare td:last-child { border-radius: 0 16px 16px 0; }
+.compare tr.chosen td { background: var(--green-deep); }
+.yes { color: var(--green-soft); font-weight: 700; }
+.no { color: #f1a39d; }
+
+.shot { border-radius: 20px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 60px rgb(0 0 0 / 0.45); }
+.shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left top; }
+
+.chart { display: grid; grid-template-columns: repeat(6, 1fr); gap: 26px; align-items: end; height: 330px; margin-top: 30px; padding: 0 10px; border-bottom: 2px solid var(--line); }
+.bars { display: flex; gap: 8px; align-items: end; height: 100%; justify-content: center; }
+.bar { width: 40px; border-radius: 10px 10px 0 0; background: var(--c); height: var(--h); transform-origin: bottom; transform: scaleY(0); }
+.slide.is-active .bar { animation: barUp 1.2s var(--expo) both; animation-delay: calc(var(--d) * 1s + 0.6s); }
+@keyframes barUp { to { transform: scaleY(1); } }
+.chart-labels { display: grid; grid-template-columns: repeat(6, 1fr); gap: 26px; padding: 12px 10px 0; text-align: center; font: 700 19px/1.2 var(--display); color: var(--muted); }
+.legend { display: flex; gap: 24px; font-size: 18px; color: var(--muted); margin-top: 14px; }
+.legend span::before { content: ''; display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 8px; background: var(--c); vertical-align: -1px; }
+
+.url { display: inline-flex; align-items: center; gap: 12px; margin-top: 26px; padding: 14px 22px; border-radius: 14px; background: #0a131a; border: 1px dashed var(--green); font: 700 22px/1 var(--mono); color: var(--green-soft); }
+
+.gallery { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 16px; flex: 1; margin-top: 30px; }
+.gallery .shot { position: relative; }
+.gallery .shot span { position: absolute; left: 12px; bottom: 12px; padding: 8px 12px; border-radius: 10px; background: rgb(15 26 35 / 0.85); font: 700 17px/1 var(--display); }
+.gallery .wide { grid-column: span 2; grid-row: span 2; }
+
+.end { justify-content: center; align-items: center; text-align: center; }
+.end h2 { font-size: 150px; }
+.end .lead { margin: 30px auto 0; }
+.float { animation: float 4s ease-in-out infinite; }
+@keyframes float { 50% { transform: translateY(-14px); } }
+
+.hud { position: fixed; left: 0; right: 0; bottom: 0; height: 5px; background: rgb(255 255 255 / 0.06); z-index: 10; }
+.hud i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--green), var(--sun)); transition: width 0.7s var(--expo); }
+.counter { position: fixed; right: 22px; bottom: 16px; font: 700 15px/1 var(--mono); color: var(--muted); z-index: 10; }
+.help { position: fixed; left: 22px; bottom: 16px; font: 500 14px/1 var(--sans); color: rgb(255 255 255 / 0.35); z-index: 10; }
+.notes { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); width: min(1100px, 92vw); max-height: 34vh; overflow: auto; padding: 22px 26px; border-radius: 18px; background: rgb(10 19 26 / 0.96); border: 1px solid var(--line); font-size: 19px; line-height: 1.55; color: #dbe7df; z-index: 20; display: none; }
+.notes.is-open { display: block; }
+.notes b { color: var(--sun); display: block; margin-bottom: 6px; font: 700 14px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; }
+aside[data-notes] { display: none; }
+.cover-logo { display: block; width: 780px; margin-left: -18px; filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.55)); }
+.inst { display: flex; align-items: center; gap: 22px; }
+.inst img { height: 64px; width: auto; }
+.inst span { padding-left: 22px; border-left: 2px solid rgb(255 255 255 / 0.35); font-size: 20px; font-weight: 500; line-height: 1.3; text-align: left; color: #e8efe9; letter-spacing: 0.02em; }
+.inst span b { display: block; font-weight: 800; color: #fff; }
+.cover > .inst { position: absolute; top: 56px; left: 96px; z-index: 2; }
+.end .inst { justify-content: center; margin-top: 56px; }
+.slide:not(.cover):not(.end)::after { content: ''; position: absolute; right: 56px; top: 38px; width: 150px; height: 52px; background: url('assets/logo.webp') right center / contain no-repeat; opacity: 0.92; pointer-events: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { padding: 10px 16px; border-radius: 999px; background: var(--night-3); font: 600 18px/1 var(--sans); color: #dbe7df; border: 1px solid var(--line); }
+.chip.is-new { background: var(--c, var(--green)); color: var(--night); border-color: transparent; font-weight: 700; }
+.world { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 48px; flex: 1; margin-top: 8px; min-height: 0; }
+.world .shot { height: 600px; }
+.world-head { display: flex; align-items: center; gap: 18px; }
+.world-head .hex { width: 84px; height: 94px; font-size: 34px; margin: 0; flex: none; }
+.world-head h2 { font-size: 70px; }
+.world-head .concept { display: block; font: 700 22px/1 var(--display); color: var(--c); margin-top: 6px; }
+.mission-list { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 10px; }
+.mission-list li { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; padding: 12px 14px; border-radius: 14px; background: var(--night-2); border: 1px solid var(--line); }
+.mission-list b { width: 44px; height: 48px; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: var(--c); color: var(--night); display: grid; place-items: center; font: 800 20px/1 var(--display); }
+.mission-list strong { display: block; font: 700 21px/1.15 var(--display); }
+.mission-list small { display: block; margin-top: 3px; font-size: 16px; color: var(--muted); line-height: 1.3; }
+.mission-list em { font-style: normal; font: 700 13px/1 var(--sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--c); margin-left: 8px; }
+.world-blocks { margin-top: 20px; }
+.world-blocks p { font: 700 15px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
+.journey { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; margin-top: 70px; position: relative; }
+.journey-step { position: relative; text-align: center; padding: 0 8px; }
+.journey-step .node { width: 110px; height: 110px; margin: 0 auto; border-radius: 30px; background: var(--c); display: grid; place-items: center; font: 800 44px/1 var(--display); color: var(--night); box-shadow: 0 10px 0 rgb(0 0 0 / 0.25); }
+.journey-step h3 { font-size: 25px; margin-top: 22px; }
+.journey-step p { margin-top: 8px; font-size: 17px; color: var(--muted); line-height: 1.35; }
+.journey-step:not(:last-child)::after { content: ''; position: absolute; top: 55px; left: calc(50% + 62px); width: calc(100% - 124px); height: 4px; border-radius: 4px; background: var(--sun); transform-origin: left; transform: scaleX(0); }
+.slide.is-active .journey-step:not(:last-child)::after { animation: barUpX 0.6s var(--expo) both; animation-delay: calc(var(--d) * 1s + 0.6s); }
+@keyframes barUpX { to { transform: scaleX(1); } }
+.loop-note { margin-top: 60px; display: flex; gap: 22px; }
+.loop-note div { flex: 1; padding: 22px 26px; border-radius: 18px; background: var(--night-2); border: 1px solid var(--line); font-size: 21px; line-height: 1.4; color: #dbe7df; }
+.loop-note b { color: var(--sun); }
+
+.stairs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; align-items: end; margin-top: 40px; height: 560px; }
+.stair { border-radius: 18px 18px 0 0; background: var(--night-2); border: 1px solid var(--line); border-bottom: none; padding: 18px 16px; display: flex; flex-direction: column; gap: 8px; height: var(--h); transform-origin: bottom; }
+.slide.is-active .stair { animation: barUp 1s var(--expo) both; animation-delay: calc(var(--d) * 1s + 0.4s); transform: scaleY(0); }
+.stair h3 { font-size: 26px; color: var(--c); }
+.stair small { font: 700 14px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.stair span { font-size: 16px; line-height: 1.3; padding: 7px 10px; border-radius: 10px; background: var(--night-3); }
+.stair span.is-new { background: var(--c); color: var(--night); font-weight: 700; }
+
+.pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
+.pillar { padding: 28px; border-radius: 22px; background: var(--night-2); border: 1px solid var(--line); border-top: 8px solid var(--c); }
+.pillar h3 { font-size: 30px; }
+.pillar p { margin-top: 12px; font-size: 19px; line-height: 1.45; color: var(--muted); }
+.pillar small { display: block; margin-top: 16px; font: 700 15px/1.3 var(--sans); color: var(--c); }
+.principles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 26px; }
+.principle { padding: 18px; border-radius: 16px; background: var(--night-3); font-size: 17px; line-height: 1.35; color: #dbe7df; }
+.principle b { display: block; font: 700 20px/1.1 var(--display); color: var(--text); margin-bottom: 6px; }
+
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+.fact { padding: 26px; border-radius: 20px; background: var(--night-2); border: 1px solid var(--line); }
+.fact small { font: 700 15px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sun); }
+.fact p { margin-top: 12px; font-size: 22px; line-height: 1.4; }
+
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; flex: 1; }
+.trio figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.trio .shot { height: 360px; }
+.trio .shot.right img { object-position: right top; }
+.trio figcaption h3 { font-size: 28px; }
+.trio figcaption p { margin-top: 6px; font-size: 18px; color: var(--muted); line-height: 1.4; }
+
+.rules { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; flex: 1; }
+.cost { display: grid; gap: 12px; }
+.cost div { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 16px 22px; border-radius: 14px; background: var(--night-2); font-size: 22px; }
+.cost b { font: 800 26px/1 var(--display); color: var(--sun); }
+.formula { padding: 28px; border-radius: 22px; background: #0a131a; border: 1px solid var(--line); }
+.formula code { display: block; font: 700 24px/1.5 var(--mono); color: var(--green-soft); }
+.star-rows { margin-top: 22px; display: grid; gap: 12px; }
+.star-rows div { display: flex; align-items: center; gap: 16px; font-size: 21px; }
+.star-rows i { font-style: normal; font-size: 30px; color: var(--sun); letter-spacing: 2px; min-width: 120px; }
+.star-rows i span { color: var(--night-3); }
+
+.question { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 44px; margin-top: 24px; flex: 1; }
+.qcard { padding: 30px; border-radius: 22px; background: #f3f7f1; color: #17231c; }
+.qcard h3 { font-size: 26px; color: #17231c; }
+.qcard pre { margin: 18px 0; padding: 18px 20px; border-radius: 14px; background: #e3ecdd; font: 600 21px/1.5 var(--mono); }
+.qopt { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 12px; border: 2px solid #c9d6c4; margin-top: 10px; font-size: 21px; }
+.qopt.is-right { border-color: #2b7a45; background: #dcefd8; font-weight: 700; }
+.qopt i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid currentColor; }
+.qopt.is-right i { background: #2b7a45; border-color: #2b7a45; }
+.qwhy { margin-top: 18px; padding: 14px 16px; border-left: 6px solid #2b7a45; background: #e9f2e5; border-radius: 8px; font-size: 19px; line-height: 1.4; color: #3c5245; }
+.skill-split { display: flex; gap: 12px; margin-top: 24px; }
+.skill-split div { flex: var(--n); padding: 16px; border-radius: 14px; background: var(--c); color: var(--night); font: 700 20px/1.2 var(--display); }
+
+.reqs { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 26px; }
+.reqs ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.reqs li { display: grid; grid-template-columns: 150px 1fr; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--night-2); font-size: 17px; line-height: 1.3; }
+.reqs li b { font: 700 15px/1.3 var(--mono); color: var(--c); }
+.reqs h3 { font-size: 26px; margin-bottom: 12px; color: var(--c); }
+
+.pyramid { display: grid; gap: 12px; justify-items: center; margin-top: 30px; }
+.tier { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; padding: 22px 30px; border-radius: 18px; background: var(--c); color: var(--night); width: var(--w); }
+.tier strong { font: 800 46px/1 var(--display); }
+.tier h3 { font-size: 26px; color: var(--night); }
+.tier p { font-size: 18px; line-height: 1.35; margin-top: 4px; }
+
+.risks { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: 24px; font-size: 20px; }
+.risks td { padding: 16px 20px; background: var(--night-2); line-height: 1.35; }
+.risks td:first-child { border-radius: 14px 0 0 14px; font-weight: 700; width: 34%; }
+.risks td:last-child { border-radius: 0 14px 14px 0; color: #dbe7df; }
+.level { display: inline-block; padding: 6px 12px; border-radius: 999px; font: 700 15px/1 var(--sans); color: var(--night); background: var(--c); white-space: nowrap; }
+
+.refs { list-style: none; padding: 0; margin: 30px 0 0; display: grid; gap: 14px; font-size: 19px; line-height: 1.45; color: #dbe7df; }
+.refs li { padding-left: 22px; border-left: 4px solid var(--green); }
+
+
+@media (prefers-reduced-motion: reduce) {
+  .slide.is-active, .slide.is-leaving, .slide.is-active [data-anim], .slide.is-active .word > span, .slide.is-active .bar, .slide.is-active .timeline path, .slide.is-active .cover-bg, .slide.is-active .section-bar, .float { animation-duration: 0.01s !important; animation-delay: 0s !important; }
+  .flip-inner { transition-duration: 0.01s; }
+}
+</style>
+</head>
+<body>
+<div class="viewport">
+<main class="stage" id="stage">
+
+<section class="slide cover">
+  <video class="cover-bg" poster="assets/cover-poster.jpg" autoplay muted loop playsinline aria-hidden="true"><source src="assets/cover-loop.webm" type="video/webm" /><source src="assets/cover-loop.mp4" type="video/mp4" /></video>
+  <div class="inst" data-anim="fade" style="--d:0.2"><img src="assets/utfpr-white.svg" alt="UTFPR – Universidade Tecnológica Federal do Paraná" /><span><b>Câmpus Santa Helena</b>Paraná</span></div>
+  <div class="float"><img class="cover-logo" src="assets/logo.webp" alt="AgroBlocks" data-anim="drop" style="--d:0.1" /></div>
+  <div><span class="cover-tag" data-anim="pop" style="--d:0.6">Automatize. Programe. Cultive.</span></div>
+  <p class="cover-sub" data-anim="rise" style="--d:0.8">Jogo educativo de automação agrícola e programação visual para o Ensino Médio</p>
+  <div class="cover-meta" data-anim="rise" style="--d:1.1">
+    <div>Autor<strong>Jorge Daniel Ristow de Camargo</strong></div>
+    <div>Disciplina<strong>Informática na Educação · UTFPR Santa Helena</strong></div>
+    <div>Orientação<strong>Prof. Djonatham C. F. Christ</strong></div>
+  </div>
+  <aside data-notes>Apresentar o projeto: AgroBlocks é um jogo de navegador em que o aluno programa um robô agrícola com blocos. O lema resume o percurso: automatizar tarefas da fazenda, programar o robô e ver a horta crescer. Dizer que a apresentação segue os tópicos pedidos: objetivos, etapas, ferramentas, problemas e soluções e, no fim, demonstração ao vivo.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Justificativa</p>
+  <div class="split">
+    <p class="quote" data-anim="mask">Alunos aprendem a <em>arrastar blocos</em>, mas não a <em>pensar o algoritmo</em>.</p>
+    <div class="pain">
+      <div class="pain-item" data-anim="rise" style="--d:0.5; --c:var(--sun)"><span>1</span><p>Dificuldade em transformar um problema em uma <b>sequência de instruções</b>.</p></div>
+      <div class="pain-item" data-anim="rise" style="--d:0.65; --c:var(--sky)"><span>2</span><p>Pouco reconhecimento de <b>padrões que pedem repetição</b> ou uma <b>condição</b>.</p></div>
+      <div class="pain-item" data-anim="rise" style="--d:0.8; --c:var(--berry)"><span>3</span><p>Ambientes genéricos sem <b>consequências visíveis</b> nem <b>recursos limitados</b>.</p></div>
+    </div>
+  </div>
+  <aside data-notes>Explicar a lacuna: plataformas de blocos ensinam a sintaxe visual, mas o aluno nem sempre entende por que a ordem importa ou quando usar um laço. Na fazenda cada instrução tem efeito visível: o robô bate na pedra, a semente acaba, a água é desperdiçada. Isso dá sentido aos conceitos e aproxima a computação de uma realidade conhecida do campo.</aside>
+</section>
+
+<section class="slide bg-grid">
+  <div class="statement">
+    <p class="kicker" data-anim="left">Objetivo geral</p>
+    <h2 data-anim="words">Ensinar programação a quem cultiva: o aluno programa um robô agrícola com blocos numa fazenda 3D.</h2>
+    <p class="lead" data-anim="rise" style="--d:1.2">E medir se ele aprendeu, <strong>antes e depois de cada conceito</strong>, com provas próprias de programação.</p>
+  </div>
+  <aside data-notes>Ler o objetivo geral: desenvolver um jogo digital educativo em que estudantes do Ensino Médio aprendam conceitos de programação programando um robô agrícola, com medida de aprendizagem antes e depois de cada conceito.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Objetivos específicos</p>
+  <h2 data-anim="words">Seis metas concretas</h2>
+  <div class="cards cards-3">
+    <div class="card" data-anim="rise" style="--d:0.4; --c:var(--green)"><div class="num">1</div><h3>Seis conceitos</h3><p>Sequência, repetição, condições, sensores, variáveis e eficiência, em ordem.</p></div>
+    <div class="card" data-anim="rise" style="--d:0.5; --c:var(--sun)"><div class="num">2</div><h3>Blocos em português</h3><p>Editor Blockly que libera blocos novos a cada mundo.</p></div>
+    <div class="card" data-anim="rise" style="--d:0.6; --c:var(--sky)"><div class="num">3</div><h3>Retorno educativo</h3><p>Erros explicados, dicas graduais e pseudocódigo do programa.</p></div>
+    <div class="card" data-anim="rise" style="--d:0.7; --c:var(--violet)"><div class="num">4</div><h3>Medir aprendizagem</h3><p>Prova inicial e final de 5 questões por mundo, com feedback.</p></div>
+    <div class="card" data-anim="rise" style="--d:0.8; --c:var(--soil)"><div class="num">5</div><h3>Eficiência</h3><p>Correção separada de eficiência: estrelas para menos blocos e recursos.</p></div>
+    <div class="card" data-anim="rise" style="--d:0.9; --c:var(--berry)"><div class="num">6</div><h3>Painel do professor</h3><p>Progresso de cada aluno, gráficos por mundo e exportação CSV.</p></div>
+  </div>
+  <aside data-notes>Passar pelos seis objetivos específicos. Destacar que correção e eficiência são separadas: uma solução correta nunca é reprovada por usar mais blocos, ela só ganha menos estrelas. E que o professor acompanha tudo pelo painel.</aside>
+</section>
+
+<section class="slide bg-grid">
+  <p class="kicker" data-anim="left">Fundamentação pedagógica</p>
+  <h2 data-anim="words">Os quatro pilares do pensamento computacional</h2>
+  <div class="pillars">
+    <div class="pillar" data-anim="rise" style="--d:0.4; --c:#8fe07a"><h3>Decomposição</h3><p>Dividir "cultivar a horta" em preparar, plantar, regar e colher, e o caminho em passos.</p><small>Horta · Fazenda completa</small></div>
+    <div class="pillar" data-anim="rise" style="--d:0.5; --c:#f2c14e"><h3>Padrões</h3><p>Perceber que a mesma sequência se repete em cada canteiro e usar um laço.</p><small>Milharal · Estufa</small></div>
+    <div class="pillar" data-anim="rise" style="--d:0.6; --c:#c3adf7"><h3>Abstração</h3><p>Procedimentos e variáveis que escondem detalhes e dão nome a ideias.</p><small>Celeiro · Fazenda completa</small></div>
+    <div class="pillar" data-anim="rise" style="--d:0.7; --c:#8fd0f5"><h3>Algoritmos</h3><p>Instruções na ordem certa, com decisões e repetições com condição.</p><small>Todos os mundos</small></div>
+  </div>
+  <div class="principles">
+    <div class="principle" data-anim="pop" style="--d:0.9"><b>Construcionismo</b>O aluno aprende construindo e testando o próprio programa (Papert).</div>
+    <div class="principle" data-anim="pop" style="--d:1.0"><b>Jogo</b>Objetivos claros, desafio crescente e retorno imediato.</div>
+    <div class="principle" data-anim="pop" style="--d:1.1"><b>Erro explicado</b>O erro para a execução, é explicado e não pune.</div>
+    <div class="principle" data-anim="pop" style="--d:1.2"><b>Andaimes</b>Programa parcial na 1ª missão e dicas aos poucos.</div>
+    <div class="principle" data-anim="pop" style="--d:1.3"><b>Depuração</b>A 4ª missão de cada mundo traz um programa com erro.</div>
+  </div>
+  <aside data-notes>A base pedagógica: os quatro pilares do pensamento computacional, de Jeannette Wing, presentes no eixo de Pensamento Computacional da BNCC Computação. Cada mundo exercita pilares diferentes. Os princípios de design vêm do construcionismo de Papert e da aprendizagem baseada em jogos: o erro faz parte do processo e é explicado, há andaimes no começo de cada mundo e uma missão dedicada a consertar programas.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Etapa 1 · Planejamento</p>
+  <div class="split" style="grid-template-columns: 1fr 1fr;">
+    <div>
+      <h2 data-anim="words" style="font-size:66px">Antes da primeira linha de código</h2>
+      <ul class="bullets">
+        <li data-anim="rise" style="--d:0.5"><span><b>Especificação</b> do jogo e referência visual da fazenda.</span></li>
+        <li data-anim="rise" style="--d:0.6"><span><b>Plano em fases</b>, cada fase em seu próprio arquivo.</span></li>
+        <li data-anim="rise" style="--d:0.7"><span><b>Metodologia</b> de avaliação: prova inicial e final por conceito.</span></li>
+        <li data-anim="rise" style="--d:0.8"><span><b>Requisitos</b> e casos de uso no Termo de Abertura.</span></li>
+        <li data-anim="rise" style="--d:0.9"><span><b>15 registros de decisão</b> (ADR) explicando cada escolha técnica.</span></li>
+      </ul>
+    </div>
+    <div class="stat-row" style="grid-template-columns: 1fr 1fr;">
+      <div class="stat" data-anim="pop" style="--d:0.6"><strong data-count="9">9</strong><span>requisitos funcionais</span></div>
+      <div class="stat" data-anim="pop" style="--d:0.7"><strong data-count="4">4</strong><span>requisitos não funcionais</span></div>
+      <div class="stat" data-anim="pop" style="--d:0.8"><strong data-count="4">4</strong><span>casos de uso</span></div>
+      <div class="stat" data-anim="pop" style="--d:0.9"><strong data-count="15">15</strong><span>decisões registradas</span></div>
+    </div>
+  </div>
+  <aside data-notes>O planejamento veio primeiro: especificação, referência visual, plano dividido por fases e a metodologia de avaliação. Os requisitos estão no Termo de Abertura: nove funcionais, quatro não funcionais e quatro casos de uso. Cada decisão técnica importante, como não usar eval ou usar HashRouter para hospedagem estática, ficou registrada em um ADR.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Etapa 2 · Design</p>
+  <div class="split" style="grid-template-columns: 0.9fr 1.1fr;">
+    <div>
+      <h2 data-anim="words" style="font-size:66px">Identidade low-poly, quente e legível</h2>
+      <div class="palette">
+        <div class="swatch" data-anim="pop" style="--d:0.5; --c:#3fa34d"><i></i><span>#3fa34d<br>plantio</span></div>
+        <div class="swatch" data-anim="pop" style="--d:0.6; --c:#f2c14e"><i></i><span>#f2c14e<br>sol</span></div>
+        <div class="swatch" data-anim="pop" style="--d:0.7; --c:#b9774a"><i></i><span>#b9774a<br>solo</span></div>
+        <div class="swatch" data-anim="pop" style="--d:0.8; --c:#5aa9e6"><i></i><span>#5aa9e6<br>água</span></div>
+      </div>
+      <div class="type-sample">
+        <div data-anim="rise" style="--d:0.9"><small>Baloo 2</small><span style="font:800 46px/1 var(--display)">Missão concluída!</span></div>
+        <div data-anim="rise" style="--d:1"><small>Inter</small><span style="font:500 26px/1.2 var(--sans)">Prepare o solo e plante uma semente.</span></div>
+      </div>
+    </div>
+    <div class="shot" data-anim="blurzoom" style="--d:0.4; height: 560px;"><img src="assets/map.png" alt="Mapa do mundo Horta com trilha de missões" /></div>
+  </div>
+  <aside data-notes>No design, a escolha foi um 3D low-poly: leve para computadores de escola e com formas fáceis de ler. A paleta vem da fazenda: verde do plantio, amarelo do sol, marrom do solo e azul da água. Baloo 2 nos títulos dá o tom de jogo e Inter garante leitura no texto. Cada mundo tem paisagem própria, como o mapa da Horta à direita.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Design · Mundos</p>
+  <h2 data-anim="words">Um mundo para cada conceito</h2>
+  <div class="worlds" data-worlds data-colors="#8fe07a,#f2c14e,#f1a39d,#8fd0f5,#d9a37c,#c3adf7" data-names="Horta|Milharal|Pomar|Estufa|Celeiro|Fazenda completa" style="--wc:#8fe07a">
+    <div class="world-stage" data-anim="blurzoom" style="--d:0.3">
+      <video data-world="0" muted loop playsinline preload="auto" poster="assets/world-garden-thumb.jpg" class="is-on"><source src="assets/world-garden.webm" type="video/webm" /><source src="assets/world-garden.mp4" type="video/mp4" /></video>
+      <video data-world="1" muted loop playsinline preload="auto" poster="assets/world-cornfield-thumb.jpg"><source src="assets/world-cornfield.webm" type="video/webm" /><source src="assets/world-cornfield.mp4" type="video/mp4" /></video>
+      <video data-world="2" muted loop playsinline preload="auto" poster="assets/world-orchard-thumb.jpg"><source src="assets/world-orchard.webm" type="video/webm" /><source src="assets/world-orchard.mp4" type="video/mp4" /></video>
+      <video data-world="3" muted loop playsinline preload="auto" poster="assets/world-greenhouse-thumb.jpg"><source src="assets/world-greenhouse.webm" type="video/webm" /><source src="assets/world-greenhouse.mp4" type="video/mp4" /></video>
+      <video data-world="4" muted loop playsinline preload="auto" poster="assets/world-barnyard-thumb.jpg"><source src="assets/world-barnyard.webm" type="video/webm" /><source src="assets/world-barnyard.mp4" type="video/mp4" /></video>
+      <video data-world="5" muted loop playsinline preload="auto" poster="assets/world-homestead-thumb.jpg"><source src="assets/world-homestead.webm" type="video/webm" /><source src="assets/world-homestead.mp4" type="video/mp4" /></video>
+      <div class="world-badge"><b>1</b><span>Horta</span></div>
+    </div>
+    <div class="world-info" data-anim="left" style="--d:0.45">
+      <div class="world-card is-on" style="--c:#8fe07a"><span class="tag">Mundo 1 de 6</span><h3>Horta</h3><span class="concept-chip">Sequência</span><h4>Ordem importa</h4><p>Levar o robô até a planta, preparar, plantar e colher, na ordem certa.</p></div>
+      <div class="world-card" style="--c:#f2c14e"><span class="tag">Mundo 2 de 6</span><h3>Milharal</h3><span class="concept-chip">Repetição</span><h4>repita N vezes</h4><p>Cuidar de uma fileira inteira com um laço em vez de copiar blocos.</p></div>
+      <div class="world-card" style="--c:#f1a39d"><span class="tag">Mundo 3 de 6</span><h3>Pomar</h3><span class="concept-chip">Condições</span><h4>se / senão</h4><p>Regar só o solo seco e colher só a fruta madura.</p></div>
+      <div class="world-card" style="--c:#8fd0f5"><span class="tag">Mundo 4 de 6</span><h3>Estufa</h3><span class="concept-chip">Sensores e laço enquanto</span><h4>enquanto…</h4><p>Andar até a parede sem saber o tamanho da fileira.</p></div>
+      <div class="world-card" style="--c:#d9a37c"><span class="tag">Mundo 5 de 6</span><h3>Celeiro</h3><span class="concept-chip">Variáveis</span><h4>guardar números</h4><p>Controlar água, sementes e passos com recursos limitados.</p></div>
+      <div class="world-card" style="--c:#c3adf7"><span class="tag">Mundo 6 de 6</span><h3>Fazenda completa</h3><span class="concept-chip">Eficiência e procedimentos</span><h4>menos é mais</h4><p>Criar procedimentos, consertar programas e gastar menos energia.</p></div>
+    </div>
+    <div class="world-strip" data-anim="rise" style="--d:0.6">
+      <button type="button" class="world-thumb is-on" data-world-thumb="0" style="--c:#8fe07a"><img src="assets/world-garden-thumb.jpg" alt="" /><span><i>1</i>Horta</span></button>
+      <button type="button" class="world-thumb" data-world-thumb="1" style="--c:#f2c14e"><img src="assets/world-cornfield-thumb.jpg" alt="" /><span><i>2</i>Milharal</span></button>
+      <button type="button" class="world-thumb" data-world-thumb="2" style="--c:#f1a39d"><img src="assets/world-orchard-thumb.jpg" alt="" /><span><i>3</i>Pomar</span></button>
+      <button type="button" class="world-thumb" data-world-thumb="3" style="--c:#8fd0f5"><img src="assets/world-greenhouse-thumb.jpg" alt="" /><span><i>4</i>Estufa</span></button>
+      <button type="button" class="world-thumb" data-world-thumb="4" style="--c:#d9a37c"><img src="assets/world-barnyard-thumb.jpg" alt="" /><span><i>5</i>Celeiro</span></button>
+      <button type="button" class="world-thumb" data-world-thumb="5" style="--c:#c3adf7"><img src="assets/world-homestead-thumb.jpg" alt="" /><span><i>6</i>Fazenda completa</span></button>
+      <i class="world-marker"></i>
+    </div>
+  </div>
+  <aside data-notes>Aperte Enter para passar de um mundo ao próximo (Shift+Enter volta). O vídeo mostra o robô resolvendo a missão final de cada mundo. São seis mundos, um por conceito, em ordem crescente. Cada mundo só abre depois da prova final do anterior, então cada conceito tem sua própria medida de antes e depois.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Design · Jornada do aluno</p>
+  <h2 data-anim="words">Do cadastro ao próximo mundo</h2>
+  <div class="journey">
+    <div class="journey-step" data-anim="pop" style="--d:0.3"><div class="node" style="--c:#ffd9a8">1</div><h3>Cadastro</h3><p>Nome e escola</p></div>
+    <div class="journey-step" data-anim="pop" style="--d:0.45"><div class="node" style="--c:#8fd0f5">2</div><h3>Treino</h3><p>15 etapas guiadas</p></div>
+    <div class="journey-step" data-anim="pop" style="--d:0.6"><div class="node" style="--c:#c3adf7">3</div><h3>Prova inicial</h3><p>5 questões + feedback</p></div>
+    <div class="journey-step" data-anim="pop" style="--d:0.75"><div class="node" style="--c:#8fe07a">4</div><h3>Missões</h3><p>Montar, executar, errar e corrigir</p></div>
+    <div class="journey-step" data-anim="pop" style="--d:0.9"><div class="node" style="--c:#f2c14e">★</div><h3>Resultado</h3><p>Correção e estrelas</p></div>
+    <div class="journey-step" data-anim="pop" style="--d:1.05"><div class="node" style="--c:#c3adf7">5</div><h3>Prova final</h3><p>Compara com a inicial</p></div>
+    <div class="journey-step" data-anim="pop" style="--d:1.2"><div class="node" style="--c:#f1a39d">→</div><h3>Próximo mundo</h3><p>Até a Fazenda completa</p></div>
+  </div>
+  <div class="loop-note">
+    <div data-anim="rise" style="--d:1.5"><b>Ciclo da missão:</b> briefing → montar blocos → executar → erro explicado ou objetivo cumprido → próxima.</div>
+    <div data-anim="rise" style="--d:1.65"><b>Tudo registrado:</b> cada tentativa, erro, dica e resposta vai para o painel do professor.</div>
+  </div>
+  <aside data-notes>A jornada do aluno: cadastro, treinamento, prova inicial do mundo, as missões, o resultado de cada uma, a prova final e o próximo mundo. Dentro de cada missão há um ciclo curto de montar, executar e corrigir. Tudo fica registrado para o professor.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Design · Blocos</p>
+  <h2 data-anim="words">Blocos liberados aos poucos</h2>
+  <div class="stairs">
+    <div class="stair" style="--h:36%; --d:0.2; --c:#8fe07a"><small>Mundo 1</small><h3>Horta</h3><span class="is-new">mover · virar</span><span class="is-new">preparar · plantar · regar · colher</span></div>
+    <div class="stair" style="--h:48%; --d:0.35; --c:#f2c14e"><small>Mundo 2</small><h3>Milharal</h3><span>movimento e agricultura</span><span class="is-new">repita N vezes</span></div>
+    <div class="stair" style="--h:62%; --d:0.5; --c:#f1a39d"><small>Mundo 3</small><h3>Pomar</h3><span>+ repita</span><span class="is-new">se / senão</span><span class="is-new">3 sensores</span></div>
+    <div class="stair" style="--h:74%; --d:0.65; --c:#8fd0f5"><small>Mundo 4</small><h3>Estufa</h3><span>+ se / senão</span><span class="is-new">enquanto · não</span><span class="is-new">2 sensores</span></div>
+    <div class="stair" style="--h:88%; --d:0.8; --c:#d9a37c"><small>Mundo 5</small><h3>Celeiro</h3><span>+ enquanto</span><span class="is-new">variáveis</span><span class="is-new">números e comparação</span><span class="is-new">coletar</span></div>
+    <div class="stair" style="--h:100%; --d:0.95; --c:#c3adf7"><small>Mundo 6</small><h3>Fazenda</h3><span>todos os anteriores</span><span class="is-new">procedimentos</span></div>
+  </div>
+  <aside data-notes>Os blocos aparecem como uma escada: cada mundo libera os blocos do seu conceito e mantém os anteriores. Assim o aluno não se perde num menu cheio no começo e, no fim, usa tudo junto. São 27 tipos de bloco no total.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Etapa 3 · Código</p>
+  <h2 data-anim="words">Arquitetura em camadas</h2>
+  <div class="layers" style="margin-top:36px">
+    <div class="layer" data-anim="left" style="--d:0.4; --c:var(--sky)"><h3>Interface</h3><p>React + Blockly + React Three Fiber. Lê snapshots e envia comandos. <code>src/features</code></p></div>
+    <div class="layer" data-anim="left" style="--d:0.55; --c:var(--violet)"><h3>Controlador</h3><p>Máquina de estados da execução: executar, pausar, passo a passo, velocidade. <code>execution/controller</code></p></div>
+    <div class="layer" data-anim="left" style="--d:0.7; --c:var(--sun)"><h3>Interpretador</h3><p>Percorre a árvore do programa com generators, uma ação por vez. <code>blocks/interpreter</code></p></div>
+    <div class="layer" data-anim="left" style="--d:0.85; --c:var(--green)"><h3>Motor puro</h3><p>Mundo, robô, regras, sensores e objetivos, sem depender da tela. <code>src/game</code></p></div>
+    <div class="layer" data-anim="left" style="--d:1.0; --c:var(--soil)"><h3>Dados</h3><p>Missões e provas declarativas, cada uma testada automaticamente. <code>src/data</code></p></div>
+  </div>
+  <aside data-notes>A arquitetura separa a regra do jogo da tela. O motor é puro: recebe um estado e uma ação e devolve o novo estado, por isso dá para testar cada missão sem abrir o navegador. Acima dele, o interpretador executa o programa do aluno passo a passo e o controlador cuida de pausar, acelerar e parar. As missões são só dados.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Código · Interpretador (versão simplificada)</p>
+  <div class="split" style="grid-template-columns: 1.15fr 0.85fr; align-items: start; margin-top: 10px;">
+    <pre class="code" id="typed" data-anim="fade" data-typed><span class="k">function*</span> <span class="f">runBlock</span>(node, state) {
+  <span class="k">switch</span> (node.kind) {
+    <span class="k">case</span> <span class="s">'action'</span>:
+      <span class="k">yield</span> <span class="f">applyAction</span>(state, node.action)
+      <span class="k">break</span>
+    <span class="k">case</span> <span class="s">'repeat'</span>:
+      <span class="k">for</span> (<span class="k">let</span> i = 0; i &lt; node.times; i++)
+        <span class="k">yield*</span> <span class="f">runBody</span>(node.body, state)
+      <span class="k">break</span>
+    <span class="k">case</span> <span class="s">'if'</span>:
+      <span class="k">if</span> (<span class="f">sense</span>(state, node.test))
+        <span class="k">yield*</span> <span class="f">runBody</span>(node.then, state)
+  }
+}</pre>
+    <div>
+      <h2 data-anim="words" style="font-size:60px">Sem <span class="hl">eval</span>, passo a passo</h2>
+      <div class="pipeline">
+        <span class="pipe" data-anim="pop" style="--d:0.6">Blocos</span><span class="pipe-arrow" data-anim="fade" style="--d:0.7">→</span>
+        <span class="pipe" data-anim="pop" style="--d:0.8">JSON</span><span class="pipe-arrow" data-anim="fade" style="--d:0.9">→</span>
+        <span class="pipe" data-anim="pop" style="--d:1.0">Árvore</span><span class="pipe-arrow" data-anim="fade" style="--d:1.1">→</span>
+        <span class="pipe" data-anim="pop" style="--d:1.2">Ações</span>
+      </div>
+      <ul class="bullets">
+        <li data-anim="rise" style="--d:1.3"><span>Cada <b>yield</b> é um passo: dá para pausar, avançar um por vez e mudar a velocidade.</span></li>
+        <li data-anim="rise" style="--d:1.45"><span><b>Limite de passos</b> para laços infinitos.</span></li>
+        <li data-anim="rise" style="--d:1.6"><span>O mesmo programa gera o <b>pseudocódigo</b> em português.</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside data-notes>Uma decisão central: não transformar os blocos em JavaScript e rodar com eval, que seria inseguro e impediria o passo a passo. Os blocos viram uma árvore e um interpretador com generators percorre essa árvore; cada yield é uma ação do robô. Assim o jogo pausa, avança um passo e detecta laço infinito com um limite de passos.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Código · Regras da simulação</p>
+  <h2 data-anim="words">Recursos que acabam e estrelas de eficiência</h2>
+  <div class="rules">
+    <div class="cost">
+      <div data-anim="left" style="--d:0.4">Mover, preparar, plantar, regar, colher, coletar<b>−1 energia</b></div>
+      <div data-anim="left" style="--d:0.5">Virar<b>0 energia</b></div>
+      <div data-anim="left" style="--d:0.6">Plantar semente<b>−1 semente</b></div>
+      <div data-anim="left" style="--d:0.7">Regar canteiro<b>−1 água</b></div>
+      <div data-anim="left" style="--d:0.8">Coletar no reservatório<b>enche o tanque</b></div>
+      <div data-anim="left" style="--d:0.9">Laço sem fim<b>para em 2.000 passos</b></div>
+    </div>
+    <div>
+      <div class="formula" data-anim="rise" style="--d:0.6"><code>razão = máx(ações ÷ ações_ref,
+            blocos ÷ blocos_ref)</code></div>
+      <div class="star-rows">
+        <div data-anim="pop" style="--d:0.9"><i>★★★</i>até 10% acima da solução de referência</div>
+        <div data-anim="pop" style="--d:1.0"><i>★★<span>★</span></i>até 50% acima</div>
+        <div data-anim="pop" style="--d:1.1"><i>★<span>★★</span></i>qualquer solução correta</div>
+      </div>
+      <p class="lead" data-anim="rise" style="--d:1.3; font-size:22px; margin-top:24px">Solução correta <strong>nunca é reprovada</strong>: eficiência é avaliada à parte.</p>
+    </div>
+  </div>
+  <aside data-notes>As regras dão consequência às escolhas: cada ação gasta energia, plantar gasta semente e regar gasta água. Plantas em solo molhado crescem a cada ação e, ao mudar de estágio, o solo seca. A eficiência compara o programa do aluno com a solução de referência: até 10% acima ganha 3 estrelas, até 50% acima ganha 2 e o resto ganha 1.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Código · Retorno educativo</p>
+  <h2 data-anim="words">Quando o aluno erra</h2>
+  <div class="explainer" data-stepper>
+    <div class="shot clip-stage" data-anim="blurzoom" style="--d:0.3" role="img" aria-label="Vídeo do jogo real: erro explicado, dicas e pseudocódigo"><video class="is-on" data-clip muted playsinline preload="auto" poster="assets/clips/retorno/step-1-first.jpg"><source src="assets/clips/retorno/step-1.webm" type="video/webm" /><source src="assets/clips/retorno/step-1.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/retorno/step-2.webm" type="video/webm" /><source src="assets/clips/retorno/step-2.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/retorno/step-3.webm" type="video/webm" /><source src="assets/clips/retorno/step-3.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/retorno/step-4.webm" type="video/webm" /><source src="assets/clips/retorno/step-4.mp4" type="video/mp4" /></video></div>
+    <ol class="ex-steps">
+      <li data-anim="left" style="--d:0.4"><div class="ex-step" data-step><b>1</b><div><h3>Bloco marcado</h3><p>O bloco que causou o problema fica destacado no editor.</p></div></div></li>
+      <li data-anim="left" style="--d:0.5"><div class="ex-step" data-step><b>2</b><div><h3>Erro explicado</h3><p>O console narra cada passo e explica o erro em português, com pista. 14 tipos de erro.</p></div></div></li>
+      <li data-anim="left" style="--d:0.6"><div class="ex-step" data-step><b>3</b><div><h3>Dicas graduais</h3><p>4 dicas por missão, da ideia geral ao exemplo, liberadas uma a uma e registradas.</p></div></div></li>
+      <li data-anim="left" style="--d:0.7"><div class="ex-step" data-step><b>4</b><div><h3>Pseudocódigo</h3><p>Os mesmos blocos em texto: ponte para a programação textual.</p></div></div></li>
+    </ol>
+  </div>
+  <aside data-notes>O retorno educativo é o coração do jogo. Quando o robô bate, fica sem água ou colhe no lugar errado, a execução para e o console explica em português o que houve, com uma pista. As dicas vêm em quatro níveis. O pseudocódigo mostra o mesmo programa em texto, preparando o aluno para linguagens textuais. Vídeo: cada Enter toca um passo e o vídeo fica parado até o próximo Enter (4 vezes); Shift+Enter volta um passo.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Avaliação · Provas</p>
+  <h2 data-anim="words" style="font-size:64px">Programação, não o jogo</h2>
+  <div class="question">
+    <div class="qcard" data-anim="flip" style="--d:0.3">
+      <h3>Um laço dentro de outro laço. Quantas estrelas aparecem na tela?</h3>
+      <pre>repita 2 vezes:
+    repita 3 vezes:
+        escreva "★"</pre>
+      <div class="qopt"><i></i>5</div>
+      <div class="qopt"><i></i>3</div>
+      <div class="qopt is-right"><i></i>6</div>
+      <div class="qopt"><i></i>2</div>
+      <p class="qwhy">O laço de dentro roda 3 vezes para cada uma das 2 voltas do laço de fora: 2 × 3 = 6.</p>
+    </div>
+    <div>
+      <ul class="bullets" style="margin-top:0">
+        <li data-anim="rise" style="--d:0.5"><span><b>5 questões</b> na prova inicial e <b>5</b> na final, em cada mundo: 60 no total.</span></li>
+        <li data-anim="rise" style="--d:0.8"><span>Sem retorno durante a prova; <b>feedback completo no fim</b>.</span></li>
+      </ul>
+      <div class="skill-split">
+        <div data-anim="pop" style="--d:1; --n:2; --c:#8fe07a">2 montar</div>
+        <div data-anim="pop" style="--d:1.1; --n:2; --c:#f2c14e">2 prever</div>
+        <div data-anim="pop" style="--d:1.2; --n:1; --c:#f1a39d">1 consertar</div>
+      </div>
+      <div class="shot" data-anim="blurzoom" style="--d:1.3; aspect-ratio:16/9; margin-top:22px"><video data-explainer data-stops="0,4.6,8.1,11.6,15.6,20.1,24.6" muted playsinline preload="auto" poster="assets/feedback-explainer-poster.jpg" aria-label="Vídeo: feedback da prova"><source src="assets/feedback-explainer.webm" type="video/webm" /><source src="assets/feedback-explainer.mp4" type="video/mp4" /></video></div>
+    </div>
+  </div>
+  <aside data-notes>Exemplo real da prova do Milharal. As questões usam pseudocódigo genérico, então medem o conceito e não a familiaridade com o jogo. Cada mundo tem duas habilidades de montar, duas de prever e uma de consertar. Ao concluir, o aluno vê a resposta certa e a explicação, como na imagem. Vídeo: aperte Enter para avançar cada passo (6 vezes); Shift+Enter volta um passo.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Avaliação</p>
+  <div class="split" style="grid-template-columns: 0.95fr 1.05fr; align-items: start;">
+    <div>
+      <h2 data-anim="words" style="font-size:62px">Antes e depois, em cada mundo</h2>
+      <div class="chart">
+        <div class="bars"><i class="bar" style="--h:40%; --c:#5f6b74; --d:0.2"></i><i class="bar" style="--h:80%; --c:var(--green); --d:0.3"></i></div>
+        <div class="bars"><i class="bar" style="--h:30%; --c:#5f6b74; --d:0.3"></i><i class="bar" style="--h:70%; --c:var(--green); --d:0.4"></i></div>
+        <div class="bars"><i class="bar" style="--h:45%; --c:#5f6b74; --d:0.4"></i><i class="bar" style="--h:75%; --c:var(--green); --d:0.5"></i></div>
+        <div class="bars"><i class="bar" style="--h:25%; --c:#5f6b74; --d:0.5"></i><i class="bar" style="--h:65%; --c:var(--green); --d:0.6"></i></div>
+        <div class="bars"><i class="bar" style="--h:35%; --c:#5f6b74; --d:0.6"></i><i class="bar" style="--h:70%; --c:var(--green); --d:0.7"></i></div>
+        <div class="bars"><i class="bar" style="--h:30%; --c:#5f6b74; --d:0.7"></i><i class="bar" style="--h:60%; --c:var(--green); --d:0.8"></i></div>
+      </div>
+      <div class="chart-labels"><span>Horta</span><span>Milharal</span><span>Pomar</span><span>Estufa</span><span>Celeiro</span><span>Fazenda</span></div>
+      <div class="legend" data-anim="fade" style="--d:1"><span style="--c:#5f6b74">prova inicial</span><span style="--c:var(--green)">prova final</span><span>dados de exemplo</span></div>
+    </div>
+    <div class="shot" data-anim="blurzoom" style="--d:0.4; height: 560px;"><img src="assets/dashboard.png" alt="Painel do professor com dados de exemplo" /></div>
+  </div>
+  <aside data-notes>Cada mundo tem prova inicial e final com itens em pares, de mesma dificuldade e cenário diferente. O painel do professor mostra o canteiro da turma, as notas de antes e depois e exporta CSV para análise estatística (teste de Wilcoxon por conceito). O gráfico usa dados de exemplo: ainda não houve aplicação com uma turma.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Avaliação · Painel do professor</p>
+  <h2 data-anim="words">O que o professor enxerga</h2>
+  <div class="explainer" data-stepper>
+    <div class="shot clip-stage" data-anim="blurzoom" style="--d:0.3" role="img" aria-label="Vídeo do painel do professor real, com dados de exemplo"><video class="is-on" data-clip muted playsinline preload="auto" poster="assets/clips/painel/step-1-first.jpg"><source src="assets/clips/painel/step-1.webm" type="video/webm" /><source src="assets/clips/painel/step-1.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/painel/step-2.webm" type="video/webm" /><source src="assets/clips/painel/step-2.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/painel/step-3.webm" type="video/webm" /><source src="assets/clips/painel/step-3.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/painel/step-4.webm" type="video/webm" /><source src="assets/clips/painel/step-4.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/painel/step-5.webm" type="video/webm" /><source src="assets/clips/painel/step-5.mp4" type="video/mp4" /></video></div>
+    <ol class="ex-steps">
+      <li data-anim="left" style="--d:0.4"><div class="ex-step" data-step><b>1</b><div><h3>Resumo da turma</h3><p>Alunos, missões concluídas, tutorial e ganho médio nas provas.</p></div></div></li>
+      <li data-anim="left" style="--d:0.5"><div class="ex-step" data-step><b>2</b><div><h3>Canteiro da turma</h3><p>Cada aluno em cada mundo: não começou, tentando ou concluído com estrelas.</p></div></div></li>
+      <li data-anim="left" style="--d:0.6"><div class="ex-step" data-step><b>3</b><div><h3>Onde a turma travou</h3><p>Os erros que mais pararam os programas.</p></div></div></li>
+      <li data-anim="left" style="--d:0.7"><div class="ex-step" data-step><b>4</b><div><h3>Prova inicial × final</h3><p>A média de acertos antes e depois, por mundo.</p></div></div></li>
+      <li data-anim="left" style="--d:0.8"><div class="ex-step" data-step><b>5</b><div><h3>Detalhe do aluno</h3><p>Cada missão, estrelas, provas e tentativas. Exporta 3 arquivos CSV.</p></div></div></li>
+    </ol>
+  </div>
+  <aside data-notes>O painel é protegido por senha conferida no servidor. Mostra a turma como um canteiro, gráficos de onde os alunos travaram e o detalhe de cada aluno. Exporta alunos, tentativas e avaliações em CSV para análise estatística. Vídeo: cada Enter toca um bloco e o vídeo fica parado até o próximo Enter (5 vezes); Shift+Enter volta um passo.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Ferramentas</p>
+  <h2 data-anim="words">O que foi usado</h2>
+  <div class="tools">
+    <div class="tool" data-anim="pop" style="--d:0.3; --c:#8fd0f5"><i>Re</i><div><h3>React 19</h3><p>telas e componentes</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.36; --c:#5aa9e6"><i>TS</i><div><h3>TypeScript</h3><p>tipos estritos em todo o código</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.42; --c:#c3adf7"><i>Vi</i><div><h3>Vite</h3><p>servidor e build</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.48; --c:#f2c14e"><i>Bl</i><div><h3>Blockly</h3><p>editor de blocos do Google</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.54; --c:#8fe07a"><i>3D</i><div><h3>Three.js + R3F</h3><p>fazenda 3D low-poly</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.6; --c:#f1a39d"><i>Mo</i><div><h3>Motion</h3><p>animações da interface</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.66; --c:#d9a37c"><i>Zu</i><div><h3>Zustand + Zod</h3><p>estado e validação do save</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.72; --c:#b9dca8"><i>Vt</i><div><h3>Vitest</h3><p>testes de unidade</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.78; --c:#8fd0f5"><i>Pw</i><div><h3>Playwright</h3><p>testes de interface e vídeos do tutorial</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.84; --c:#f2c14e"><i>Ve</i><div><h3>Vercel + Upstash</h3><p>servidor e banco do painel</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.9; --c:#8fe07a"><i>gl</i><div><h3>glTF + sharp</h3><p>modelos 3D CC0 e imagens</p></div></div>
+    <div class="tool" data-anim="pop" style="--d:0.96; --c:#c3adf7"><i>Gi</i><div><h3>Git + GitHub</h3><p>versionamento</p></div></div>
+  </div>
+  <aside data-notes>React e TypeScript para a interface, Blockly para os blocos, Three.js com React Three Fiber para o 3D e Motion para as animações. Vitest e Playwright garantem os testes; o Playwright também grava os vídeos do treinamento. O painel do professor usa funções da Vercel com banco Upstash Redis. Modelos 3D são de licença livre (CC0).</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Por que não…</p>
+  <h2 data-anim="words">Comparando com as alternativas</h2>
+  <table class="compare">
+    <thead><tr data-anim="fade" style="--d:0.3"><th>Ferramenta</th><th>Blocos próprios</th><th>3D leve no navegador</th><th>Painel com dados</th><th>Abre por link</th></tr></thead>
+    <tbody>
+      <tr data-anim="rise" style="--d:0.45"><td>Scratch</td><td class="yes">sim</td><td class="no">não (2D)</td><td class="no">não</td><td class="yes">sim</td></tr>
+      <tr data-anim="rise" style="--d:0.6"><td>Unity</td><td class="no">precisa criar</td><td class="no">build pesado</td><td class="no">precisa criar</td><td class="no">WebGL lento</td></tr>
+      <tr data-anim="rise" style="--d:0.75"><td>Construct</td><td class="no">não</td><td class="no">não (2D)</td><td class="no">não</td><td class="yes">sim</td></tr>
+      <tr class="chosen" data-anim="rise" style="--d:0.9"><td>Web (escolhido)</td><td class="yes">Blockly</td><td class="yes">Three.js</td><td class="yes">sim</td><td class="yes">sim</td></tr>
+    </tbody>
+  </table>
+  <aside data-notes>Por que não Scratch, Unity ou Construct? O Scratch ensina blocos, mas não permite criar blocos agrícolas nem um 3D e não guarda dados para o professor. A Unity faria o 3D, mas gera um build pesado para os computadores da escola e exigiria criar o editor de blocos do zero. O Construct é 2D. Com tecnologias web o jogo abre por um link, até em laboratório sem instalação.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Problemas e soluções</p>
+  <h2 data-anim="words">O que deu errado e o que aprendi</h2>
+  <div class="probs">
+    <div class="prob-col" data-anim="rise" style="--d:0.4; --c:#8fd0f5">
+      <h3>Técnicos</h3>
+      <ul>
+        <li><strong>Rodar o código do aluno</strong><em>→</em> interpretador próprio passo a passo, sem eval, com limite contra laço infinito.</li>
+        <li><strong>3D em PC de escola</strong><em>→</em> instancing, modo de gráficos leves e grade 2D sem WebGL.</li>
+        <li><strong>Animais atravessando cercas</strong><em>→</em> grade de ocupação e rotas A* só por células livres.</li>
+        <li><strong>Cards "sambando" no mapa</strong><em>→</em> rótulo posicionado depois da câmera do mesmo quadro.</li>
+        <li><strong>Internet instável no laboratório</strong><em>→</em> progresso salvo no navegador e reenvio automático.</li>
+      </ul>
+    </div>
+    <div class="prob-col" data-anim="rise" style="--d:0.55; --c:#f1a39d">
+      <h3>Pedagógicos</h3>
+      <ul>
+        <li><strong>Provas mediam o jogo</strong><em>→</em> questões de programação genérica; um teste bloqueia palavras do jogo.</li>
+        <li><strong>Longo demais para a aula</strong><em>→</em> 5 missões e 5 questões por mundo, com feedback no fim da prova.</li>
+      </ul>
+    </div>
+    <div class="prob-col" data-anim="rise" style="--d:0.7; --c:#8fe07a">
+      <h3>Lições aprendidas</h3>
+      <ul>
+        <li><strong>Separar regra de tela</strong>Motor puro: cada missão testada sem abrir o navegador.</li>
+        <li><strong>Registrar decisões</strong>15 registros explicam cada escolha e ajudaram nas mudanças.</li>
+        <li><strong>Validar a prova cedo</strong>Revisar com professores antes teria poupado retrabalho.</li>
+        <li><strong>Menos conteúdo, mais foco</strong>Cinco missões cabem na aula sem perder nenhum papel.</li>
+      </ul>
+    </div>
+  </div>
+  <aside data-notes>Problemas técnicos: o código do aluno roda num interpretador próprio, passo a passo, em vez de eval; o 3D usa instancing e tem modo leve; animais e pessoas andam por uma grade de ocupação com rotas A*; o tremor dos cartões do mapa vinha de usar a câmera do quadro anterior; e a internet instável foi resolvida salvando no navegador e reenviando. Pedagógicos: as provas perguntavam sobre o jogo e viraram questões de programação genérica; o conteúdo era longo e caiu para 5 missões e 5 questões por mundo, com feedback. Lições: separar regra de tela, registrar decisões, validar a prova cedo e começar com menos conteúdo.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Roteiro da demonstração</p>
+  <div class="explainer explainer--demo" data-stepper>
+    <div class="shot clip-stage" data-anim="blurzoom" style="--d:0.3" role="img" aria-label="Vídeo do jogo real, do cadastro ao painel do professor"><video class="is-on" data-clip muted playsinline preload="auto" poster="assets/clips/roteiro/step-1-first.jpg"><source src="assets/clips/roteiro/step-1.webm" type="video/webm" /><source src="assets/clips/roteiro/step-1.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/roteiro/step-2.webm" type="video/webm" /><source src="assets/clips/roteiro/step-2.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/roteiro/step-3.webm" type="video/webm" /><source src="assets/clips/roteiro/step-3.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/roteiro/step-4.webm" type="video/webm" /><source src="assets/clips/roteiro/step-4.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/roteiro/step-5.webm" type="video/webm" /><source src="assets/clips/roteiro/step-5.mp4" type="video/mp4" /></video><video data-clip muted playsinline preload="auto"><source src="assets/clips/roteiro/step-6.webm" type="video/webm" /><source src="assets/clips/roteiro/step-6.mp4" type="video/mp4" /></video></div>
+    <div>
+      <ol class="ex-steps">
+      <li data-anim="left" style="--d:0.3"><div class="ex-step" data-step><b>1</b><div><h3>Iniciar nova fazenda e se cadastrar</h3></div></div></li>
+      <li data-anim="left" style="--d:0.4"><div class="ex-step" data-step><b>2</b><div><h3>Treinamento guiado com vídeo e holofote</h3></div></div></li>
+      <li data-anim="left" style="--d:0.5"><div class="ex-step" data-step><b>3</b><div><h3>Prova inicial da Horta e o feedback</h3></div></div></li>
+      <li data-anim="left" style="--d:0.6"><div class="ex-step" data-step><b>4</b><div><h3>Missão: montar blocos, executar e errar de propósito</h3></div></div></li>
+      <li data-anim="left" style="--d:0.7"><div class="ex-step" data-step><b>5</b><div><h3>Dica, pseudocódigo e resultado com estrelas</h3></div></div></li>
+      <li data-anim="left" style="--d:0.8"><div class="ex-step" data-step><b>6</b><div><h3>Painel do professor com a jogada</h3></div></div></li>
+      </ol>
+      <span class="url" data-anim="pop" style="--d:1">▶ agroblocks.vercel.app</span>
+    </div>
+  </div>
+  <aside data-notes>Seguir o roteiro na aba do jogo. Na missão, errar de propósito (por exemplo, usar um passo a mais) para mostrar a mensagem de erro explicada e a dica. Terminar no painel do professor (senha: dashboard) mostrando que a jogada chegou. Vídeo: gravação do jogo real; cada Enter toca um passo e o vídeo fica parado até o próximo Enter (6 vezes); Shift+Enter volta um passo. Se a internet falhar, o vídeo serve de reserva.</aside>
+</section>
+
+<section class="slide bg-grid">
+  <p class="kicker" data-anim="left">Conclusão</p>
+  <h2 data-anim="words">Resultados e próximos passos</h2>
+  <div class="cards cards-2" style="margin-top:44px">
+    <div class="card" data-anim="rise" style="--d:0.4; --c:var(--green)"><div class="num">✓</div><h3>Entregue</h3><p>6 mundos, 30 missões testadas, treinamento guiado, provas com feedback, painel do professor e hospedagem por link.</p></div>
+    <div class="card" data-anim="rise" style="--d:0.55; --c:var(--sun)"><div class="num">→</div><h3>Próximos passos</h3><p>Aplicar com uma turma real, comparar com um grupo sem o jogo e ajustar dificuldade pelos erros mais comuns do painel.</p></div>
+  </div>
+  <aside data-notes>Fechar com o que foi entregue e o que vem a seguir. O próximo passo natural é aplicar com uma turma, com autorização da escola e termos de consentimento, e usar os dados do painel para ajustar as missões mais difíceis.</aside>
+</section>
+
+<section class="slide">
+  <p class="kicker" data-anim="left">Referências</p>
+  <h2 data-anim="words">Bases do projeto</h2>
+  <ul class="refs">
+    <li data-anim="left" style="--d:0.3">BRASIL. CNE/CEB. <b>Parecer nº 2/2022</b> – Computação na Educação Básica (complemento à BNCC).</li>
+    <li data-anim="left" style="--d:0.4">WING, J. M. <b>Computational thinking</b>. Communications of the ACM, 2006.</li>
+    <li data-anim="left" style="--d:0.5">BRACKMANN, C. P. <b>Desenvolvimento do pensamento computacional</b>… Tese, UFRGS, 2017.</li>
+    <li data-anim="left" style="--d:0.6">PAPERT, S. <b>Mindstorms</b>: children, computers, and powerful ideas. 1980.</li>
+    <li data-anim="left" style="--d:0.7">RESNICK, M. et al. <b>Scratch</b>: programming for all. Communications of the ACM, 2009.</li>
+    <li data-anim="left" style="--d:0.8">GEE, J. P. <b>What video games have to teach us about learning and literacy</b>. 2003.</li>
+    <li data-anim="left" style="--d:0.9">GOOGLE. <b>Blockly</b>. developers.google.com/blockly · W3C. <b>WCAG 2.2</b>. · <b>LGPD</b>, Lei nº 13.709/2018.</li>
+  </ul>
+  <aside data-notes>As principais referências: a norma de Computação na Educação Básica, os trabalhos sobre pensamento computacional de Wing e Brackmann, o construcionismo de Papert, o Scratch e a aprendizagem com jogos de Gee.</aside>
+</section>
+
+<section class="slide end">
+  <div class="float"><img src="assets/logo.webp" alt="AgroBlocks" data-anim="drop" style="--d:0.1; width:620px; filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.5));" /></div>
+  <h2 data-anim="decode" style="margin-top:40px">Obrigado!</h2>
+  <p class="lead" data-anim="rise" style="--d:0.8">Perguntas? <span class="hl-green">Automatize. Programe. Cultive.</span></p>
+  <div class="inst" data-anim="rise" style="--d:1.1"><img src="assets/utfpr-white.svg" alt="UTFPR – Universidade Tecnológica Federal do Paraná" /><span><b>Câmpus Santa Helena</b>Paraná</span></div>
+  <aside data-notes>Agradecer e abrir para perguntas.</aside>
+</section>
+
+</main>
+</div>
+
+<div class="hud"><i id="progress"></i></div>
+<div class="counter" id="counter"></div>
+<div class="help">← → navegar · N notas · F tela cheia · Enter avançar animação / mundo · Shift+Enter voltar</div>
+<div class="notes" id="notes"></div>
+
+<script>
+const stage = document.getElementById('stage')
+const slides = [...document.querySelectorAll('.slide')]
+const progress = document.getElementById('progress')
+const counter = document.getElementById('counter')
+const notes = document.getElementById('notes')
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+if (reduced) document.querySelectorAll('video.cover-bg').forEach((video) => { video.removeAttribute('autoplay'); video.pause() })
+let current = 0
+let timers = []
+
+function fit() {
+  const scale = Math.min(window.innerWidth / 1600, window.innerHeight / 900) * 0.96
+  stage.style.transform = `scale(${scale})`
+}
+
+function splitWords(element) {
+  if (element.dataset.split) return
+  element.dataset.split = '1'
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
+  const texts = []
+  while (walker.nextNode()) texts.push(walker.currentNode)
+  let index = 0
+  for (const node of texts) {
+    const fragment = document.createDocumentFragment()
+    for (const part of node.textContent.split(/(\s+)/)) {
+      if (!part) continue
+      if (/^\s+$/.test(part)) { fragment.append(part); continue }
+      const outer = document.createElement('span')
+      outer.className = 'word'
+      const inner = document.createElement('span')
+      inner.textContent = part
+      inner.style.setProperty('--w', index++)
+      outer.append(inner)
+      fragment.append(outer)
+    }
+    node.replaceWith(fragment)
+  }
+  element.removeAttribute('data-anim')
+}
+
+function decode(element, delay) {
+  const target = element.dataset.text ?? (element.dataset.text = element.textContent)
+  const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+<>/'
+  if (reduced) { element.textContent = target; return }
+  element.textContent = target.replace(/\S/g, ' ')
+  const start = performance.now() + delay
+  const duration = 900
+  const tick = (now) => {
+    const t = Math.min(1, Math.max(0, (now - start) / duration))
+    const revealed = Math.floor(t * target.length)
+    element.textContent = [...target].map((char, index) => (index < revealed || char === ' ' ? char : glyphs[Math.floor(Math.random() * glyphs.length)])).join('')
+    if (t < 1) timers.push(requestAnimationFrame(tick))
+  }
+  timers.push(requestAnimationFrame(tick))
+}
+
+function countUp(element, delay) {
+  const target = Number(element.dataset.count)
+  const suffix = element.dataset.suffix ?? ''
+  if (reduced) { element.textContent = target + suffix; return }
+  element.textContent = '0' + suffix
+  const start = performance.now() + delay
+  const duration = 1400
+  const tick = (now) => {
+    const t = Math.min(1, Math.max(0, (now - start) / duration))
+    const eased = 1 - Math.pow(1 - t, 4)
+    element.textContent = Math.round(target * eased) + suffix
+    if (t < 1) timers.push(requestAnimationFrame(tick))
+  }
+  timers.push(requestAnimationFrame(tick))
+}
+
+function typeCode(element, delay) {
+  const html = element.dataset.html ?? (element.dataset.html = element.innerHTML)
+  if (reduced) { element.innerHTML = html; return }
+  const holder = document.createElement('div')
+  holder.innerHTML = html
+  const total = holder.textContent.length
+  element.innerHTML = ''
+  element.classList.add('caret')
+  const start = performance.now() + delay
+  const duration = 2600
+  const render = (count) => {
+    const clone = holder.cloneNode(true)
+    let left = count
+    const walker = document.createTreeWalker(clone, NodeFilter.SHOW_TEXT)
+    const nodes = []
+    while (walker.nextNode()) nodes.push(walker.currentNode)
+    for (const node of nodes) {
+      if (left >= node.textContent.length) { left -= node.textContent.length; continue }
+      node.textContent = node.textContent.slice(0, left)
+      left = 0
+    }
+    element.innerHTML = clone.innerHTML
+  }
+  const tick = (now) => {
+    const t = Math.min(1, Math.max(0, (now - start) / duration))
+    render(Math.floor(t * total))
+    if (t < 1) timers.push(requestAnimationFrame(tick))
+    else element.classList.remove('caret')
+  }
+  timers.push(requestAnimationFrame(tick))
+}
+
+function delayOf(element) {
+  return (Number(getComputedStyle(element).getPropertyValue('--d')) || 0) * 1000 + 350
+}
+
+function clipsOf(box) {
+  return [...box.querySelectorAll('video[data-clip]')]
+}
+
+function paintStepper(box, step) {
+  box.dataset.step = String(step)
+  box.querySelectorAll('[data-step]').forEach((card, index) => {
+    card.classList.toggle('is-on', index === step - 1)
+    card.classList.toggle('is-done', index < step - 1)
+  })
+}
+
+function showClip(box, index) {
+  clipsOf(box).forEach((clip, position) => {
+    clip.pause()
+    clip.classList.toggle('is-on', position === index)
+  })
+}
+
+function holdEnd(clip) {
+  const seek = () => { clip.currentTime = Math.max(0, clip.duration - 0.02) }
+  if (clip.readyState >= 1) seek()
+  else clip.addEventListener('loadedmetadata', seek, { once: true })
+}
+
+function resetStepper(box) {
+  const clips = clipsOf(box)
+  paintStepper(box, 0)
+  showClip(box, 0)
+  clips.forEach((clip) => { if (clip.readyState >= 1) clip.currentTime = 0 })
+}
+
+function moveStepper(box, direction) {
+  const clips = clipsOf(box)
+  const step = Math.min(clips.length, Math.max(0, Number(box.dataset.step ?? 0) + direction))
+  if (step === Number(box.dataset.step ?? 0)) return
+  paintStepper(box, step)
+  if (step === 0) {
+    showClip(box, 0)
+    clips[0].currentTime = 0
+    return
+  }
+  const clip = clips[step - 1]
+  showClip(box, step - 1)
+  if (direction < 0 || reduced) {
+    holdEnd(clip)
+    return
+  }
+  clip.currentTime = 0
+  clip.play().catch(() => {})
+}
+
+function show(next, direction = 1) {
+  if (next < 0 || next >= slides.length) return
+  timers.forEach((id) => cancelAnimationFrame(id))
+  timers = []
+  const previous = slides[current]
+  slides.forEach((slide) => slide.classList.remove('is-leaving', 'is-back'))
+  if (previous !== slides[next]) {
+    previous.classList.remove('is-active')
+    previous.classList.add('is-leaving')
+    if (direction < 0) previous.classList.add('is-back')
+  }
+  current = next
+  const slide = slides[current]
+  slide.classList.remove('is-active')
+  void slide.offsetWidth
+  if (direction < 0) slide.classList.add('is-back')
+  slide.classList.add('is-active')
+  slide.querySelectorAll('.flip').forEach((card) => card.classList.remove('is-flipped'))
+  slide.querySelectorAll('[data-anim="decode"]').forEach((element) => decode(element, delayOf(element)))
+  slide.querySelectorAll('[data-count]').forEach((element) => countUp(element, delayOf(element.closest('[data-anim]') ?? element)))
+  slide.querySelectorAll('[data-typed]').forEach((element) => typeCode(element, 500))
+  document.querySelectorAll('[data-stepper]').forEach(resetStepper)
+  document.querySelectorAll('[data-worlds]').forEach((box) => {
+    if (slide.contains(box)) selectWorld(box, 0, false)
+    else box.querySelectorAll('video').forEach((video) => video.pause())
+  })
+  document.querySelectorAll('video[data-explainer]').forEach((video) => {
+    video.pause()
+    video.dataset.step = '0'
+    video.currentTime = 0
+  })
+  progress.style.width = `${((current + 1) / slides.length) * 100}%`
+  counter.textContent = `${String(current + 1).padStart(2, '0')} / ${slides.length}`
+  const text = slide.querySelector('aside[data-notes]')?.textContent.trim() ?? ''
+  notes.innerHTML = `<b>Notas · slide ${current + 1}</b>${text}`
+  history.replaceState(null, '', `#${current + 1}`)
+}
+
+document.querySelectorAll('[data-anim="words"]').forEach(splitWords)
+document.querySelectorAll('.flip').forEach((card) => card.addEventListener('click', (event) => { event.stopPropagation(); card.classList.toggle('is-flipped') }))
+
+function selectWorld(box, index, animate = true) {
+  const videos = [...box.querySelectorAll('video[data-world]')]
+  const count = videos.length
+  index = Math.min(count - 1, Math.max(0, index))
+  const colors = box.dataset.colors.split(',')
+  const names = box.dataset.names.split('|')
+  const previous = Number(box.dataset.index ?? 0)
+  box.dataset.index = String(index)
+  videos.forEach((video, i) => {
+    video.classList.remove('is-out')
+    if (i === index) {
+      video.classList.add('is-on')
+      video.currentTime = 0
+      if (!reduced) video.play().catch(() => {})
+    } else {
+      if (i === previous && animate && previous !== index) video.classList.add('is-out')
+      video.classList.remove('is-on')
+      setTimeout(() => { if (!video.classList.contains('is-on')) video.pause() }, 900)
+    }
+  })
+  box.querySelectorAll('.world-card').forEach((card, i) => {
+    card.classList.remove('is-on')
+    if (i === index) { void card.offsetWidth; card.classList.add('is-on') }
+  })
+  box.querySelectorAll('[data-world-thumb]').forEach((thumb, i) => {
+    thumb.classList.toggle('is-on', i === index)
+    thumb.classList.toggle('is-done', i < index)
+  })
+  box.style.setProperty('--wc', colors[index])
+  box.querySelector('.world-marker').style.setProperty('--i', index)
+  const badge = box.querySelector('.world-badge')
+  badge.querySelector('b').textContent = String(index + 1)
+  badge.querySelector('span').textContent = names[index]
+  badge.animate([{ transform: 'translateY(16px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 500, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' })
+}
+
+document.querySelectorAll('[data-worlds]').forEach((box) => {
+  box.querySelectorAll('[data-world-thumb]').forEach((thumb) => thumb.addEventListener('click', (event) => { event.stopPropagation(); selectWorld(box, Number(thumb.dataset.worldThumb)) }))
+})
+
+function stepExplainer(video, direction) {
+  const stops = video.dataset.stops.split(',').map(Number)
+  const step = Math.min(stops.length - 1, Math.max(0, Number(video.dataset.step ?? 0) + direction))
+  if (step === Number(video.dataset.step ?? 0)) return
+  video.dataset.step = String(step)
+  const target = stops[step]
+  cancelAnimationFrame(Number(video.dataset.frame ?? 0))
+  if (direction < 0 || reduced) { video.pause(); video.currentTime = target; return }
+  video.play().catch(() => {})
+  const watch = () => {
+    if (video.currentTime >= target || video.ended) { video.pause(); video.currentTime = target; return }
+    video.dataset.frame = String(requestAnimationFrame(watch))
+  }
+  video.dataset.frame = String(requestAnimationFrame(watch))
+}
+
+document.addEventListener('keydown', (event) => {
+  if (['ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); show(current + 1, 1) }
+  else if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); show(current - 1, -1) }
+  else if (event.key === 'Home') show(0, -1)
+  else if (event.key === 'End') show(slides.length - 1, 1)
+  else if (event.key.toLowerCase() === 'n') notes.classList.toggle('is-open')
+  else if (event.key.toLowerCase() === 'f') { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen() }
+  else if (event.key === 'Enter' && slides[current].querySelector('[data-stepper]')) {
+    event.preventDefault()
+    moveStepper(slides[current].querySelector('[data-stepper]'), event.shiftKey ? -1 : 1)
+  }
+  else if (event.key === 'Enter' && slides[current].querySelector('[data-worlds]')) {
+    event.preventDefault()
+    const box = slides[current].querySelector('[data-worlds]')
+    selectWorld(box, Number(box.dataset.index ?? 0) + (event.shiftKey ? -1 : 1))
+  }
+  else if (event.key === 'Enter' && slides[current].querySelector('video[data-stops]')) {
+    event.preventDefault()
+    stepExplainer(slides[current].querySelector('video[data-stops]'), event.shiftKey ? -1 : 1)
+  }
+  else if (event.key === 'Enter') {
+    const cards = [...slides[current].querySelectorAll('.flip')]
+    const unflipped = cards.filter((card) => !card.classList.contains('is-flipped'))
+    if (unflipped.length) unflipped.forEach((card, index) => setTimeout(() => card.classList.add('is-flipped'), index * 120))
+    else cards.forEach((card) => card.classList.remove('is-flipped'))
+  }
+})
+stage.addEventListener('click', (event) => { if (event.clientX > window.innerWidth / 2) show(current + 1, 1); else show(current - 1, -1) })
+window.addEventListener('resize', fit)
+
+fit()
+const start = Math.min(slides.length, Math.max(1, Number(location.hash.slice(1)) || 1)) - 1
+current = start
+show(start, 1)
+</script>
+</body>
+</html>
